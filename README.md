@@ -1,3 +1,4 @@
+# Smart Student Hub
 
 ## Backend_setup
 
