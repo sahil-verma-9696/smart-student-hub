@@ -28,4 +28,6 @@ export const env = {
   MONGO_URI: getEnv("MONGO_URI"),
 
   CLIENTS_URL: getEnv("CLIENTS_URL"),
+
+  ABC : getEnv("CLIENTS_URL"),
 };

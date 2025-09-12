@@ -1,104 +1,130 @@
 "use client";
-
-import React, { useState } from "react";
-import { useNavigate } from "react-router";
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export function LoginForm({ onToggleMode }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+export function LoginForm() {
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
 
-    const success = await login(email, password);
-
-    if (!success) {
-      setError("Invalid email or password");
-    }
-    
-    if (success) {
-      navigate("/chat"); // ✅ Redirect to /chat
-    } else {
-      setError("Invalid email or password");
-    }
-    
-    setLoading(false);
+    // Simulate login process
+    setTimeout(() => {
+      setIsLoading(false);
+      // Redirect to dashboard based on role
+      window.location.href = "/dashboard";
+    }, 1000);
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Welcome Back</CardTitle>
-        <CardDescription>Sign in to your account to continue</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+    <Tabs defaultValue="student" className="w-full">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="student">Student</TabsTrigger>
+        <TabsTrigger value="faculty">Faculty</TabsTrigger>
+        <TabsTrigger value="admin">Admin</TabsTrigger>
+      </TabsList>
 
+      <TabsContent value="student" className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="student-id">Student ID</Label>
             <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="student-id"
+              placeholder="Enter your student ID"
               required
             />
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
               required
             />
           </div>
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign In as Student"}
           </Button>
-
-          <div className="text-center">
-            <Button variant="link" onClick={onToggleMode}>
-              Don't have an account? Sign up
-            </Button>
-          </div>
         </form>
-      </CardContent>
-    </Card>
-  );
-}
+      </TabsContent>
 
-async function login(email, password) {
-  const res = await fetch("http://localhost:8000/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-    credentials: "include",
-  });
-  return res.ok;
+      <TabsContent value="faculty" className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="faculty-id">Faculty ID</Label>
+            <Input
+              id="faculty-id"
+              placeholder="Enter your faculty ID"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="department">Department</Label>
+            <Select required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cse">Computer Science</SelectItem>
+                <SelectItem value="ece">Electronics & Communication</SelectItem>
+                <SelectItem value="me">Mechanical Engineering</SelectItem>
+                <SelectItem value="ce">Civil Engineering</SelectItem>
+                <SelectItem value="eee">Electrical Engineering</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="faculty-password">Password</Label>
+            <Input
+              id="faculty-password"
+              type="password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign In as Faculty"}
+          </Button>
+        </form>
+      </TabsContent>
+
+      <TabsContent value="admin" className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="admin-email">Admin Email</Label>
+            <Input
+              id="admin-email"
+              type="email"
+              placeholder="Enter admin email"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="admin-password">Password</Label>
+            <Input
+              id="admin-password"
+              type="password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign In as Admin"}
+          </Button>
+        </form>
+      </TabsContent>
+    </Tabs>
+  );
 }

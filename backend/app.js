@@ -6,7 +6,7 @@ import initialiseSocketServer from "./socket/index.js";
 async function main() {
   // Your code here
   const PORT = env.PORT;
-  const DATABASE_NAME = "test-chat";
+  const DATABASE_NAME = "smart-student-hub";
 
   await connectDB(DATABASE_NAME);
   const httpServer = getHttpServer(PORT);
