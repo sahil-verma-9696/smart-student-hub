@@ -28,7 +28,7 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ]
 
-export function DashboardSidebar() {
+ function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -42,7 +42,7 @@ export function DashboardSidebar() {
         {!collapsed && (
           <div className="flex items-center space-x-2">
             <GraduationCap className="h-8 w-8 text-sidebar-primary" />
-            <span className="text-lg font-semibold text-sidebar-foreground">SSH</span>
+            <span className="text-lg font-semibold text-sidebar-foreground">Smart Student Hub</span>
           </div>
         )}
         <Button
@@ -74,3 +74,4 @@ export function DashboardSidebar() {
     </div>
   )
 }
+export default Sidebar;

@@ -10,12 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export function DashboardHeader() {
+function Navbar({title}) {
   return (
     <header className="border-b border-border bg-card px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h2 className="text-xl font-semibold text-card-foreground">Smart Student Hub</h2>
+          <h2 className="text-xl font-semibold text-card-foreground">{title}</h2>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -48,3 +48,4 @@ export function DashboardHeader() {
     </header>
   )
 }
+export default Navbar;
