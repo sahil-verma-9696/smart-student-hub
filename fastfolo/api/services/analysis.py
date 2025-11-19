@@ -34,6 +34,12 @@ async def analyze_student_data(student: StudentData, cert_data: List[dict], ats_
     {cert_data}
     """
 
+    if student.job_role and student.job_role != 'Default':
+        prompt += f"""
+    The student has specified the following job role: {student.job_role}.
+    You MUST only include skills, projects, and achievements relevant to this job role.
+    """
+
     if student.job_description:
         prompt += f"""
     The portfolio should be tailored for the following job description:

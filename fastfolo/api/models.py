@@ -18,3 +18,4 @@ class StudentData(BaseModel):
     education: Optional[List[str]] = None
     work_experience: Optional[List[str]] = None
     job_description: Optional[str] = None
+    job_role: Optional[str] = None

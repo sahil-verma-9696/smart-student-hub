@@ -48,6 +48,17 @@
                 <input name="skills" class="form-control" value="{{ student_data.skills|join(',') if student_data else '' }}">
             </div>
             <div class="form-group">
+                <label>Job Role:</label>
+                <select name="job_role" class="form-control">
+                    <option value="Default" {% if student_data and student_data.job_role == 'Default' %}selected{% endif %}>Default</option>
+                    <option value="Software Engineer" {% if student_data and student_data.job_role == 'Software Engineer' %}selected{% endif %}>Software Engineer</option>
+                    <option value="Data Scientist" {% if student_data and student_data.job_role == 'Data Scientist' %}selected{% endif %}>Data Scientist</option>
+                    <option value="Product Manager" {% if student_data and student_data.job_role == 'Product Manager' %}selected{% endif %}>Product Manager</option>
+                    <option value="Web Developer" {% if student_data and student_data.job_role == 'Web Developer' %}selected{% endif %}>Web Developer</option>
+                    <option value="HR" {% if student_data and student_data.job_role == 'HR' %}selected{% endif %}>HR</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>Job Description:</label>
                 <textarea name="job_description" class="form-control" rows="5">{{ student_data.job_description if student_data else '' }}</textarea>
             </div>

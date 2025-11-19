@@ -14,7 +14,7 @@
    # The backend will be running at http://localhost:8000.
 
 ### 4. In the second terminal, start the frontend Flask application with the following command:
-   # python test_app/main.py
+   python test_app/main.py
 
    ### The frontend will be running at http://localhost:5000.
 
@@ -77,7 +77,8 @@ All endpoints expect a JSON object with the following structure:
     ] (optional),
     "education": ["string"] (optional),
     "work_experience": ["string"] (optional),
-    "job_description": "string" (optional)
+    "job_description": "string" (optional),
+    "job_role": "string" (optional) // Added field
 }
 ```
 ### Postman Usage:

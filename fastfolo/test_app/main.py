@@ -55,6 +55,7 @@ def generate():
         "achievements": request.form.get("achievements", "").split(','),
         "skills": request.form.get("skills", "").split(','),
         "job_description": request.form.get("job_description"),
+        "job_role": request.form.get("job_role"),
         "certificates": certificates
     }
 
