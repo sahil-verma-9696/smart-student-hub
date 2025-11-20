@@ -1,0 +1,59 @@
+\documentclass[letterpaper,10pt]{article}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{ragged2e}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+
+\pagestyle{empty}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1.0in}
+\addtolength{\topmargin}{-0.5in}
+\addtolength{\textheight}{1.0in}
+
+% Custom section formatting
+\titleformat{\section}{\vspace{-4pt}\raggedright\large\bfseries}{}{0em}{}[\color{black}\titlerule\vspace{-5pt}]
+
+% Custom commands
+\newcommand{\resumeItem}[1]{\item\small{#1 \vspace{-2pt}}}
+
+\newcommand{\resumeSubheading}[4]{\vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{#3} & \textit{#4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand{\labelitemii}{$\\\circ$}
+
+\begin{document}
+
+%----------HEADER----------
+\begin{center}
+    \textbf{\Huge \color{black}{{ name }}} \\ \vspace{1pt} 
+    \small {{ email }} $|$ {{ phone }} $|$ \href{ {{ linkedin }} }{LinkedIn} $|$ \href{ {{ github }} }{GitHub}
+\end{center}
+
+%----------SECTIONS----------
+{% for section in portfolio_structure %}
+\section{ {{ section.section_title }} }
+  \begin{itemize}[leftmargin=0.15in, rightmargin=0.15in]
+    {% for item in section.section_items %}
+      \resumeItem{ {{ item }} }
+    {% endfor %}
+  \end{itemize}
+{% endfor %}
+
+\end{document}

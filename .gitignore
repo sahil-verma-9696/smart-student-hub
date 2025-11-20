@@ -10,6 +10,9 @@
 /client/*.env.production
 /backend/*.env.production
 
+/fastfolo/.env
+/fastfolo/venv
+
 # compiled output
 /backend/dist
 /node_modules
