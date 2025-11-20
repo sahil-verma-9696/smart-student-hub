@@ -5,7 +5,7 @@ import Footer from './Footer'
 import Hero from './Hero'
 import Features from './Features'
 import ProblemSolution from './ProblemSolution'
-import Team from './team'
+import Team from './Team'
 
 const LandingPage = () => {
     return (
