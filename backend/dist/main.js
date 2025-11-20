@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = require("@nestjs/core");
+const app_module_1 = require("./app.module");
+const morgan_1 = __importDefault(require("morgan"));
+const response_interceptor_1 = require("./common/interceptors/response.interceptor");
+const exception_filter_1 = require("./common/filters/exception.filter");
+async function bootstrap() {
+    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.enableCors({
+        origin: '*',
+        methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+        allowedHeaders: 'Content-Type, Authorization',
+    });
+    app.use((0, morgan_1.default)('combined'));
+    app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor());
+    app.useGlobalFilters(new exception_filter_1.GlobalExceptionFilter());
+    await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+//# sourceMappingURL=main.js.map
