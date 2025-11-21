@@ -1,13 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 import morgan from 'morgan';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './common/filters/exception.filter';
 
 async function bootstrap() {
-  /**********************************
-   * Create app
-   *********************************/
   const app = await NestFactory.create(AppModule);
 
   /**********************************
@@ -19,24 +17,28 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization',
   });
 
-  /**********************************
-   * Morgan middleware
-   *********************************/
-  app.use(morgan('combined')); // or 'combined', 'tiny', etc.
+  // Global ValidationPipe (Required for DTO validation)
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
 
-  /**********************************
-   * Global interceptors
-   *********************************/
+  // Morgan Logger (useful for HTTP request tracking)
+  app.use(morgan('combined'));
+
+  // Global Interceptor (formats response)
   app.useGlobalInterceptors(new ResponseInterceptor());
 
-  /**********************************
-   * Global filters
-   *********************************/
+  // Global Error Handler
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  /**********************************
-   * Start server
-   *********************************/
+  // Start Server
   await app.listen(process.env.PORT ?? 3000);
+  console.log(`🚀 Server running at http://localhost:${process.env.PORT ?? 3000}`);
 }
+
 bootstrap();

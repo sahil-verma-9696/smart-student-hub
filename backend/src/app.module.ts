@@ -8,9 +8,11 @@ import { AuthService } from './auth/auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StudentModule } from './student/student.module';
 import { InstituteModule } from './institute/institute.module';
+import { FacultyModule } from './faculty/faculty.module';
+import { ActivityModule } from './activity/activity.module';
 
 @Module({
-  imports: [
+  imports: [ 
     /** ****** Authentication Module ****** */
     AuthModule,
 
@@ -26,6 +28,10 @@ import { InstituteModule } from './institute/institute.module';
     StudentModule,
 
     InstituteModule,
+
+    ActivityModule,
+    
+    FacultyModule
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService],

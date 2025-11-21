@@ -5,6 +5,5 @@ export declare class CreateInstituteDto {
     affiliation?: string;
     state: string;
     country: string;
-    code: string;
     type: InstituteType;
 }

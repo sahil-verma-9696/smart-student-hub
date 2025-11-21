@@ -17,6 +17,8 @@ const auth_service_1 = require("./auth/auth.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const student_module_1 = require("./student/student.module");
 const institute_module_1 = require("./institute/institute.module");
+const faculty_module_1 = require("./faculty/faculty.module");
+const activity_module_1 = require("./activity/activity.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,6 +33,8 @@ exports.AppModule = AppModule = __decorate([
             mongoose_1.MongooseModule.forRoot(process.env.MONGO_URI),
             student_module_1.StudentModule,
             institute_module_1.InstituteModule,
+            faculty_module_1.FacultyModule,
+            activity_module_1.ActivityModule,
         ],
         controllers: [app_controller_1.AppController, auth_controller_1.AuthController],
         providers: [app_service_1.AppService, auth_service_1.AuthService],

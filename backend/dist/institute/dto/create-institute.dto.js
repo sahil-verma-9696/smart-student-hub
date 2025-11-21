@@ -7,7 +7,6 @@ class CreateInstituteDto {
     affiliation;
     state;
     country;
-    code;
     type;
 }
 exports.CreateInstituteDto = CreateInstituteDto;
