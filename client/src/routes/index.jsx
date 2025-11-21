@@ -6,6 +6,8 @@ import { createBrowserRouter } from "react-router";
 import ScholarWindowPage from "@/pages/student-scholarwindow";
 import FacultyDashboardPage from "@/pages/faculty-dashboard";
 import AdminDashboardPage from "@/pages/admin-dashboard";
+import Quickactions from "@/components/dashboard/quickactions";
+import ApprovalPannel from "@/pages/approval-pannel";
 
 export default createBrowserRouter([
   {
@@ -14,34 +16,41 @@ export default createBrowserRouter([
   },
   {
     path: "/students",
-    
+
     Component: StudentLayout,
-    children:[
+    children: [
       {
-        index:true,
-        Component:ScholarWindowPage
-      }
-    ]
+        index: true,
+        Component: ScholarWindowPage,
+      },
+    ],
   },
   {
     path: "/faculties",
     Component: FacultyLayout,
-    children:[
+    children: [
       {
-        index:true,
-        Component:FacultyDashboardPage,
-
-      }
-    ]
+        index: true,
+        Component: FacultyDashboardPage,
+      },
+      {
+        path: "approval-pannel",
+        Component: ApprovalPannel,
+      },
+    ],
   },
   {
     path: "/admin",
     Component: AdminLayout,
-    children:[
+    children: [
       {
-        index:true,
-        Component:AdminDashboardPage
-      }
-    ]
+        index: true,
+        Component: AdminDashboardPage,
+      },
+      {
+        index: true,
+        Component: Quickactions,
+      },
+    ],
   },
 ]);

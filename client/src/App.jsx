@@ -3,6 +3,8 @@ import AuthProvider from './contexts/Auth'
 import { GlobalContextProvider } from './contexts/Global'
 import { RouterProvider } from 'react-router-dom'
 import routes from './routes'
+import { AuthModalProvider } from "./hooks/useAuthModal";
+import AuthModal from "./components/publicComponents/AuthModal";
 
 const App = () => {
   return (
