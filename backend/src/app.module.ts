@@ -12,7 +12,7 @@ import { FacultyModule } from './faculty/faculty.module';
 import { ActivityModule } from './activity/activity.module';
 
 @Module({
-  imports: [ 
+  imports: [
     /** ****** Authentication Module ****** */
     AuthModule,
 
@@ -30,8 +30,8 @@ import { ActivityModule } from './activity/activity.module';
     InstituteModule,
 
     ActivityModule,
-    
-    FacultyModule
+
+    FacultyModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService],
