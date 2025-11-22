@@ -1,7 +1,11 @@
-import { Button } from '@/components/ui/button'
-import { ArrowRight } from 'lucide-react'
+import { useState } from "react";
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import AuthModal from '@/components/publicComponents/AuthModal';
 
-export default function Hero() {
+export default function Hero({ onGetStarted }) {
+  const [authOpen, setAuthOpen] = useState(false);
+
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -10,7 +14,7 @@ export default function Hero() {
           {/* Left Content */}
           <div className="space-y-6">
             <div className="inline-block">
-              <span className="px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium text-[#3b82f6] ">
+              <span className="px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium text-[#3b82f6]">
                 Government Initiative • J&K Higher Education
               </span>
             </div>
@@ -24,7 +28,11 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button size="lg" className="bg-[#3b82f6] hover:bg-primary/90">
+              <Button
+                size="lg"
+                className="bg-[#3b82f6] hover:bg-primary/90"
+                onClick={onGetStarted}
+              >
                 Get Started
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -57,8 +65,11 @@ export default function Hero() {
             </div>
           </div>
 
+          {/* Modal */}
+          <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+
         </div>
       </div>
     </section>
-  )
+  );
 }
