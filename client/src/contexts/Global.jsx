@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 
-const GlobalContext = createContext({
+export const GlobalContext = createContext({
   user: null,
   setUser: () => {},
 });
