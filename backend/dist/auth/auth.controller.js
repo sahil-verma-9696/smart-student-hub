@@ -18,21 +18,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const adminRegistration_dto_1 = __importDefault(require("./dto/adminRegistration.dto"));
-const instituteRegistration_dto_1 = __importDefault(require("./dto/instituteRegistration.dto"));
+const institute_registration_dto_1 = __importDefault(require("./dto/institute-registration.dto"));
+const student_registration_dto_1 = __importDefault(require("./dto/student-registration.dto"));
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
         this.authService = authService;
     }
-    register(istituteRegistrationDto) {
-        return this.authService.instituteRegistration(istituteRegistrationDto);
+    async register(body) {
+        const res = await this.authService.instituteRegistration(body);
+        return { ...res.data, msg: res.msg };
     }
-    adminRegistration(adminRegisterDto) {
-        return this.authService.adminRegistration(adminRegisterDto);
-    }
-    studentRegistration(adminRegisterDto) {
-        return this.authService.adminRegistration(adminRegisterDto);
+    async studentRegistration(body) {
+        const res = await this.authService.studentRegistration(body);
+        return { ...res.data, msg: res.msg };
     }
 };
 exports.AuthController = AuthController;
@@ -40,22 +39,15 @@ __decorate([
     (0, common_1.Post)('institute/register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [instituteRegistration_dto_1.default]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [institute_registration_dto_1.default]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
-__decorate([
-    (0, common_1.Post)('admin/register'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [adminRegistration_dto_1.default]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "adminRegistration", null);
 __decorate([
     (0, common_1.Post)('student/register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [adminRegistration_dto_1.default]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [student_registration_dto_1.default]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "studentRegistration", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),

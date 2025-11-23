@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import AdminRegistrationDto from './dto/adminRegistration.dto';
-import InstitueRegistrationDto from './dto/instituteRegistration.dto';
+import InstitueRegistrationDto from './dto/institute-registration.dto';
+import StudentRegistrationDto from './dto/student-registration.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,8 +17,9 @@ export class AuthController {
    * desc : Register Institute
    *********************************/
   @Post('institute/register')
-  register(@Body() istituteRegistrationDto: InstitueRegistrationDto) {
-    return this.authService.instituteRegistration(istituteRegistrationDto);
+  async register(@Body() body: InstitueRegistrationDto) {
+    const res = await this.authService.instituteRegistration(body);
+    return { ...res.data, msg: res.msg };
   }
 
   /**********************************
@@ -27,10 +28,10 @@ export class AuthController {
    * Return : AdminRegistrationDto
    * desc : Register Admin
    *********************************/
-  @Post('admin/register')
-  adminRegistration(@Body() adminRegisterDto: AdminRegistrationDto) {
-    return this.authService.adminRegistration(adminRegisterDto);
-  }
+  // @Post('admin/register')
+  // adminRegistration(@Body() adminRegisterDto: AdminRegistrationDto) {
+  //   return this.authService.adminRegistration(adminRegisterDto);
+  // }
 
   /**********************************
    * POST : auth/student/register
@@ -39,7 +40,8 @@ export class AuthController {
    * desc : Register Student
    *********************************/
   @Post('student/register')
-  studentRegistration(@Body() adminRegisterDto: AdminRegistrationDto) {
-    return this.authService.adminRegistration(adminRegisterDto);
+  async studentRegistration(@Body() body: StudentRegistrationDto) {
+    const res = await this.authService.studentRegistration(body);
+    return { ...res.data, msg: res.msg };
   }
 }

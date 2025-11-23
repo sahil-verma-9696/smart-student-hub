@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { InstituteService } from './institute.service';
 import { InstituteController } from './institute.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Institute, InstituteSchema } from './schemas/institute.schema';
+import Institute, { InstituteSchema } from './schemas/institute.schema';
 
 @Module({
   imports: [
@@ -12,5 +12,6 @@ import { Institute, InstituteSchema } from './schemas/institute.schema';
   ],
   controllers: [InstituteController],
   providers: [InstituteService],
+  exports: [InstituteService],
 })
 export class InstituteModule {}

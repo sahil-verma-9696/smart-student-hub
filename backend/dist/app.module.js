@@ -11,33 +11,33 @@ const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const config_1 = require("@nestjs/config");
-const auth_controller_1 = require("./auth/auth.controller");
 const auth_module_1 = require("./auth/auth.module");
-const auth_service_1 = require("./auth/auth.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const student_module_1 = require("./student/student.module");
 const institute_module_1 = require("./institute/institute.module");
 const faculty_module_1 = require("./faculty/faculty.module");
 const activity_module_1 = require("./activity/activity.module");
+const admin_module_1 = require("./admin/admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            auth_module_1.AuthModule,
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
             }),
             mongoose_1.MongooseModule.forRoot(process.env.MONGO_URI),
+            auth_module_1.AuthModule,
             student_module_1.StudentModule,
             institute_module_1.InstituteModule,
-            faculty_module_1.FacultyModule,
             activity_module_1.ActivityModule,
+            faculty_module_1.FacultyModule,
+            admin_module_1.AdminModule,
         ],
-        controllers: [app_controller_1.AppController, auth_controller_1.AuthController],
-        providers: [app_service_1.AppService, auth_service_1.AuthService],
+        controllers: [app_controller_1.AppController],
+        providers: [app_service_1.AppService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

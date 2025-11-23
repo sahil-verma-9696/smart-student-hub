@@ -11,11 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstituteController = void 0;
 const common_1 = require("@nestjs/common");
 const institute_service_1 = require("./institute.service");
-const create_institute_dto_1 = require("./dto/create-institute.dto");
+const create_institute_dto_1 = __importDefault(require("./dto/create-institute.dto"));
 const update_institute_dto_1 = require("./dto/update-institute.dto");
 let InstituteController = class InstituteController {
     instituteService;
@@ -43,7 +46,7 @@ __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_institute_dto_1.CreateInstituteDto]),
+    __metadata("design:paramtypes", [create_institute_dto_1.default]),
     __metadata("design:returntype", void 0)
 ], InstituteController.prototype, "create", null);
 __decorate([
