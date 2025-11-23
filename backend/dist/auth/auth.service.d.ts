@@ -4,6 +4,7 @@ import { UserService } from 'src/user/user.service';
 import { AdminService } from 'src/admin/admin.service';
 import { JwtService } from '@nestjs/jwt';
 import { StudentService } from 'src/student/student.service';
+import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 export declare class AuthService {
     private readonly instituteService;
     private readonly adminService;
@@ -29,10 +30,11 @@ export declare class AuthService {
                 __v: number;
             };
             token: string;
+            expires_in: string | undefined;
         };
         msg: string;
     }>;
-    studentRegistration(data: any): Promise<{
+    studentRegistration(data: StudentRegistrationBodyDto, instituteId: string): Promise<{
         data: {
             user: import("mongoose").Document<unknown, {}, import("../user/schema/user.schema").User, {}, {}> & import("../user/schema/user.schema").User & {
                 _id: import("mongoose").Types.ObjectId;
@@ -44,12 +46,7 @@ export declare class AuthService {
             }> & {
                 __v: number;
             };
-        };
-        msg: string;
-    }>;
-    facultyRegistration(data: any): Promise<{
-        data: {
-            facultyData: any;
+            token: string;
         };
         msg: string;
     }>;

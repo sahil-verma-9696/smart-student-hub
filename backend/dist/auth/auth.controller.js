@@ -19,7 +19,6 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const institute_registration_dto_1 = __importDefault(require("./dto/institute-registration.dto"));
-const faculty_registration_dto_1 = __importDefault(require("./dto/faculty-registration.dto"));
 const student_registration_body_dto_1 = __importDefault(require("./dto/student-registration-body.dto"));
 let AuthController = class AuthController {
     authService;
@@ -31,12 +30,7 @@ let AuthController = class AuthController {
         return { ...res.data, msg: res.msg };
     }
     async studentRegistration(body, instituteId) {
-        const studentData = { ...body, role: 'student', instituteId };
-        const res = await this.authService.studentRegistration(studentData);
-        return { ...res.data, msg: res.msg };
-    }
-    async facultyRegistration(body) {
-        const res = await this.authService.facultyRegistration(body);
+        const res = await this.authService.studentRegistration(body, instituteId);
         return { ...res.data, msg: res.msg };
     }
 };
@@ -56,13 +50,6 @@ __decorate([
     __metadata("design:paramtypes", [student_registration_body_dto_1.default, String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "studentRegistration", null);
-__decorate([
-    (0, common_1.Post)('faculty/register'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [faculty_registration_dto_1.default]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "facultyRegistration", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

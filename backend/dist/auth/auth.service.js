@@ -54,28 +54,31 @@ let AuthService = class AuthService {
                 admin,
                 user,
                 token,
+                expires_in: process.env.JWT_EXPIRES_IN_MILI,
             },
             msg: 'Institute Successfully Registered',
         };
     }
-    async studentRegistration(data) {
+    async studentRegistration(data, instituteId) {
         const { password } = data || {};
         const user = await this.userService.create({
             passwordHash: password,
             userId: '22CSME017',
-            ...data,
+            instituteId,
+            contactInfo: data.contactInfo,
+            email: data.email,
+            name: data.name,
+            role: 'student',
+            gender: data.gender,
         });
         const studentData = await this.studentService.create(user._id.toString());
+        const token = this.jwtService.sign({
+            user_id: user._id,
+            role: 'student',
+        });
         return {
-            data: { user, studentData },
+            data: { user, studentData, token },
             msg: 'Student Successfully Registered',
-        };
-    }
-    async facultyRegistration(data) {
-        const facultyData = { ...data, role: 'faculty' };
-        return {
-            data: { facultyData },
-            msg: 'Faculty Successfully Registered',
         };
     }
 };

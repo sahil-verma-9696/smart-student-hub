@@ -1,6 +1,5 @@
 import { AuthService } from './auth.service';
 import InstitueRegistrationDto from './dto/institute-registration.dto';
-import FacultyRegistrationDto from './dto/faculty-registration.dto';
 import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 export declare class AuthController {
     authService: AuthService;
@@ -23,6 +22,7 @@ export declare class AuthController {
             __v: number;
         };
         token: string;
+        expires_in: string | undefined;
     }>;
     studentRegistration(body: StudentRegistrationBodyDto, instituteId: string): Promise<{
         msg: string;
@@ -36,9 +36,6 @@ export declare class AuthController {
         }> & {
             __v: number;
         };
-    }>;
-    facultyRegistration(body: FacultyRegistrationDto): Promise<{
-        msg: string;
-        facultyData: any;
+        token: string;
     }>;
 }
