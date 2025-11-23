@@ -16,18 +16,21 @@ const user_service_1 = require("../user/user.service");
 const admin_service_1 = require("../admin/admin.service");
 const jwt_1 = require("@nestjs/jwt");
 const student_service_1 = require("../student/student.service");
+const faculty_service_1 = require("../faculty/faculty.service");
 let AuthService = class AuthService {
     instituteService;
     adminService;
     userService;
     jwtService;
     studentService;
-    constructor(instituteService, adminService, userService, jwtService, studentService) {
+    facultyService;
+    constructor(instituteService, adminService, userService, jwtService, studentService, facultyService) {
         this.instituteService = instituteService;
         this.adminService = adminService;
         this.userService = userService;
         this.jwtService = jwtService;
         this.studentService = studentService;
+        this.facultyService = facultyService;
     }
     async instituteRegistration(data) {
         const { admin_name, admin_email, admin_password, admin_contactInfo, admin_gender, ...instituteData } = data || {};
@@ -49,13 +52,11 @@ let AuthService = class AuthService {
             role: 'admin',
         });
         return {
-            data: {
-                institute,
-                admin,
-                user,
-                token,
-                expires_in: process.env.JWT_EXPIRES_IN_MILI,
-            },
+            institute,
+            admin,
+            user,
+            token,
+            expires_in: process.env.JWT_EXPIRES_IN_MILI,
             msg: 'Institute Successfully Registered',
         };
     }
@@ -77,8 +78,38 @@ let AuthService = class AuthService {
             role: 'student',
         });
         return {
-            data: { user, studentData, token },
+            user,
+            studentData,
+            token,
+            expires_in: process.env.JWT_EXPIRES_IN_MILI,
             msg: 'Student Successfully Registered',
+        };
+    }
+    async facultyRegistration(data, instituteId) {
+        const { password } = data;
+        const user = await this.userService.create({
+            userId: 'FAC001',
+            email: data.email,
+            name: data.name,
+            gender: data.gender,
+            contactInfo: data.contactInfo,
+            passwordHash: password,
+            role: 'faculty',
+            instituteId,
+        });
+        const faculty = await this.facultyService.create(user._id.toString());
+        const token = this.jwtService.sign({
+            user_id: user._id,
+            role: 'faculty',
+            instituteId,
+        });
+        const { passwordHash, ...sanitizedUser } = user.toObject();
+        return {
+            user: sanitizedUser,
+            faculty,
+            token,
+            expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
+            msg: 'Faculty Successfully Registered',
         };
     }
     async userLogin(userLoginDto) {
@@ -115,6 +146,7 @@ exports.AuthService = AuthService = __decorate([
         admin_service_1.AdminService,
         user_service_1.UserService,
         jwt_1.JwtService,
-        student_service_1.StudentService])
+        student_service_1.StudentService,
+        faculty_service_1.FacultyService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

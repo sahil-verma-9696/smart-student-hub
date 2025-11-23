@@ -7,6 +7,7 @@ import { InstituteModule } from 'src/institute/institute.module';
 import { AdminModule } from 'src/admin/admin.module';
 import { ConfigService } from '@nestjs/config';
 import { StudentModule } from 'src/student/student.module';
+import { FacultyModule } from 'src/faculty/faculty.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { StudentModule } from 'src/student/student.module';
     InstituteModule,
     AdminModule,
     StudentModule,
+    FacultyModule,
   ],
 
   controllers: [AuthController],

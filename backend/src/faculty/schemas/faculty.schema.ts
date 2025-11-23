@@ -1,16 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { User, UserSchema } from 'src/user/schema/user.schema';
+import { Document, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Faculty extends Document {
-  @Prop({ type: UserSchema, required: true })
-  basicUserDetails: User;
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'User',
+    default: null,
+    required: true,
+  })
+  basicUserDetails: Types.ObjectId;
 
-  @Prop({ required: true })
   designation: string;
 
-  @Prop({ required: true })
   department: string;
 }
 

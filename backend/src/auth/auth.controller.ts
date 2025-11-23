@@ -1,8 +1,9 @@
 import { Body, Controller, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import InstitueRegistrationDto from './dto/institute-registration.dto';
+import InstitueRegistrationDto from './dto/institute-registration-body.dto';
 import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 import { UserLoginBodyDto } from './dto/user-login-body.dto.';
+import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -55,9 +56,11 @@ export class AuthController {
    * Return : InstitueRegistrationDto
    * desc : Register Student
    *********************************/
-  // @Post('faculty/register')
-  // async facultyRegistration(@Body() body: FacultyRegistrationDto) {
-  //   const res = await this.authService.facultyRegistration(body);
-  //   return { ...res.data, msg: res.msg };
-  // }
+  @Post('faculty/register')
+  async facultyRegistration(
+    @Body() body: FacultyRegistrationDto,
+    @Query('instituteId') institueId: string,
+  ) {
+    return await this.authService.facultyRegistration(body, institueId);
+  }
 }

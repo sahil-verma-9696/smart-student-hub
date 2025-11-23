@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Faculty } from './schemas/faculty.schema';
 import { isValidObjectId } from 'mongoose';
-import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
 
 @Injectable()
@@ -12,16 +15,12 @@ export class FacultyService {
     @InjectModel(Faculty.name) private facultyModel: Model<Faculty>,
   ) {}
 
-  async create(dto: CreateFacultyDto) {
-  try {
-    const result = await this.facultyModel.create(dto);
-    return result;
-  } catch (error) {
-    console.error('🔥 [Faculty CREATE ERROR] ->', error.message);   // ADD THIS
-    throw error; // DO NOT REMOVE — must rethrow
+  async create(userId: string) {
+    const faculty = await this.facultyModel.create({
+      basicUserDetails: userId,
+    });
+    return faculty;
   }
-}
-
 
   async findAll() {
     return await this.facultyModel.find();
@@ -42,7 +41,9 @@ export class FacultyService {
       throw new BadRequestException('Invalid faculty id');
     }
 
-    const faculty = await this.facultyModel.findByIdAndUpdate(id, dto, { new: true });
+    const faculty = await this.facultyModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
     if (!faculty) throw new NotFoundException('Faculty not found');
     return faculty;
   }

@@ -9,17 +9,6 @@ class UpdateFacultyDto extends PartialType(CreateFacultyDto) {}
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}
 
-  @Post()
-  async create(@Body() dto: CreateFacultyDto) {
-    // quick debug log to verify request reaches controller
-    // (remove or replace with proper logger later)
-    // eslint-disable-next-line no-console
-    console.log('[faculty:create] incoming body ->', JSON.stringify(dto));
-    const result = await this.facultyService.create(dto);
-    // eslint-disable-next-line no-console
-    console.log('[faculty:create] result ->', result && (result._id || result));
-    return result;
-  }
 
   @Get()
   async findAll() {
