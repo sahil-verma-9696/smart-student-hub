@@ -27,7 +27,6 @@ let StudentService = class StudentService {
             basicUserDetails: userId,
         });
         await student.save();
-        console.log(userId);
         return student;
     }
     findAll() {

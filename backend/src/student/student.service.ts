@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBasicStudentDto } from './dto/create-basic-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Student } from './schema/student.schema';
@@ -16,8 +15,6 @@ export class StudentService {
       basicUserDetails: userId,
     });
     await student.save();
-    console.log(userId);
-    // createStudentDto.
     return student;
   }
 
