@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateInstituteDto } from './dto/create-institute.dto';
 import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Institute } from './schemas/institute.schema';
+import Institute from './schemas/institute.schema';
 import { Model } from 'mongoose';
+import CreateInstituteDto from './dto/create-institute.dto';
 
 @Injectable()
 export class InstituteService {
@@ -12,6 +12,17 @@ export class InstituteService {
   ) {}
 
   async create(createInstituteDto: CreateInstituteDto) {
+    /**
+     * Check Already exists
+     */
+    const instituteExists = await this.instituteModel.findOne({
+      official_email: createInstituteDto.official_email,
+    });
+
+    if (instituteExists) {
+      throw new Error('Institute already exists');
+    }
+
     const newInstitute = new this.instituteModel(createInstituteDto);
     await newInstitute.save();
     return newInstitute;

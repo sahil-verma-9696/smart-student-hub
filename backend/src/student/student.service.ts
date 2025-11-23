@@ -1,16 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Student } from './schema/student.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class StudentService {
-  create(createStudentDto: CreateStudentDto) {
-    return 'This action adds a new student';
+  constructor(
+    @InjectModel(Student.name) private studentModel: Model<Student>,
+  ) {}
+
+  async create(userId: string) {
+    const student = await this.studentModel.create({
+      basicUserDetails: userId,
+    });
+    await student.save();
+    return student;
   }
 
-  createBulk(createStudentDto: CreateStudentDto[]) {
-    return 'This action adds a new student in bulk';
-  }
+  // createBulk(createStudentDto: CreateStudentDto[]) {
+  //   return 'This action adds a new student in bulk';
+  // }
 
   findAll() {
     return `This action returns all student`;

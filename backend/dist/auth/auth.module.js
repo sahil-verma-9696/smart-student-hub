@@ -10,11 +10,33 @@ exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
+const jwt_1 = require("@nestjs/jwt");
+const user_module_1 = require("../user/user.module");
+const institute_module_1 = require("../institute/institute.module");
+const admin_module_1 = require("../admin/admin.module");
+const config_1 = require("@nestjs/config");
+const student_module_1 = require("../student/student.module");
+const faculty_module_1 = require("../faculty/faculty.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            jwt_1.JwtModule.registerAsync({
+                global: true,
+                inject: [config_1.ConfigService],
+                useFactory: (config) => ({
+                    secret: config.get('JWT_SECRET'),
+                    signOptions: { expiresIn: '1d' },
+                }),
+            }),
+            user_module_1.UserModule,
+            institute_module_1.InstituteModule,
+            admin_module_1.AdminModule,
+            student_module_1.StudentModule,
+            faculty_module_1.FacultyModule,
+        ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService],
     })

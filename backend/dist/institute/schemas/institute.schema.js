@@ -9,44 +9,73 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InstituteSchema = exports.Institute = void 0;
+exports.InstituteSchema = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 const auth_enum_1 = require("../../auth/types/auth.enum");
-let Institute = class Institute {
-    name;
-    isAffiliated;
-    affiliation;
+let Institute = class Institute extends mongoose_2.Document {
+    institute_name;
+    institute_type;
+    official_email;
+    official_phone;
+    address_line1;
+    city;
     state;
-    country;
-    type;
+    pincode;
+    is_affiliated;
+    affiliation_university;
+    affiliation_id;
 };
-exports.Institute = Institute;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], Institute.prototype, "name", void 0);
+], Institute.prototype, "institute_name", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", Boolean)
-], Institute.prototype, "isAffiliated", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
+    (0, mongoose_1.Prop)({
+        required: true,
+        enum: Object.values(auth_enum_1.InstituteType),
+    }),
     __metadata("design:type", String)
-], Institute.prototype, "affiliation", void 0);
+], Institute.prototype, "institute_type", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, mongoose_1.Prop)({ required: true, lowercase: true, unique: true }),
+    __metadata("design:type", String)
+], Institute.prototype, "official_email", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Institute.prototype, "official_phone", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Institute.prototype, "address_line1", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Institute.prototype, "city", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Institute.prototype, "state", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Institute.prototype, "pincode", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", Boolean)
+], Institute.prototype, "is_affiliated", void 0);
+__decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
-], Institute.prototype, "country", void 0);
+], Institute.prototype, "affiliation_university", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, default: auth_enum_1.InstituteType.Private }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
-], Institute.prototype, "type", void 0);
-exports.Institute = Institute = __decorate([
-    (0, mongoose_1.Schema)()
+], Institute.prototype, "affiliation_id", void 0);
+Institute = __decorate([
+    (0, mongoose_1.Schema)({ timestamps: true })
 ], Institute);
+exports.default = Institute;
 exports.InstituteSchema = mongoose_1.SchemaFactory.createForClass(Institute);
 //# sourceMappingURL=institute.schema.js.map

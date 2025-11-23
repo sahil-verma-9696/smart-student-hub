@@ -1,10 +1,14 @@
-import { InstituteType } from 'src/auth/types/auth.enum';
-export declare class CreateInstituteDto {
-    name: string;
-    isAffiliated: boolean;
-    affiliation?: string;
+import { InstituteType } from 'src/institute/types/enum';
+export default class CreateInstituteDto {
+    institute_name: string;
+    institute_type: InstituteType;
+    official_email: string;
+    official_phone: string;
+    address_line1: string;
+    city: string;
     state: string;
-    country: string;
-    code: string;
-    type: InstituteType;
+    pincode: string;
+    is_affiliated: boolean;
+    affiliation_university?: string;
+    affiliation_id?: string;
 }

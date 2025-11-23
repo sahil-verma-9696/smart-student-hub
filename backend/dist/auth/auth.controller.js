@@ -18,21 +18,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const adminRegistration_dto_1 = __importDefault(require("./dto/adminRegistration.dto"));
-const instituteRegistration_dto_1 = __importDefault(require("./dto/instituteRegistration.dto"));
+const institute_registration_body_dto_1 = __importDefault(require("./dto/institute-registration-body.dto"));
+const student_registration_body_dto_1 = __importDefault(require("./dto/student-registration-body.dto"));
+const user_login_body_dto_1 = require("./dto/user-login-body.dto.");
+const faculty_registration_body_dto_1 = __importDefault(require("./dto/faculty-registration-body.dto"));
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
         this.authService = authService;
     }
-    register(istituteRegistrationDto) {
-        return this.authService.instituteRegistration(istituteRegistrationDto);
+    async register(body) {
+        return await this.authService.instituteRegistration(body);
     }
-    adminRegistration(adminRegisterDto) {
-        return this.authService.adminRegistration(adminRegisterDto);
+    userLogin(userLoginDto) {
+        return this.authService.userLogin(userLoginDto);
     }
-    studentRegistration(adminRegisterDto) {
-        return this.authService.adminRegistration(adminRegisterDto);
+    async studentRegistration(body, instituteId) {
+        return await this.authService.studentRegistration(body, instituteId);
+    }
+    async facultyRegistration(body, institueId) {
+        return await this.authService.facultyRegistration(body, institueId);
     }
 };
 exports.AuthController = AuthController;
@@ -40,23 +45,32 @@ __decorate([
     (0, common_1.Post)('institute/register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [instituteRegistration_dto_1.default]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [institute_registration_body_dto_1.default]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([
-    (0, common_1.Post)('admin/register'),
+    (0, common_1.Post)('user/login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [adminRegistration_dto_1.default]),
+    __metadata("design:paramtypes", [user_login_body_dto_1.UserLoginBodyDto]),
     __metadata("design:returntype", void 0)
-], AuthController.prototype, "adminRegistration", null);
+], AuthController.prototype, "userLogin", null);
 __decorate([
     (0, common_1.Post)('student/register'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)('instituteId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [adminRegistration_dto_1.default]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [student_registration_body_dto_1.default, String]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "studentRegistration", null);
+__decorate([
+    (0, common_1.Post)('faculty/register'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)('instituteId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [faculty_registration_body_dto_1.default, String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "facultyRegistration", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

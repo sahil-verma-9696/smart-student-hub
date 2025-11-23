@@ -11,11 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstituteService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
-const institute_schema_1 = require("./schemas/institute.schema");
+const institute_schema_1 = __importDefault(require("./schemas/institute.schema"));
 const mongoose_2 = require("mongoose");
 let InstituteService = class InstituteService {
     instituteModel;
@@ -23,6 +26,12 @@ let InstituteService = class InstituteService {
         this.instituteModel = instituteModel;
     }
     async create(createInstituteDto) {
+        const instituteExists = await this.instituteModel.findOne({
+            official_email: createInstituteDto.official_email,
+        });
+        if (instituteExists) {
+            throw new Error('Institute already exists');
+        }
         const newInstitute = new this.instituteModel(createInstituteDto);
         await newInstitute.save();
         return newInstitute;
@@ -43,7 +52,7 @@ let InstituteService = class InstituteService {
 exports.InstituteService = InstituteService;
 exports.InstituteService = InstituteService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(institute_schema_1.Institute.name)),
+    __param(0, (0, mongoose_1.InjectModel)(institute_schema_1.default.name)),
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], InstituteService);
 //# sourceMappingURL=institute.service.js.map

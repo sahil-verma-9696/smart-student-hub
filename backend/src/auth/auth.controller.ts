@@ -1,7 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import AdminRegistrationDto from './dto/adminRegistration.dto';
-import InstitueRegistrationDto from './dto/instituteRegistration.dto';
+import InstitueRegistrationDto from './dto/institute-registration-body.dto';
+import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
+import { UserLoginBodyDto } from './dto/user-login-body.dto.';
+import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,19 +19,19 @@ export class AuthController {
    * desc : Register Institute
    *********************************/
   @Post('institute/register')
-  register(@Body() istituteRegistrationDto: InstitueRegistrationDto) {
-    return this.authService.instituteRegistration(istituteRegistrationDto);
+  async register(@Body() body: InstitueRegistrationDto) {
+    return await this.authService.instituteRegistration(body);
   }
 
   /**********************************
-   * POST : auth/admin/register
+   * POST : auth/admin/login
    * Body : AdminRegistrationDto
    * Return : AdminRegistrationDto
    * desc : Register Admin
    *********************************/
-  @Post('admin/register')
-  adminRegistration(@Body() adminRegisterDto: AdminRegistrationDto) {
-    return this.authService.adminRegistration(adminRegisterDto);
+  @Post('user/login')
+  userLogin(@Body() userLoginDto: UserLoginBodyDto) {
+    return this.authService.userLogin(userLoginDto);
   }
 
   /**********************************
@@ -39,7 +41,24 @@ export class AuthController {
    * desc : Register Student
    *********************************/
   @Post('student/register')
-  studentRegistration(@Body() adminRegisterDto: AdminRegistrationDto) {
-    return this.authService.adminRegistration(adminRegisterDto);
+  async studentRegistration(
+    @Body() body: StudentRegistrationBodyDto,
+    @Query('instituteId') instituteId: string,
+  ) {
+    return await this.authService.studentRegistration(body, instituteId);
+  }
+
+  /**********************************
+   * POST : auth/faculty/register
+   * Body : InstitueRegistrationDto
+   * Return : InstitueRegistrationDto
+   * desc : Register Student
+   *********************************/
+  @Post('faculty/register')
+  async facultyRegistration(
+    @Body() body: FacultyRegistrationDto,
+    @Query('instituteId') institueId: string,
+  ) {
+    return await this.authService.facultyRegistration(body, institueId);
   }
 }
