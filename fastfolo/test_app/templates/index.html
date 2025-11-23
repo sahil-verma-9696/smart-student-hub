@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Portfolio Tester</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Student Portfolio Generator</h2>
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Name:</label>
+                <input name="name" class="form-control" value="{{ student_data.name if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input name="email" class="form-control" value="{{ student_data.email if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Phone:</label>
+                <input name="phone" class="form-control" value="{{ student_data.phone if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>LinkedIn:</label>
+                <input name="linkedin" class="form-control" value="{{ student_data.linkedin if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>GitHub:</label>
+                <input name="github" class="form-control" value="{{ student_data.github if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Education (comma separated):</label>
+                <input name="education" class="form-control" value="{{ student_data.education|join(',') if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Projects (comma separated):</label>
+                <input name="projects" class="form-control" value="{{ student_data.projects|join(',') if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Achievements (comma separated):</label>
+                <input name="achievements" class="form-control" value="{{ student_data.achievements|join(',') if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Skills (comma separated):</label>
+                <input name="skills" class="form-control" value="{{ student_data.skills|join(',') if student_data else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Job Description:</label>
+                <textarea name="job_description" class="form-control" rows="5">{{ student_data.job_description if student_data else '' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Certificates:</label>
+                <div class="custom-file">
+                    <input type="file" id="certificates" name="certificates" class="custom-file-input" multiple>
+                    <label class="custom-file-label" for="certificates">Choose files...</label>
+                </div>
+                
+                <div id="file-error" class="text-danger mt-2"></div>
+
+                {% if uploaded_files %}
+                <h5 class="mt-3">Uploaded Files (click to remove):</h5>
+                <ul id="uploaded-files-list" class="list-group mt-2">
+                    {% for file in uploaded_files %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center" onclick="this.remove()">
+                            {{ file.split('/')[-1] }}
+                            <input type="hidden" name="uploaded_file_paths" value="{{ file }}">
+                            <span class="badge badge-danger badge-pill">Remove</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <h5 class="mt-3">Newly Selected Files:</h5>
+                <ul id="selected-files-list" class="list-group mt-2"></ul>
+            </div>
+            <button type="submit" formaction="/generate-portfolio" class="btn btn-primary">Generate Modern Portfolio</button>
+            <button type="submit" formaction="/generate-ats-portfolio" class="btn btn-secondary">Generate ATS-Friendly Portfolio</button>
+            <button type="submit" formaction="/analyze-portfolio" class="btn btn-info">Get Analysis PDF</button>
+        </form>
+
+        {% if error %}
+            <div class="alert alert-danger mt-5">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% endif %}
+
+        {% if pdf_file %}
+            <h3 class="mt-5">Generated PDF:</h3>
+            <embed src="{{ pdf_file }}" width="100%" height="800px" type="application/pdf">
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('certificates').addEventListener('change', function(e) {
+            var selectedFilesList = document.getElementById('selected-files-list');
+            var fileError = document.getElementById('file-error');
+            var submitButtons = document.querySelectorAll('button[type="submit"]');
+            var totalSize = 0;
+
+            selectedFilesList.innerHTML = ''; // Clear previous selection
+            for (var i = 0; i < e.target.files.length; i++) {
+                var file = e.target.files[i];
+                var listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.textContent = file.name;
+                selectedFilesList.appendChild(listItem);
+                totalSize += file.size;
+            }
+
+            // Update the custom file input label
+            var fileInput = e.target;
+            var fileName = fileInput.files.length > 0 ? fileInput.files.length + ' files selected' : 'Choose files...';
+            var nextSibling = fileInput.nextElementSibling;
+            nextSibling.innerText = fileName;
+
+            var maxSize = 10 * 1024 * 1024; // 10MB
+            if (totalSize > maxSize) {
+                fileError.textContent = 'Total file size of new files should not exceed 10MB.';
+                submitButtons.forEach(function(button) {
+                    button.disabled = true;
+                });
+            } else {
+                fileError.textContent = '';
+                submitButtons.forEach(function(button) {
+                    button.disabled = false;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

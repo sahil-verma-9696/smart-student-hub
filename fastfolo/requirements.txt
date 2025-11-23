@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+flask
+jinja2
+requests
+python-docx
+pytesseract
+pillow
+weasyprint
+PyMuPDF
+google-generativeai
+python-dotenv
+pydantic
+werkzeug

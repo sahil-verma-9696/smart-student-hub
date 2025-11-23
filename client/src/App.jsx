@@ -1,31 +1,21 @@
-import { LoginForm } from "@/components/auth/login-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import React from 'react'
+import AuthProvider from './contexts/Auth'
+import { GlobalContextProvider } from './contexts/Global'
+import { RouterProvider } from 'react-router-dom'
+import routes from './routes'
+import { AuthModalProvider } from "./hooks/useAuthModal";
+import AuthModal from "./components/publicComponents/AuthModal";
 
-export default function App() {
+const App = () => {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">Smart Student Hub</h1>
-          <p className="text-muted-foreground">
-            Your centralized platform for academic achievements and portfolio management
-          </p>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome Back</CardTitle>
-            <CardDescription>Sign in to access your student dashboard</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LoginForm />
-          </CardContent>
-        </Card>
-
-        <div className="text-center text-sm text-muted-foreground">
-          <p>For institutions seeking digital transformation in student record management</p>
-        </div>
-      </div>
-    </div>
+    <>
+      <AuthProvider>
+        <GlobalContextProvider>
+          <RouterProvider router={routes} />
+        </GlobalContextProvider>
+      </AuthProvider>
+    </>
   )
 }
+
+export default App;
