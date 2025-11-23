@@ -6,7 +6,26 @@ import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 export declare class AuthController {
     authService: AuthService;
     constructor(authService: AuthService);
-    register(body: InstitueRegistrationDto): Promise<any>;
+    register(body: InstitueRegistrationDto): Promise<{
+        institute: import("mongoose").Document<unknown, {}, import("../institute/schemas/institute.schema").default, {}, {}> & import("../institute/schemas/institute.schema").default & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        };
+        admin: import("mongoose").Document<unknown, {}, import("../admin/schema/admin.schema").Admin, {}, {}> & import("../admin/schema/admin.schema").Admin & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        };
+        user: import("mongoose").Document<unknown, {}, import("../user/schema/user.schema").UserDocument, {}, {}> & import("../user/schema/user.schema").User & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & import("../user/schema/user.schema").UserMethods & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        };
+        token: string;
+        expires_in: string | undefined;
+        msg: string;
+    }>;
     userLogin(userLoginDto: UserLoginBodyDto): Promise<{
         user: {
             userId: string;
@@ -37,7 +56,21 @@ export declare class AuthController {
         expires_in: number;
         msg: string;
     }>;
-    studentRegistration(body: StudentRegistrationBodyDto, instituteId: string): Promise<any>;
+    studentRegistration(body: StudentRegistrationBodyDto, instituteId: string): Promise<{
+        user: import("mongoose").Document<unknown, {}, import("../user/schema/user.schema").UserDocument, {}, {}> & import("../user/schema/user.schema").User & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & import("../user/schema/user.schema").UserMethods & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        };
+        studentData: import("mongoose").Document<unknown, {}, import("../student/schema/student.schema").Student, {}, {}> & import("../student/schema/student.schema").Student & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        };
+        token: string;
+        expires_in: string | undefined;
+        msg: string;
+    }>;
     facultyRegistration(body: FacultyRegistrationDto, institueId: string): Promise<{
         user: {
             userId: string;

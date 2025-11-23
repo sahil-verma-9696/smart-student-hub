@@ -28,15 +28,13 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async register(body) {
-        const res = await this.authService.instituteRegistration(body);
-        return { ...res.data, msg: res.msg };
+        return await this.authService.instituteRegistration(body);
     }
     userLogin(userLoginDto) {
         return this.authService.userLogin(userLoginDto);
     }
     async studentRegistration(body, instituteId) {
-        const res = await this.authService.studentRegistration(body, instituteId);
-        return { ...res.data, msg: res.msg };
+        return await this.authService.studentRegistration(body, instituteId);
     }
     async facultyRegistration(body, institueId) {
         return await this.authService.facultyRegistration(body, institueId);

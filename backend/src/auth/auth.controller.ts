@@ -20,8 +20,7 @@ export class AuthController {
    *********************************/
   @Post('institute/register')
   async register(@Body() body: InstitueRegistrationDto) {
-    const res = await this.authService.instituteRegistration(body);
-    return { ...res.data, msg: res.msg };
+    return await this.authService.instituteRegistration(body);
   }
 
   /**********************************
@@ -46,8 +45,7 @@ export class AuthController {
     @Body() body: StudentRegistrationBodyDto,
     @Query('instituteId') instituteId: string,
   ) {
-    const res = await this.authService.studentRegistration(body, instituteId);
-    return { ...res.data, msg: res.msg };
+    return await this.authService.studentRegistration(body, instituteId);
   }
 
   /**********************************
