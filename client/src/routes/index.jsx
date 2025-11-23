@@ -3,11 +3,15 @@ import AdminLayout from "@/layout/AdminLayout";
 import PublicLayout from "@/layout/PublicLayout";
 import StudentLayout from "@/layout/StudentLayout";
 import { createBrowserRouter } from "react-router";
-import ScholarWindowPage from "@/pages/student-scholarwindow";
-import FacultyDashboardPage from "@/pages/faculty-dashboard";
-import AdminDashboardPage from "@/pages/admin-dashboard";
-import Quickactions from "@/components/dashboard/quickactions";
-import ApprovalPannel from "@/pages/approval-pannel";
+import ScholarWindowPage from "@/pages/student-pages/student-scholarwindow";
+import FacultyDashboardPage from "@/pages/faculty-pages/faculty-dashboard";
+import AdminDashboardPage from "@/pages/admin-pages/admin-dashboard";
+import ApprovalPannel from "@/pages/faculty-pages/approval-pannel";
+import AdminAddStudentsPage from "@/pages/admin-pages/add-students";
+import AdminAddFacultyPage from "@/pages/admin-pages/add-faculty";
+import ActivitiesFilterPage from "@/pages/admin-pages/student-panel";
+import AdminAnalyticsPage from "@/pages/admin-pages/admin-analytics";
+import AdminSettingsPage from "@/pages/admin-pages/admin-settings";
 
 export default createBrowserRouter([
   {
@@ -39,18 +43,36 @@ export default createBrowserRouter([
       },
     ],
   },
-  {
-    path: "/admin",
-    Component: AdminLayout,
-    children: [
-      {
-        index: true,
-        Component: AdminDashboardPage,
-      },
-      {
-        index: true,
-        Component: Quickactions,
-      },
-    ],
-  },
+ {
+  path: "/admin",
+  Component: AdminLayout,
+  children: [
+    {
+      index: true,
+      path:"dashboard",
+      Component: AdminDashboardPage,
+    },
+    {
+      path: "add-student",
+      Component: AdminAddStudentsPage,
+    },
+    {
+      path: "add-faculty",
+      Component: AdminAddFacultyPage,
+    },
+    {
+      path: "students-panel",
+      Component: ActivitiesFilterPage,
+    },
+    
+    {
+      path: "analytics",
+      Component: AdminAnalyticsPage,
+    },
+    {
+      path: "settings",
+      Component: AdminSettingsPage,
+    }
+  ],
+}
 ]);
