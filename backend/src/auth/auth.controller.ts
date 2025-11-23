@@ -2,6 +2,7 @@ import { Body, Controller, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import InstitueRegistrationDto from './dto/institute-registration.dto';
 import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
+import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 
 @Controller('auth')
 export class AuthController {
@@ -23,15 +24,15 @@ export class AuthController {
   }
 
   /**********************************
-   * POST : auth/admin/register
+   * POST : auth/admin/login
    * Body : AdminRegistrationDto
    * Return : AdminRegistrationDto
    * desc : Register Admin
    *********************************/
-  // @Post('admin/register')
-  // adminRegistration(@Body() adminRegisterDto: AdminRegistrationDto) {
-  //   return this.authService.adminRegistration(adminRegisterDto);
-  // }
+  @Post('user/login')
+  userLogin(@Body() userLoginDto: UserLoginBodyDto) {
+    return this.authService.userLogin(userLoginDto);
+  }
 
   /**********************************
    * POST : auth/student/register

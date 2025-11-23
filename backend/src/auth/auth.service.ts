@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import InstitueRegistrationDto from './dto/institute-registration.dto';
 import { InstituteService } from 'src/institute/institute.service';
 import { UserService } from 'src/user/user.service';
@@ -6,6 +11,7 @@ import { AdminService } from 'src/admin/admin.service';
 import { JwtService } from '@nestjs/jwt';
 import { StudentService } from 'src/student/student.service';
 import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
+import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +22,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly studentService: StudentService,
   ) {}
-
+  /************************************
+   * Register Institute + User + Admin + Token
+   * @returns {Promise<{data:{institute, admin, user, token, expires_in}, msg:string}>}
+   *********************************/
   async instituteRegistration(data: InstitueRegistrationDto) {
     /************************************
      * STEP 0: Destructure data
@@ -110,6 +119,57 @@ export class AuthService {
     return {
       data: { user, studentData, token },
       msg: 'Student Successfully Registered',
+    };
+  }
+
+  async userLogin(userLoginDto: UserLoginBodyDto) {
+    const { email, password } = userLoginDto;
+
+    /*********************
+     * Validate input
+     *********************/
+    if (!email || !password) {
+      throw new BadRequestException('Email and password are required');
+    }
+
+    /*********************
+     * Find user
+     *********************/
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    /*********************
+     * Validate Password
+     *********************/
+    const isValidPassword = await user.comparePassword(password);
+
+    if (!isValidPassword) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    /*********************
+     * Generate Token
+     *********************/
+    const token = this.jwtService.sign({
+      sub: user._id.toString(), // Standard JWT claim
+      role: user.role,
+      instituteId: user.instituteId,
+    });
+
+    /*********************
+     * Remove passwordHash before returning
+     *********************/
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...sanitizedUser } = user.toObject();
+
+    return {
+      user: sanitizedUser,
+      token,
+      expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
+      msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
     };
   }
 

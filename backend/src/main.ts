@@ -15,6 +15,7 @@ async function bootstrap() {
     origin: '*', // allow all (for testing)
     methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
+    Credentials: true,
   });
 
   // Global ValidationPipe (Required for DTO validation)

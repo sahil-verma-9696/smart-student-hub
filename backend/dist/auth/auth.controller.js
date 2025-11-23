@@ -20,6 +20,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const institute_registration_dto_1 = __importDefault(require("./dto/institute-registration.dto"));
 const student_registration_body_dto_1 = __importDefault(require("./dto/student-registration-body.dto"));
+const user_login_body_dto_1 = require("./dto/user-login-body.dto.");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -28,6 +29,9 @@ let AuthController = class AuthController {
     async register(body) {
         const res = await this.authService.instituteRegistration(body);
         return { ...res.data, msg: res.msg };
+    }
+    userLogin(userLoginDto) {
+        return this.authService.userLogin(userLoginDto);
     }
     async studentRegistration(body, instituteId) {
         const res = await this.authService.studentRegistration(body, instituteId);
@@ -42,6 +46,13 @@ __decorate([
     __metadata("design:paramtypes", [institute_registration_dto_1.default]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
+__decorate([
+    (0, common_1.Post)('user/login'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_login_body_dto_1.UserLoginBodyDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "userLogin", null);
 __decorate([
     (0, common_1.Post)('student/register'),
     __param(0, (0, common_1.Body)()),

@@ -81,6 +81,32 @@ let AuthService = class AuthService {
             msg: 'Student Successfully Registered',
         };
     }
+    async userLogin(userLoginDto) {
+        const { email, password } = userLoginDto;
+        if (!email || !password) {
+            throw new common_1.BadRequestException('Email and password are required');
+        }
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const isValidPassword = await user.comparePassword(password);
+        if (!isValidPassword) {
+            throw new common_1.UnauthorizedException('Invalid email or password');
+        }
+        const token = this.jwtService.sign({
+            sub: user._id.toString(),
+            role: user.role,
+            instituteId: user.instituteId,
+        });
+        const { passwordHash, ...sanitizedUser } = user.toObject();
+        return {
+            user: sanitizedUser,
+            token,
+            expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
+            msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
+        };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

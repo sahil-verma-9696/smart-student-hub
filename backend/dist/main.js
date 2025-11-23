@@ -15,6 +15,7 @@ async function bootstrap() {
         origin: '*',
         methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
         allowedHeaders: 'Content-Type, Authorization',
+        Credentials: true,
     });
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,

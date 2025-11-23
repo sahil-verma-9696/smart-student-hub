@@ -2,7 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 
-export type UserDocument = User & Document;
+export interface UserMethods {
+  comparePassword(plainPassword: string): Promise<boolean>;
+}
+
+export type UserDocument = User & Document & UserMethods;
 
 export class ContactInfo {
   @Prop({ required: true })
