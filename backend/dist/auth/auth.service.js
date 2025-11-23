@@ -15,16 +15,19 @@ const institute_service_1 = require("../institute/institute.service");
 const user_service_1 = require("../user/user.service");
 const admin_service_1 = require("../admin/admin.service");
 const jwt_1 = require("@nestjs/jwt");
+const student_service_1 = require("../student/student.service");
 let AuthService = class AuthService {
     instituteService;
     adminService;
     userService;
     jwtService;
-    constructor(instituteService, adminService, userService, jwtService) {
+    studentService;
+    constructor(instituteService, adminService, userService, jwtService, studentService) {
         this.instituteService = instituteService;
         this.adminService = adminService;
         this.userService = userService;
         this.jwtService = jwtService;
+        this.studentService = studentService;
     }
     async instituteRegistration(data) {
         const { admin_name, admin_email, admin_password, admin_contactInfo, admin_gender, ...instituteData } = data || {};
@@ -56,10 +59,23 @@ let AuthService = class AuthService {
         };
     }
     async studentRegistration(data) {
-        const studentData = { ...data, role: 'student' };
+        const { password } = data || {};
+        const user = await this.userService.create({
+            passwordHash: password,
+            userId: '22CSME017',
+            ...data,
+        });
+        const studentData = await this.studentService.create(user._id.toString());
         return {
-            data: { studentData },
+            data: { user, studentData },
             msg: 'Student Successfully Registered',
+        };
+    }
+    async facultyRegistration(data) {
+        const facultyData = { ...data, role: 'faculty' };
+        return {
+            data: { facultyData },
+            msg: 'Faculty Successfully Registered',
         };
     }
 };
@@ -69,6 +85,7 @@ exports.AuthService = AuthService = __decorate([
     __metadata("design:paramtypes", [institute_service_1.InstituteService,
         admin_service_1.AdminService,
         user_service_1.UserService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        student_service_1.StudentService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

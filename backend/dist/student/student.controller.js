@@ -15,18 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StudentController = void 0;
 const common_1 = require("@nestjs/common");
 const student_service_1 = require("./student.service");
-const create_student_dto_1 = require("./dto/create-student.dto");
 const update_student_dto_1 = require("./dto/update-student.dto");
 let StudentController = class StudentController {
     studentService;
     constructor(studentService) {
         this.studentService = studentService;
-    }
-    create(createStudentDto) {
-        return this.studentService.create(createStudentDto);
-    }
-    createBulk(createStudentDto) {
-        return this.studentService.createBulk(createStudentDto);
     }
     findAll() {
         return this.studentService.findAll();
@@ -42,20 +35,6 @@ let StudentController = class StudentController {
     }
 };
 exports.StudentController = StudentController;
-__decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_student_dto_1.CreateStudentDto]),
-    __metadata("design:returntype", void 0)
-], StudentController.prototype, "create", null);
-__decorate([
-    (0, common_1.Post)('bulk'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Array]),
-    __metadata("design:returntype", void 0)
-], StudentController.prototype, "createBulk", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),

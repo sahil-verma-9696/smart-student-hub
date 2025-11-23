@@ -3,12 +3,14 @@ import { InstituteService } from 'src/institute/institute.service';
 import { UserService } from 'src/user/user.service';
 import { AdminService } from 'src/admin/admin.service';
 import { JwtService } from '@nestjs/jwt';
+import { StudentService } from 'src/student/student.service';
 export declare class AuthService {
     private readonly instituteService;
     private readonly adminService;
     private readonly userService;
     private readonly jwtService;
-    constructor(instituteService: InstituteService, adminService: AdminService, userService: UserService, jwtService: JwtService);
+    private readonly studentService;
+    constructor(instituteService: InstituteService, adminService: AdminService, userService: UserService, jwtService: JwtService, studentService: StudentService);
     instituteRegistration(data: InstitueRegistrationDto): Promise<{
         data: {
             institute: import("mongoose").Document<unknown, {}, import("../institute/schemas/institute.schema").default, {}, {}> & import("../institute/schemas/institute.schema").default & Required<{
@@ -32,7 +34,22 @@ export declare class AuthService {
     }>;
     studentRegistration(data: any): Promise<{
         data: {
-            studentData: any;
+            user: import("mongoose").Document<unknown, {}, import("../user/schema/user.schema").User, {}, {}> & import("../user/schema/user.schema").User & {
+                _id: import("mongoose").Types.ObjectId;
+            } & {
+                __v: number;
+            };
+            studentData: import("mongoose").Document<unknown, {}, import("../student/schema/student.schema").Student, {}, {}> & import("../student/schema/student.schema").Student & Required<{
+                _id: import("mongoose").Types.ObjectId;
+            }> & {
+                __v: number;
+            };
+        };
+        msg: string;
+    }>;
+    facultyRegistration(data: any): Promise<{
+        data: {
+            facultyData: any;
         };
         msg: string;
     }>;

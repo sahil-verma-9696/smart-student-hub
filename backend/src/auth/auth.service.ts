@@ -5,6 +5,8 @@ import { InstituteService } from 'src/institute/institute.service';
 import { UserService } from 'src/user/user.service';
 import { AdminService } from 'src/admin/admin.service';
 import { JwtService } from '@nestjs/jwt';
+import { StudentService } from 'src/student/student.service';
+import StudentRegistrationDto from './dto/student-registration-body.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
     private readonly adminService: AdminService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly studentService: StudentService,
   ) {}
 
   async instituteRegistration(data: InstitueRegistrationDto) {
@@ -73,10 +76,31 @@ export class AuthService {
   }
 
   async studentRegistration(data) {
-    const studentData = { ...data, role: 'student' };
+    const { password } = data || {};
+    /************************************
+     * STEP 1: Create User (role = admin)
+     *********************************/
+    const user = await this.userService.create({
+      passwordHash: password,
+      userId: '22CSME017',
+      ...data,
+    });
+
+    /**
+     * STEP 2: Create Student profile
+     */
+    const studentData = await this.studentService.create(user._id.toString());
     return {
-      data: { studentData },
+      data: { user, studentData },
       msg: 'Student Successfully Registered',
+    };
+  }
+
+  async facultyRegistration(data) {
+    const facultyData = { ...data, role: 'faculty' };
+    return {
+      data: { facultyData },
+      msg: 'Faculty Successfully Registered',
     };
   }
 }

@@ -1,31 +1,35 @@
 // schemas/student.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { User, UserSchema } from 'src/user/schema/user.schema';
+import { Document, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Student extends Document {
-  @Prop({ type: UserSchema, required: true })
-  basicUserDetails: User;
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'User',
+    default: null,
+    required: true,
+  })
+  basicUserDetails: Types.ObjectId;
 
   // Academic Info
-  @Prop({ required: true })
+  // @Prop({ required: true })
   branch: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
   course: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
   year: number;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
   semester: number;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
   section: string;
 
-  @Prop({ required: true })
-  studentId: string;
+  // @Prop({ required: true })
+  // studentId: string;
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);

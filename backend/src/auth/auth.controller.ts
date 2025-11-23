@@ -1,7 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import InstitueRegistrationDto from './dto/institute-registration.dto';
-import StudentRegistrationDto from './dto/student-registration.dto';
+import FacultyRegistrationDto from './dto/faculty-registration.dto';
+import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -40,8 +41,24 @@ export class AuthController {
    * desc : Register Student
    *********************************/
   @Post('student/register')
-  async studentRegistration(@Body() body: StudentRegistrationDto) {
-    const res = await this.authService.studentRegistration(body);
+  async studentRegistration(
+    @Body() body: StudentRegistrationBodyDto,
+    @Query('instituteId') instituteId: string,
+  ) {
+    const studentData = { ...body, role: 'student', instituteId };
+    const res = await this.authService.studentRegistration(studentData);
+    return { ...res.data, msg: res.msg };
+  }
+
+  /**********************************
+   * POST : auth/faculty/register
+   * Body : InstitueRegistrationDto
+   * Return : InstitueRegistrationDto
+   * desc : Register Student
+   *********************************/
+  @Post('faculty/register')
+  async facultyRegistration(@Body() body: FacultyRegistrationDto) {
+    const res = await this.authService.facultyRegistration(body);
     return { ...res.data, msg: res.msg };
   }
 }

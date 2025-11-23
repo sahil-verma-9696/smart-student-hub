@@ -15,6 +15,7 @@ const user_module_1 = require("../user/user.module");
 const institute_module_1 = require("../institute/institute.module");
 const admin_module_1 = require("../admin/admin.module");
 const config_1 = require("@nestjs/config");
+const student_module_1 = require("../student/student.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -32,6 +33,7 @@ exports.AuthModule = AuthModule = __decorate([
             user_module_1.UserModule,
             institute_module_1.InstituteModule,
             admin_module_1.AdminModule,
+            student_module_1.StudentModule,
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService],

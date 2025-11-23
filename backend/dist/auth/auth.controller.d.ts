@@ -1,6 +1,7 @@
 import { AuthService } from './auth.service';
 import InstitueRegistrationDto from './dto/institute-registration.dto';
-import StudentRegistrationDto from './dto/student-registration.dto';
+import FacultyRegistrationDto from './dto/faculty-registration.dto';
+import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 export declare class AuthController {
     authService: AuthService;
     constructor(authService: AuthService);
@@ -23,8 +24,21 @@ export declare class AuthController {
         };
         token: string;
     }>;
-    studentRegistration(body: StudentRegistrationDto): Promise<{
+    studentRegistration(body: StudentRegistrationBodyDto, instituteId: string): Promise<{
         msg: string;
-        studentData: any;
+        user: import("mongoose").Document<unknown, {}, import("../user/schema/user.schema").User, {}, {}> & import("../user/schema/user.schema").User & {
+            _id: import("mongoose").Types.ObjectId;
+        } & {
+            __v: number;
+        };
+        studentData: import("mongoose").Document<unknown, {}, import("../student/schema/student.schema").Student, {}, {}> & import("../student/schema/student.schema").Student & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        };
+    }>;
+    facultyRegistration(body: FacultyRegistrationDto): Promise<{
+        msg: string;
+        facultyData: any;
     }>;
 }

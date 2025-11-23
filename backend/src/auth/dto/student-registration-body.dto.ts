@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { ContactInfoDto } from 'src/user/dto/contact-info.dto';
 
-export default class StudentRegistrationDto {
+export default class StudentRegistrationBodyDto {
   @IsString()
   name: string;
 
@@ -16,7 +16,7 @@ export default class StudentRegistrationDto {
   email: string;
 
   @IsString()
-  passwordHash: string;
+  password: string;
 
   @IsString()
   gender: string;
