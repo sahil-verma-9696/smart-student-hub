@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useChatSocketContext } from "@/contexts/ChatSocket";
-import { useGlobalContext } from "@/contexts/Global";
+import { useGlobalContext } from "@/contexts/global-context";
 
 const MessageArea = (props) => {
   const { friendId, messages, setMessages } = props;

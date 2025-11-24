@@ -14,6 +14,8 @@ import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 import { FacultyService } from 'src/faculty/faculty.service';
+import { User } from 'src/user/schema/user.schema';
+import { JwtPayload } from './types/auth.type';
 
 @Injectable()
 export class AuthService {
@@ -69,15 +71,14 @@ export class AuthService {
      */
     const admin = await this.adminService.create(user._id.toString());
 
-    /**
-     *  Generate JWT
-     */
-    const token = this.jwtService.sign({
-      user_id: user._id,
-      institute_id: institute._id,
-      role: 'admin',
-    });
+    /****** Sanitize User **************/
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...sanitizedUser } = user.toObject();
+
+    /****** Generate Token **************/
+    const payload = this.buildJwtPayload(user);
+    const token = this.jwtService.sign(payload);
     return {
       institute,
       admin,
@@ -115,16 +116,15 @@ export class AuthService {
      ********************************/
     const studentData = await this.studentService.create(user._id.toString());
 
-    /********************************
-     *  Generate JWT
-     ********************************/
-    const token = this.jwtService.sign({
-      user_id: user._id,
-      role: 'student',
-    });
+    /****** Sanitize User **************/
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...sanitizedUser } = user.toObject();
 
+    /****** Generate Token **************/
+    const payload = this.buildJwtPayload(user);
+    const token = this.jwtService.sign(payload);
     return {
-      user,
+      user: sanitizedUser,
       studentData,
       token,
       expires_in: process.env.JWT_EXPIRES_IN_MILI,
@@ -156,19 +156,14 @@ export class AuthService {
     const faculty = await this.facultyService.create(user._id.toString());
 
     /********************************
-     *  Generate JWT
-     ********************************/
-    const token = this.jwtService.sign({
-      user_id: user._id,
-      role: 'faculty',
-      instituteId,
-    });
-
-    /********************************
      *  Sanitize User
      ********************************/
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...sanitizedUser } = user.toObject();
+
+    /****** Generate Token **************/
+    const payload = this.buildJwtPayload(user);
+    const token = this.jwtService.sign(payload);
 
     return {
       user: sanitizedUser,
@@ -204,22 +199,40 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    /****** Generate Token **************/
-    const token = this.jwtService.sign({
-      sub: user._id.toString(), // Standard JWT claim
-      role: user.role,
-      instituteId: user.instituteId,
-    });
-
     /****** Sanitize User **************/
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...sanitizedUser } = user.toObject();
+
+    /****** Generate Token **************/
+    const payload = this.buildJwtPayload(user);
+    const token = this.jwtService.sign(payload);
 
     return {
       user: sanitizedUser,
       token,
       expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
       msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
+    };
+  }
+
+  async me(user: JwtPayload) {
+    const userData = await this.userService.findById(user.sub);
+
+    return {
+      userData,
+      payload: user,
+      msg: `User ${userData?.name} (role: ${userData?.role}) successfully logged in`,
+    };
+  }
+
+  private buildJwtPayload(user: User): JwtPayload {
+    return {
+      sub: user._id.toString(),
+      userId: user.userId,
+      email: user.email,
+      role: user.role,
+      instituteId: user.instituteId.toString(),
+      name: user.name,
     };
   }
 }

@@ -8,6 +8,7 @@ import { AdminModule } from 'src/admin/admin.module';
 import { ConfigService } from '@nestjs/config';
 import { StudentModule } from 'src/student/student.module';
 import { FacultyModule } from 'src/faculty/faculty.module';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -27,6 +28,6 @@ import { FacultyModule } from 'src/faculty/faculty.module';
   ],
 
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}

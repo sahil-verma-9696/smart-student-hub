@@ -1,4 +1,5 @@
 import { Gender, Role } from './auth.enum';
+import { Request } from 'express';
 
 export type User = {
   firstName: string;
@@ -19,3 +20,18 @@ export type Student = {
   branch: string;
   instituteId: string;
 } & User;
+
+export interface JwtPayload {
+  sub: string;
+  email: string;
+  name: string;
+  userId: string;
+  role: string;
+  instituteId: string;
+  iat?: number;
+  exp?: number;
+}
+
+export type AuthenticatedRequest = Request & {
+  user?: JwtPayload;
+};
