@@ -27,7 +27,7 @@ const FacultyLayout = () => {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar navigationConfig={navigationConfig} />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-auto">
         <Navbar title={"Faculty Dashboard"} />
         <Outlet />
       </div>

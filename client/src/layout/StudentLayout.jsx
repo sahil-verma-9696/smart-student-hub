@@ -9,6 +9,7 @@ import {
   DockIcon,
   FileText,
   Home,
+  LinkIcon,
   Lock,
   Settings,
   Share,
@@ -24,12 +25,17 @@ const studentNavigationConfig = [
   { name: "Share Achivos", href: "/student/share-achivos", icon: Share },
   { name: "Private Vault", href: "/student/private-vault", icon: Lock },
   { name: "Settings", href: "/student/setting", icon: Settings },
+  {
+    name: "Social Integrations",
+    href: "/student/social-integrations",
+    icon: LinkIcon,
+  },
 ];
 const StudentLayout = () => {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar navigationConfig={studentNavigationConfig} />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-auto">
         <Navbar title={"Scholar window"} />
         <Outlet />
       </div>

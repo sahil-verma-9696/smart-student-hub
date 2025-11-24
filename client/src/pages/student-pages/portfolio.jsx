@@ -1,6 +1,6 @@
-import { PortfolioBuilder } from "@/components/portfolio/portfolio-builder";
-import { PortfolioPreview } from "@/components/portfolio/portfolio-preview";
-import { PortfolioTemplates } from "@/components/portfolio/portfolio-templates";
+import { PortfolioBuilder } from "@/pages/student-pages/portfolio/portfolio-builder";
+import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-preview";
+import { PortfolioTemplates } from "@/pages/student-pages/portfolio/portfolio-templates";
 
 export default function PortfolioPage() {
   return (

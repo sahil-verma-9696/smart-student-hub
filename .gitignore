@@ -17,6 +17,7 @@
 /backend/dist
 /node_modules
 /backend/build
+/backend/dist
 
 # Logs
 /backend/logs

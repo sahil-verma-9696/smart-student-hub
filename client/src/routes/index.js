@@ -18,6 +18,8 @@ import MindPilot from "@/pages/student-pages/MindPilot";
 import ShareAchivos from "@/pages/student-pages/ShareAchivos";
 import PrivateVault from "@/pages/student-pages/PrivateVault";
 import Settings from "@/pages/student-pages/Settings";
+import { IntegrationOverview } from "@/pages/student-pages/integrations/integration-overview";
+import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-preview";
 
 export default createBrowserRouter([
   {
@@ -39,7 +41,7 @@ export default createBrowserRouter([
       },
       {
         path: "fastfolo",
-        Component: PortfolioPage,
+        Component: PortfolioPreview,
       },
       {
         path: "mind-piolet",
@@ -56,6 +58,10 @@ export default createBrowserRouter([
       {
         path: "setting",
         Component: Settings,
+      },
+      {
+        path: "social-integrations",
+        Component: IntegrationOverview,
       },
     ],
   },
