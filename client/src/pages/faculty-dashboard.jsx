@@ -1,17 +1,41 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UserPlus, BarChart3, CheckCircle, Users, Award, TrendingUp, Clock, AlertCircle, XCircle, ArrowRight, Sparkles } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import FacultyAnalyticsPage from "@/pages/analytics";
+import FacultyReporting from './Reporting';
+import { 
+  UserPlus, 
+  BarChart3, 
+  CheckCircle, 
+  Users, 
+  Award, 
+  TrendingUp, 
+  Clock, 
+  AlertCircle, 
+  XCircle, 
+  ArrowRight, 
+  Sparkles,
+  BookOpen,
+  GraduationCap,
+  Sun,
+  Moon
+} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { useNavigate } from "react-router-dom";
 
-export default function FacultyDashboardPage() {
+
+
+
+
+export default function FacultyDashboardPage({ isDark, toggleTheme }) {
+  // --- State & Logic ---
   const [activities] = useState([
-    { id: 1, student: 'Alice Johnson', action: 'Completed Project Submission', time: '2 hours ago', status: 'pending' },
-    { id: 2, student: 'Bob Smith', action: 'Workshop Attendance', time: '5 hours ago', status: 'verified' },
-    { id: 3, student: 'Carol White', action: 'Research Paper Draft', time: '1 day ago', status: 'rejected' },
-    { id: 4, student: 'David Brown', action: 'Lab Report Submission', time: '2 days ago', status: 'pending' },
-    { id: 5, student: 'Eva Martinez', action: 'Seminar Participation', time: '3 days ago', status: 'verified' },
-    { id: 6, student: 'Frank Wilson', action: 'Code Review Task', time: '4 days ago', status: 'rejected' },
+    { id: 1, student: 'Alice Johnson', action: 'Project Submission', time: '2h ago', status: 'pending' },
+    { id: 2, student: 'Bob Smith', action: 'Workshop Attendance', time: '5h ago', status: 'verified' },
+    { id: 3, student: 'Carol White', action: 'Research Paper Draft', time: '1d ago', status: 'rejected' },
+    { id: 4, student: 'David Brown', action: 'Lab Report', time: '2d ago', status: 'pending' },
+    { id: 5, student: 'Eva Martinez', action: 'Seminar', time: '3d ago', status: 'verified' },
+    { id: 6, student: 'Frank Wilson', action: 'Code Review', time: '4d ago', status: 'rejected' },
   ]);
 
   const [visibleSections, setVisibleSections] = useState(new Set());
@@ -26,7 +50,7 @@ export default function FacultyDashboardPage() {
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
-                setVisibleSections((prev) => new Set([...prev, index]));
+                setVisibleSections((prev) => new Set(prev).add(index));
               }
             });
           },
@@ -44,194 +68,218 @@ export default function FacultyDashboardPage() {
   }, []);
 
   const stats = [
-    { label: 'Total Students', value: '248', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', change: '+12%' },
-    { label: 'Pending Verifications', value: '12', icon: Clock, color: 'text-orange-600', bg: 'bg-orange-50', change: '-3%' },
-    { label: 'Achievements', value: '156', icon: Award, color: 'text-purple-600', bg: 'bg-purple-50', change: '+28%' },
-    { label: 'Avg. Performance', value: '87%', icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-50', change: '+5%' },
+    { label: 'Total Students', value: '248', icon: Users, color: 'blue', change: '+12%', trend: 'up' },
+    { label: 'Pending Verifications', value: '12', icon: Clock, color: 'amber', change: '-3%', trend: 'down' },
+    { label: 'Achievements', value: '156', icon: Award, color: 'purple', change: '+28%', trend: 'up' },
+    { label: 'Avg. Performance', value: '87%', icon: TrendingUp, color: 'emerald', change: '+5%', trend: 'up' },
   ];
 
-  const handleRegisterStudent = () => {
-    console.log('Opening student registration...');
-  };
 
-  const handleViewAnalytics = () => {
-    console.log('Opening analytics dashboard...');
-  };
+  const navigate = useNavigate();
 
-  const handleVerifyActivity = (activityId) => {
-    console.log('Verifying activity:', activityId);
-  };
-
-  const getStatusConfig = (status) => {
+  // --- Handlers ---
+  const handleRegisterStudent = () => console.log('Opening student registration...');
+  const handleViewAnalytics = () => navigate("/analytics");
+  const handleVerifyActivity = (activityId) => console.log('Verifying activity:', activityId);
+  // --- Helper Components ---
+  
+  const StatusBadge = ({ status }) => {
     switch (status) {
       case 'verified':
-        return {
-          icon: CheckCircle,
-          color: 'text-green-600',
-          bg: 'bg-green-100',
-          badgeClass: 'bg-green-50 text-green-700 border-green-200'
-        };
+        return <Badge variant="success" className="px-3 py-1 rounded-lg">Verified</Badge>;
       case 'rejected':
-        return {
-          icon: XCircle,
-          color: 'text-red-600',
-          bg: 'bg-red-100',
-          badgeClass: 'bg-red-50 text-red-700 border-red-200'
-        };
-      default: // pending
-        return {
-          icon: Clock,
-          color: 'text-orange-600',
-          bg: 'bg-orange-100',
-          badgeClass: 'bg-orange-50 text-orange-700 border-orange-200'
-        };
+        return <Badge variant="danger" className="px-3 py-1 rounded-lg">Rejected</Badge>;
+      default:
+        return <Badge variant="warning" className="px-3 py-1 rounded-lg">Pending</Badge>;
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'verified': return { 
+        Icon: CheckCircle, 
+        color: 'text-emerald-500 dark:text-emerald-400', 
+        bg: 'bg-emerald-50 dark:bg-emerald-900/20' 
+      };
+      case 'rejected': return { 
+        Icon: XCircle, 
+        color: 'text-rose-500 dark:text-rose-400', 
+        bg: 'bg-rose-50 dark:bg-rose-900/20' 
+      };
+      default: return { 
+        Icon: Clock, 
+        color: 'text-amber-500 dark:text-amber-400', 
+        bg: 'bg-amber-50 dark:bg-amber-900/20' 
+      };
     }
   };
 
   return (
-    <main className="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-gray-50 via-white to-blue-50">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header Section */}
+    <main className="flex-1 overflow-y-auto p-6 md:p-12 max-w-[1600px] mx-auto">
+      <div className="space-y-10">
+        
+        {/* --- Header Section --- */}
         <div 
-          ref={(el) => (sectionRefs.current[0] = el)}
-          className={`flex items-center justify-between transition-all duration-1000 ${
+          ref={(el) => { sectionRefs.current[0] = el; }}
+          className={`flex flex-col md:flex-row items-start md:items-end justify-between gap-4 transition-all duration-700 ease-out ${
             visibleSections.has(0) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >
-          <div className="group cursor-default">
-            <h1 className="text-5xl font-bold text-black mb-2 group-hover:text-blue-600 transition-colors duration-500 flex items-center gap-3">
-              Dashboard
-              <Sparkles className="h-8 w-8 text-blue-600 opacity-0 group-hover:opacity-100 group-hover:rotate-12 transition-all duration-500" />
+          <div className="relative">
+            <div className="absolute -top-8 -left-8 w-24 h-24 bg-purple-200 dark:bg-purple-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-50 animate-blob"></div>
+            <div className="absolute -top-8 -right-8 w-24 h-24 bg-blue-200 dark:bg-blue-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-50 animate-blob animation-delay-2000"></div>
+            
+            <h1 className="relative font-heading text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-50 tracking-tight mb-3">
+              Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400">Professor</span>
             </h1>
-            <p className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Welcome back, John Doe</p>
+            <p className="relative text-lg text-slate-500 dark:text-slate-400 max-w-2xl">
+              Here's what's happening in your digital classroom today.
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-sm py-2 px-4 border-2 border-black text-black hover:bg-black hover:text-white transition-all duration-300 cursor-pointer hover:scale-105">
-              Faculty
-            </Badge>
+          
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={toggleTheme}
+              className="h-12 w-12 rounded-2xl p-0 border-slate-100 dark:border-slate-800 shadow-sm"
+            >
+              {isDark ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-slate-600" />}
+            </Button>
+            
+            <div className="h-12 px-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-2 text-slate-600 dark:text-slate-300 font-medium transition-colors duration-300">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              Semester 2024
+            </div>
+            <div className="h-12 w-12 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-700 dark:text-purple-300 shadow-sm transition-colors duration-300">
+               <GraduationCap size={24} />
+            </div>
           </div>
         </div>
 
-        {/* Quick Actions Section */}
+        {/* --- Quick Actions Section --- */}
         <div
-          ref={(el) => (sectionRefs.current[1] = el)}
-          className={`transition-all duration-1000 delay-100 ${
+          ref={(el) => { sectionRefs.current[1] = el; }}
+          className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-700 delay-100 ease-out ${
             visibleSections.has(1) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           }`}
         >
-          <Card className="border-2 border-black shadow-xl bg-white hover:shadow-2xl hover:border-blue-600 transition-all duration-500 overflow-visible hover:scale-[1.02] group/card">
-            <CardHeader className="group-hover/card:bg-gradient-to-r group-hover/card:from-blue-50 group-hover/card:to-transparent transition-all duration-500">
-              <CardTitle className="text-black text-2xl flex items-center gap-2 group-hover/card:text-blue-600 transition-colors duration-300">
-                Quick Actions
-                <ArrowRight className="h-5 w-5 opacity-0 group-hover/card:opacity-100 group-hover/card:translate-x-1 transition-all duration-300" />
-              </CardTitle>
-              <CardDescription className="text-gray-600 group-hover/card:text-gray-800 transition-colors duration-300">
-                Frequently used actions for efficient workflow
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-4">
-              <Button
-                onClick={handleRegisterStudent}
-                className="bg-black text-white hover:bg-blue-600 hover:border-blue-600 shadow-lg transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:-translate-y-2 border-2 border-black relative overflow-hidden group/btn"
-                size="lg"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 transform -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-700 ease-out"></span>
-                <span className="relative flex items-center">
-                  <UserPlus className="mr-2 h-5 w-5 group-hover/btn:rotate-12 group-hover/btn:scale-110 transition-all duration-500" />
-                  Register Students
-                </span>
-              </Button>
-              <Button
-                onClick={handleViewAnalytics}
-                className="bg-black text-white hover:bg-blue-600 hover:border-blue-600 shadow-lg transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:-translate-y-2 border-2 border-black relative overflow-hidden group/btn"
-                size="lg"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 transform -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-700 ease-out"></span>
-                <span className="relative flex items-center">
-                  <BarChart3 className="mr-2 h-5 w-5 group-hover/btn:scale-125 group-hover/btn:-rotate-6 transition-all duration-500" />
-                  View Analytics
-                </span>
-              </Button>
-              <Button
-                onClick={() => handleVerifyActivity('all')}
-                className="bg-black text-white hover:bg-blue-600 hover:border-blue-600 shadow-lg transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:-translate-y-2 border-2 border-black relative overflow-hidden group/btn"
-                size="lg"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 transform -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-700 ease-out"></span>
-                <span className="relative flex items-center">
-                  <CheckCircle className="mr-2 h-5 w-5 group-hover/btn:rotate-[360deg] group-hover/btn:scale-110 transition-all duration-700" />
-                  Verify Activities
-                </span>
-              </Button>
-            </CardContent>
-          </Card>
+            <button 
+              onClick={handleRegisterStudent}
+              className="group relative overflow-hidden p-8 bg-purple-200 dark:bg-purple-700 rounded-3xl shadow-xl shadow-purple-200 dark:shadow-purple-950/40 hover:shadow-2xl hover:shadow-purple-300/50 hover:scale-[1.02] transition-all duration-300 text-left border border-transparent"
+            >
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-purple-800 rounded-2xl flex items-center justify-center mb-4 backdrop-blur-sm">
+                  <UserPlus className="text-black" size={24} />
+                </div>
+                <h3 className="font-heading text-xl font-bold text-purple-900 mb-1">Register Students</h3>
+                <p className="text-black text-sm">Add new scholars to your course roster.</p>
+              </div>
+            </button>
+
+            <button 
+               onClick={handleViewAnalytics}
+               className="group p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 text-left"
+            >
+              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <BarChart3 className="text-blue-600 dark:text-blue-400" size={24} />
+              </div>
+              <h3 className="font-heading text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">View Analytics</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Deep dive into student performance metrics.</p>
+            </button>
+
+            <button 
+               onClick={() => handleVerifyActivity('all')}
+               className="group p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 text-left"
+            >
+              <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <CheckCircle className="text-emerald-600 dark:text-emerald-400" size={24} />
+              </div>
+              <h3 className="font-heading text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">Verify Activities</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Review pending submissions and tasks.</p>
+            </button>
         </div>
 
-        {/* Stats Grid */}
+        {/* --- Stats Grid --- */}
         <div 
-          ref={(el) => (sectionRefs.current[2] = el)}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          ref={(el) => { sectionRefs.current[2] = el; }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {stats.map((stat, index) => (
+          {stats.map((stat, index) => {
+            const colorClasses = {
+               blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+               amber: 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
+               purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
+               emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+            };
+            
+            return (
             <div
               key={stat.label}
-              className={`transition-all duration-1000 ${
+              className={`transition-all duration-700 ease-out ${
                 visibleSections.has(2) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
               }`}
-              style={{ transitionDelay: `${index * 150 + 200}ms` }}
+              style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
-              <Card className="border-2 border-black shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:border-blue-600 group/stat cursor-pointer overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-blue-500/0 group-hover/stat:from-blue-500/5 group-hover/stat:to-blue-500/10 transition-all duration-500"></div>
-                <CardContent className="p-6 relative z-10">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-2 group-hover/stat:text-blue-600 transition-colors duration-300">{stat.label}</p>
-                      <p className="text-4xl font-bold text-black group-hover/stat:text-blue-600 transition-all duration-300 group-hover/stat:scale-110 inline-block">{stat.value}</p>
-                      <Badge variant="outline" className="ml-2 text-xs group-hover/stat:bg-blue-100 group-hover/stat:border-blue-600 transition-all duration-300">
-                        {stat.change}
-                      </Badge>
+              <Card className="h-full hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-slate-100 dark:border-slate-800">
+                <CardContent className="flex flex-col justify-between h-full pt-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className={`p-3 rounded-2xl ${colorClasses[stat.color]} transition-colors duration-300`}>
+                      <stat.icon size={24} strokeWidth={2.5} />
                     </div>
-                    <div className={`${stat.bg} ${stat.color} p-4 rounded-xl border-2 border-transparent group-hover/stat:border-current group-hover/stat:scale-110 group-hover/stat:rotate-6 transition-all duration-500 shadow-lg`}>
-                      <stat.icon className="h-7 w-7 group-hover/stat:scale-110 transition-transform duration-500" />
-                    </div>
+                    <Badge variant={stat.trend === 'up' ? 'secondary' : 'warning'} className="rounded-lg px-2.5">
+                      {stat.change}
+                    </Badge>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-heading font-bold text-slate-900 dark:text-slate-50 mb-1 transition-colors duration-300">{stat.value}</div>
+                    <div className="text-sm font-medium text-slate-500 dark:text-slate-400 transition-colors duration-300">{stat.label}</div>
                   </div>
                 </CardContent>
               </Card>
             </div>
-          ))}
+          )})}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content Area */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* --- Main Content Area (Left 2 cols) --- */}
+          <div className="lg:col-span-2 space-y-8">
+            
             {/* Student Overview */}
             <div
-              ref={(el) => (sectionRefs.current[3] = el)}
-              className={`transition-all duration-1000 ${
+              ref={(el) => { sectionRefs.current[3] = el; }}
+              className={`transition-all duration-700 ease-out ${
                 visibleSections.has(3) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
               }`}
             >
-              <Card className="border-2 border-black shadow-xl hover:shadow-2xl hover:border-blue-600 transition-all duration-500 group/overview">
-                <CardHeader className="group-hover/overview:bg-gradient-to-r group-hover/overview:from-blue-50 group-hover/overview:to-transparent transition-all duration-500">
-                  <CardTitle className="text-2xl text-black group-hover/overview:text-blue-600 transition-colors duration-300 flex items-center gap-2">
-                    Student Overview
-                    <TrendingUp className="h-6 w-6 opacity-0 group-hover/overview:opacity-100 transition-all duration-300" />
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">Current semester performance metrics</CardDescription>
+              <Card className="overflow-hidden">
+                <CardHeader className="border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl text-indigo-600 dark:text-indigo-400">
+                      <TrendingUp size={20} />
+                    </div>
+                    <div>
+                      <CardTitle>Student Overview</CardTitle>
+                      <CardDescription>Current semester performance metrics</CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
-                      { label: 'Active Students', sublabel: 'Currently enrolled', value: '235', color: 'blue' },
-                      { label: 'On Track', sublabel: 'Meeting requirements', value: '92%', color: 'green' },
-                      { label: 'Need Attention', sublabel: 'Below average', value: '13', color: 'orange' }
+                      { label: 'Active Students', sublabel: 'Currently enrolled', value: '235', color: 'blue', darkColor: 'blue-500' },
+                      { label: 'On Track', sublabel: 'Meeting requirements', value: '92%', color: 'emerald', darkColor: 'emerald-500' },
+                      { label: 'Need Attention', sublabel: 'Below average', value: '13', color: 'rose', darkColor: 'rose-500' }
                     ].map((item, idx) => (
-                      <div key={idx} className={`flex items-center justify-between p-5 bg-${item.color}-50 rounded-xl transition-all duration-500 hover:shadow-lg border-2 border-${item.color}-200 hover:border-${item.color}-400 group/item hover:scale-105 hover:-translate-y-1 cursor-pointer`}>
-                        <div>
-                          <p className="font-semibold text-black group-hover/item:text-blue-600 transition-colors duration-300">{item.label}</p>
-                          <p className="text-sm text-gray-600">{item.sublabel}</p>
-                        </div>
-                        <p className={`text-4xl font-bold text-${item.color}-600 group-hover/item:scale-110 transition-transform duration-300`}>{item.value}</p>
+                      <div 
+                        key={idx} 
+                        className="relative overflow-hidden p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 group hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-600 transition-all duration-300"
+                      >
+                        <div className={`absolute top-0 right-0 w-24 h-24 bg-${item.color}-500 opacity-[0.03] dark:opacity-[0.1] rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-500`}></div>
+                        <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{item.label}</p>
+                        <p className={`text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2`}>{item.value}</p>
+                        <p className="text-xs text-slate-400 font-medium">{item.sublabel}</p>
                       </div>
                     ))}
                   </div>
@@ -239,74 +287,64 @@ export default function FacultyDashboardPage() {
               </Card>
             </div>
 
-            {/* Recent Activities with Verification */}
+            {/* Recent Activities */}
             <div
-              ref={(el) => (sectionRefs.current[4] = el)}
-              className={`transition-all duration-1000 delay-200 ${
+              ref={(el) => { sectionRefs.current[4] = el; }}
+              className={`transition-all duration-700 delay-150 ease-out ${
                 visibleSections.has(4) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
               }`}
             >
-              <Card className="border-2 border-black shadow-xl hover:shadow-2xl hover:border-blue-600 transition-all duration-500 group/activities">
-                <CardHeader className="group-hover/activities:bg-gradient-to-r group-hover/activities:from-blue-50 group-hover/activities:to-transparent transition-all duration-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-2xl text-black group-hover/activities:text-blue-600 transition-colors duration-300 flex items-center gap-2">
-                        Recent Activities
-                        <AlertCircle className="h-6 w-6 opacity-0 group-hover/activities:opacity-100 transition-all duration-300" />
-                      </CardTitle>
-                      <CardDescription className="text-gray-600">Student submissions with status</CardDescription>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-amber-600 dark:text-amber-400">
+                      <AlertCircle size={20} />
                     </div>
-                    <div className="flex gap-2">
-                      <Badge variant="secondary" className="bg-orange-100 text-orange-700 border border-orange-300 hover:scale-110 transition-transform duration-300 cursor-pointer">
-                        {activities.filter(a => a.status === 'pending').length} Pending
-                      </Badge>
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 border border-green-300 hover:scale-110 transition-transform duration-300 cursor-pointer">
-                        {activities.filter(a => a.status === 'verified').length} Verified
-                      </Badge>
-                      <Badge variant="secondary" className="bg-red-100 text-red-700 border border-red-300 hover:scale-110 transition-transform duration-300 cursor-pointer">
-                        {activities.filter(a => a.status === 'rejected').length} Rejected
-                      </Badge>
+                    <div>
+                      <CardTitle>Recent Activities</CardTitle>
+                      <CardDescription>Live feed of student submissions</CardDescription>
                     </div>
                   </div>
+                  <Button variant="ghost" size="sm" className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30">
+                    View All <ArrowRight size={16} className="ml-2" />
+                  </Button>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {activities.map((activity, index) => {
-                      const statusConfig = getStatusConfig(activity.status);
-                      const StatusIcon = statusConfig.icon;
-                      
+                <CardContent className="p-0">
+                  <div className="divide-y divide-slate-50 dark:divide-slate-800">
+                    {activities.map((activity) => {
+                      const { Icon, color, bg } = getStatusIcon(activity.status);
                       return (
                         <div
                           key={activity.id}
-                          className="flex items-center justify-between p-5 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:shadow-xl transition-all duration-500 group/activity hover:scale-[1.02] hover:-translate-y-1 cursor-pointer bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent"
+                          className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors duration-200 gap-4"
                         >
-                          <div className="flex items-start gap-4 flex-1">
-                            <div className={`p-3 rounded-xl ${statusConfig.bg} border-2 ${statusConfig.color.replace('text-', 'border-')} group-hover/activity:scale-110 group-hover/activity:rotate-6 transition-all duration-500`}>
-                              <StatusIcon className={`h-5 w-5 ${statusConfig.color} group-hover/activity:scale-110 transition-transform duration-300`} />
+                          <div className="flex items-center gap-5">
+                            <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${bg} ${color} shadow-sm transition-colors duration-300`}>
+                              <Icon size={20} />
                             </div>
-                            <div className="flex-1">
-                              <p className="font-semibold text-black group-hover/activity:text-blue-600 transition-colors duration-300">{activity.student}</p>
-                              <p className="text-sm text-gray-600 group-hover/activity:text-gray-800 transition-colors duration-300">{activity.action}</p>
-                              <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                            <div>
+                              <h4 className="font-bold text-slate-900 dark:text-slate-100 transition-colors duration-300">{activity.student}</h4>
+                              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium transition-colors duration-300">{activity.action}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <Badge variant="outline" className={`${statusConfig.badgeClass} hover:scale-110 transition-transform duration-300`}>
-                              {activity.status.charAt(0).toUpperCase() + activity.status.slice(1)}
-                            </Badge>
-                            {activity.status === 'pending' && (
-                              <Button
-                                size="sm"
-                                onClick={() => handleVerifyActivity(activity.id)}
-                                className="bg-black text-white hover:bg-blue-600 transition-all duration-500 hover:scale-110 hover:shadow-xl border-2 border-black hover:border-blue-600 relative overflow-hidden group/verify"
-                              >
-                                <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 transform -translate-x-full group-hover/verify:translate-x-0 transition-transform duration-500"></span>
-                                <span className="relative flex items-center">
-                                  <CheckCircle className="mr-1 h-4 w-4 group-hover/verify:rotate-180 transition-transform duration-500" />
+                          
+                          <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
+                            <div className="text-right mr-2">
+                              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg uppercase tracking-wide transition-colors duration-300">{activity.time}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <StatusBadge status={activity.status} />
+                              {activity.status === 'pending' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleVerifyActivity(activity.id)}
+                                  className="h-8 rounded-xl"
+                                >
                                   Verify
-                                </span>
-                              </Button>
-                            )}
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -317,40 +355,85 @@ export default function FacultyDashboardPage() {
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
+          {/* --- Sidebar (Right col) --- */}
+          <div className="space-y-8">
             {/* Achievement Stats */}
             <div
-              ref={(el) => (sectionRefs.current[5] = el)}
-              className={`transition-all duration-1000 ${
+              ref={(el) => { sectionRefs.current[5] = el; }}
+              className={`transition-all duration-700 ease-out ${
                 visibleSections.has(5) ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
               }`}
             >
-              <Card className="border-2 border-black shadow-xl hover:shadow-2xl hover:border-blue-600 transition-all duration-500 group/achievements">
-                <CardHeader className="group-hover/achievements:bg-gradient-to-r group-hover/achievements:from-blue-50 group-hover/achievements:to-transparent transition-all duration-500">
-                  <CardTitle className="text-2xl text-black group-hover/achievements:text-blue-600 transition-colors duration-300 flex items-center gap-2">
-                    Achievement Stats
-                    <Award className="h-6 w-6 opacity-0 group-hover/achievements:opacity-100 group-hover/achievements:rotate-12 transition-all duration-500" />
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">This semester's highlights</CardDescription>
+              <Card className="bg-purple-200  text-purple-900 border-none shadow-xl shadow-slate-400/30 dark:shadow-black/40 transition-colors duration-300">
+                <CardHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 bg-white/10 rounded-xl text-purple-800">
+                      <Sparkles size={20} />
+                    </div>
+                    <CardTitle className="text-purple-800">Highlights</CardTitle>
+                  </div>
+                  <CardDescription className="text-black">Semester achievements</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {[
-                    { icon: Award, label: 'Gold Medals', value: '23', sublabel: 'National level competitions', color: 'yellow' },
-                    { icon: Award, label: 'Publications', value: '47', sublabel: 'Research papers & articles', color: 'purple' },
-                    { icon: TrendingUp, label: 'Internships', value: '89', sublabel: 'Students placed this year', color: 'blue' }
+                    { icon: Award, label: 'Gold Medals', value: '23', sublabel: 'National Competitions', color: 'text-amber-400', bg: 'bg-amber-400/10' },
+                    { icon: BookOpen, label: 'Publications', value: '47', sublabel: 'Research Papers', color: 'text-purple-400', bg: 'bg-purple-400/10' },
+                    { icon: GraduationCap, label: 'Internships', value: '89', sublabel: 'Placements secured', color: 'text-blue-400', bg: 'bg-blue-400/10' }
                   ].map((achievement, idx) => (
-                    <div key={idx} className={`p-5 bg-${achievement.color}-50 rounded-xl border-l-4 border-${achievement.color}-600 transition-all duration-500 hover:shadow-xl hover:scale-105 hover:-translate-y-1 cursor-pointer group/achievement`}>
-                      <div className="flex items-center gap-3 mb-3">
-                        <achievement.icon className={`h-6 w-6 text-${achievement.color}-600 group-hover/achievement:rotate-12 group-hover/achievement:scale-125 transition-all duration-500`} />
-                        <p className="font-semibold text-black group-hover/achievement:text-blue-600 transition-colors duration-300">{achievement.label}</p>
+                    <div 
+                      key={idx} 
+                      className="flex items-center p-4 rounded-2xl bg-purple-50 border-purple-700 hover:bg-purple-100 transition-colors cursor-default"
+                    >
+                      <div className={`p-3 rounded-xl ${achievement.bg} ${achievement.color} mr-4`}>
+                        <achievement.icon size={20} />
                       </div>
-                      <p className={`text-4xl font-bold text-${achievement.color}-600 mb-2 group-hover/achievement:scale-110 inline-block transition-transform duration-300`}>{achievement.value}</p>
-                      <p className="text-sm text-gray-600">{achievement.sublabel}</p>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center">
+                          <p className="font-semibold text-black">{achievement.label}</p>
+                          <span className={`text-xl font-bold ${achievement.color}`}>{achievement.value}</span>
+                        </div>
+                        <p className="text-xs text-black mt-1">{achievement.sublabel}</p>
+                      </div>
                     </div>
                   ))}
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Mini Calendar / Notices */}
+            <div className={`transition-all duration-700 delay-200 ease-out ${visibleSections.has(5) ? 'opacity-100' : 'opacity-0'}`}>
+               <Card className="bg-gradient-to-br from-purple-50 to-white dark:from-slate-900 dark:to-slate-900 border-purple-100 dark:border-slate-800 transition-all duration-300">
+                  <CardHeader>
+                     <CardTitle className="text-purple-900 dark:text-purple-300">Upcoming Events</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                     <div className="space-y-4">
+                        <div className="flex gap-4 items-center">
+                           <div className="flex flex-col items-center justify-center w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl shadow-sm text-xs font-bold text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-slate-700 transition-colors duration-300">
+                              <span>OCT</span>
+                              <span className="text-lg">24</span>
+                           </div>
+                           <div>
+                              <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Faculty Meeting</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">2:00 PM • Room 304</p>
+                           </div>
+                        </div>
+                        <div className="flex gap-4 items-center">
+                           <div className="flex flex-col items-center justify-center w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl shadow-sm text-xs font-bold text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+                              <span>OCT</span>
+                              <span className="text-lg">28</span>
+                           </div>
+                           <div>
+                              <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Project Submission</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">11:59 PM • Online Portal</p>
+                           </div>
+                        </div>
+                     </div>
+                     <Button variant="secondary" className="w-full mt-6 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50">
+                        View Calendar
+                     </Button>
+                  </CardContent>
+               </Card>
             </div>
           </div>
         </div>

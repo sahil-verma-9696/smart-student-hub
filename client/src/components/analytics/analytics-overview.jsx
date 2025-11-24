@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { BarChart3, Users, TrendingUp, Calendar, CheckCircle, Clock } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { BarChart3, Users, TrendingUp, Calendar, CheckCircle, Clock } from "lucide-react";
 
 const overviewStats = [
   {
@@ -36,14 +36,14 @@ const overviewStats = [
     icon: Clock,
     description: "Faculty review time",
   },
-]
+];
 
 const departmentEngagement = [
   { department: "Computer Science", students: 856, activities: 2340, engagement: 92 },
   { department: "Electronics", students: 743, activities: 1876, engagement: 85 },
   { department: "Mechanical", students: 654, activities: 1456, engagement: 78 },
   { department: "Civil", students: 594, activities: 1234, engagement: 73 },
-]
+];
 
 const monthlyTrends = [
   { month: "Aug", activities: 456, students: 234 },
@@ -52,7 +52,7 @@ const monthlyTrends = [
   { month: "Nov", activities: 1234, students: 567 },
   { month: "Dec", activities: 987, students: 432 },
   { month: "Jan", activities: 1456, students: 678 },
-]
+];
 
 export function AnalyticsOverview() {
   return (
@@ -60,21 +60,24 @@ export function AnalyticsOverview() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {overviewStats.map((stat) => (
-          <Card key={stat.title}>
+          <Card key={stat.title} className="bg-purple-50 border-purple-500">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-sm font-medium text-purple-800">{stat.title}</p>
+                  <p className="text-2xl font-bold text-black">{stat.value}</p>
                   <div className="flex items-center gap-1">
-                    <Badge variant={stat.changeType === "positive" ? "default" : "destructive"} className="text-xs">
+                    <Badge
+                      variant={stat.changeType === "positive" ? "default" : "destructive"}
+                      className="text-black bg-purple-100"
+                    >
                       {stat.change}
                     </Badge>
-                    <span className="text-xs text-muted-foreground">{stat.description}</span>
+                    <span className="text-white text-xs">{stat.description}</span>
                   </div>
                 </div>
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <stat.icon className="h-5 w-5 text-primary" />
+                <div className="p-2 bg-purple-400/30 rounded-lg">
+                  <stat.icon className="h-5 w-5 text-black" />
                 </div>
               </div>
             </CardContent>
@@ -83,13 +86,13 @@ export function AnalyticsOverview() {
       </div>
 
       {/* Department Engagement */}
-      <Card>
+      <Card className="bg-purple-50 border-purple-500">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-purple-900">
+            <BarChart3 className="h-5 w-5 text-black" />
             Department Engagement Overview
           </CardTitle>
-          <CardDescription>Student participation and activity levels by department</CardDescription>
+          <CardDescription className="text-white">Student participation and activity levels by department</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -97,15 +100,15 @@ export function AnalyticsOverview() {
               <div key={dept.department} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <span className="font-medium min-w-0 flex-1">{dept.department}</span>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="font-medium min-w-0 flex-1 text-black">{dept.department}</span>
+                    <div className="flex items-center gap-4 text-sm text-white">
                       <span>{dept.students} students</span>
                       <span>{dept.activities} activities</span>
                     </div>
                   </div>
-                  <Badge variant="secondary">{dept.engagement}%</Badge>
+                  <Badge variant="secondary" className="bg-purple-300 text-black">{dept.engagement}%</Badge>
                 </div>
-                <Progress value={dept.engagement} className="h-2" />
+                <Progress value={dept.engagement} className="h-2 bg-purple-200" />
               </div>
             ))}
           </div>
@@ -113,50 +116,50 @@ export function AnalyticsOverview() {
       </Card>
 
       {/* Monthly Activity Trend */}
-      <Card>
+      <Card className="bg-purple-50 border-purple-500">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-secondary" />
+          <CardTitle className="flex items-center gap-2 text-black">
+            <TrendingUp className="h-5 w-5 text-black" />
             Monthly Activity Trends
           </CardTitle>
-          <CardDescription>Activity submissions and student participation over time</CardDescription>
+          <CardDescription className="text-purple-600">Activity submissions and student participation over time</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="grid grid-cols-6 gap-4">
-              {monthlyTrends.map((month, index) => (
+              {monthlyTrends.map((month) => (
                 <div key={month.month} className="text-center space-y-2">
-                  <div className="text-xs font-medium text-muted-foreground">{month.month}</div>
+                  <div className="text-xs font-medium text-black">{month.month}</div>
                   <div className="space-y-1">
                     <div
-                      className="bg-primary rounded-t"
+                      className="bg-purple-700 rounded-t"
                       style={{ height: `${(month.activities / 1500) * 60}px`, minHeight: "4px" }}
                     ></div>
                     <div
-                      className="bg-secondary rounded-b"
+                      className="bg-purple-500 rounded-b"
                       style={{ height: `${(month.students / 700) * 40}px`, minHeight: "2px" }}
                     ></div>
                   </div>
                   <div className="space-y-0.5 text-xs">
-                    <div className="text-primary font-medium">{month.activities}</div>
-                    <div className="text-secondary">{month.students}</div>
+                    <div className="text-black font-medium">{month.activities}</div>
+                    <div className="text-black">{month.students}</div>
                   </div>
                 </div>
               ))}
             </div>
             <div className="flex justify-center gap-6 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-primary rounded"></div>
-                <span>Activities</span>
+                <div className="w-3 h-3 bg-purple-700 rounded"></div>
+                <span className="text-black">Activities</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-secondary rounded"></div>
-                <span>Active Students</span>
+                <div className="w-3 h-3 bg-purple-300 rounded"></div>
+                <span className="text-black">Active Students</span>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

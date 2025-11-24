@@ -5,6 +5,7 @@ import { RouterProvider } from 'react-router-dom'
 import routes from './routes'
 import { AuthModalProvider } from "./hooks/useAuthModal";
 import AuthModal from "./components/publicComponents/AuthModal";
+import FacultyAnalyticsPage from "@/pages/analytics";
 
 const App = () => {
   return (

@@ -11,7 +11,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <nav className="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#3b82f6] rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-purple-500 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-lg">S</span>
           </div>
           <span className="font-semibold text-xl text-foreground hidden sm:inline">Smart Student Hub</span>
