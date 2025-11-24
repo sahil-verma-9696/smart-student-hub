@@ -1,10 +1,10 @@
-import React from 'react'
-import AuthProvider from './contexts/Auth'
-import { GlobalContextProvider } from './contexts/Global'
-import { RouterProvider } from 'react-router-dom'
-import routes from './routes'
-import { AuthModalProvider } from "./hooks/useAuthModal";
-import AuthModal from "./components/publicComponents/AuthModal";
+import React from "react";
+
+import { RouterProvider } from "react-router-dom";
+import routes from "./routes/index.js";
+
+import AuthProvider from "./providers/auth-context-provider.jsx";
+import GlobalContextProvider from "./providers/global-context-provider.jsx";
 
 const App = () => {
   return (
@@ -15,7 +15,7 @@ const App = () => {
         </GlobalContextProvider>
       </AuthProvider>
     </>
-  )
-}
+  );
+};
 
 export default App;

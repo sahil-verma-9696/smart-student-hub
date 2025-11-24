@@ -1,23 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
+import { ContactInfoDto } from '../dto/contact-info.dto';
 
 export interface UserMethods {
   comparePassword(plainPassword: string): Promise<boolean>;
 }
 
 export type UserDocument = User & Document & UserMethods;
-
-export class ContactInfo {
-  @Prop({ required: true })
-  phone: string;
-
-  @Prop()
-  alternatePhone?: string;
-
-  @Prop()
-  address?: string;
-}
 
 @Schema({ timestamps: true })
 export class User {
@@ -39,8 +29,8 @@ export class User {
   @Prop({ enum: ['male', 'female', 'other'], required: true })
   gender: string;
 
-  @Prop({ type: ContactInfo, required: true })
-  contactInfo: ContactInfo;
+  @Prop({ type: ContactInfoDto, required: true })
+  contactInfo: ContactInfoDto;
 
   /**
    * REFERENCES for deriving relations

@@ -27,25 +27,10 @@ const studentNavigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-const adminNavigation = [
-  { name: "Dashboard", href: "/admin/dashboard", icon: Home },
-  { name: "Add Student", href: "/admin/add-student", icon: Users },
-  { name: "Add Faculty", href: "/admin/add-faculty", icon: Users },
-  { name: "Student Panel", href: "/admin/students-panel", icon: GraduationCap },
-  { name: "All Activities", href: "/admin/activities", icon: Calendar },
-  { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { name: "Reports", href: "/admin/reports", icon: FileText },
-  { name: "Settings", href: "/settings", icon: Settings },
-];
 
-export default function Sidebar() {
+
+export default function Sidebar({ navigationConfig }) {
   const [collapsed, setCollapsed] = useState(false);
-
-  // TODO: Replace with actual role from session / API
-  const role = "admin"; 
-  // role can be: "student" | "admin"
-
-  const navigation = role === "admin" ? adminNavigation : studentNavigation;
 
   return (
     <div
@@ -78,7 +63,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="px-2 py-4 space-y-1">
-        {navigation.map((item) => (
+        {navigationConfig.map((item) => (
           <a
             key={item.name}
             href={item.href}

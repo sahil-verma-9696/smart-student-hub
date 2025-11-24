@@ -4,7 +4,7 @@ import { FriendsList } from "@/components/chat/friends-list";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { LogOut, MessageCircle } from "lucide-react";
-import { useGlobalContext } from "@/contexts/Global";
+import { useGlobalContext } from "@/contexts/global-context";
 import { useNavigate } from "react-router";
 import Header from "@/components/chat/header";
 

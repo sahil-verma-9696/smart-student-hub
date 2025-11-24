@@ -26,8 +26,8 @@ export class StudentService {
     return `This action returns all student`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} student`;
+  async findOne(id: string) {
+    return await this.studentModel.findById(id).populate('basicUserDetails');
   }
 
   update(id: number, updateStudentDto: UpdateStudentDto) {

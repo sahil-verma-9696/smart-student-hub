@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
-import { useGlobalContext } from "./Global";
+import { useGlobalContext } from "./global-context";
 
 const DEBUG = false;
 const ChatSocketContext = createContext({

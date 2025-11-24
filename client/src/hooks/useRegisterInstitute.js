@@ -1,17 +1,15 @@
-import { AuthContext } from "@/contexts/Auth";
-import React, { useContext } from "react";
+import React from "react";
+import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
+import storageKeys from "@/common/storage-keys";
 import useAuthContext from "./useAuthContext";
 import useGlobalContext from "./useGlobalContext";
-import { useNavigate } from "react-router";
 
 export default function useRegisterInstitute() {
-  const { setIsUserAuthenticated, setUserRole } = useAuthContext();
-  const { setUser } = useGlobalContext();
-  const navigate = useNavigate()
   /******************************************
    * variables
    ********************************************/
-  const BASE_URL = "https://700d771d478e.ngrok-free.app";
+  const BASE_URL = import.meta.env.VITE_SERVER_URL;
   /******************************************
    * Local State for handling api call.
    ********************************************/
@@ -20,8 +18,21 @@ export default function useRegisterInstitute() {
   const [error, setError] = React.useState(null);
 
   /******************************************
-   * Function to register an institute.
+   * hooks invokation
    ********************************************/
+  const navigate = useNavigate();
+
+  /******************************************
+   * Custom hooks invokation
+   ********************************************/
+  const { setIsUserAuthenticated, setUserRole } = useAuthContext();
+  const { setUser } = useGlobalContext();
+
+  /******************************************
+   * Functions
+   ********************************************/
+
+  /** Institute + Admin Registration */
   async function registerInstitute(payload) {
     try {
       setLoading(true);
@@ -32,22 +43,39 @@ export default function useRegisterInstitute() {
       });
 
       const response = await res.json();
+
+      if (!res.ok) {
+        toast.error(response.msg);
+        throw new Error(response.message || "Registration failed");
+      }
+
       setData(response.data);
+      toast.success(response.msg);
       setIsUserAuthenticated(true);
       setUserRole(response.data.user?.role || "");
       setUser(response?.data?.user || {});
 
-      localStorage.setItem("token", response?.data?.token || "");
-      localStorage.setItem("user", JSON.stringify(response?.data?.user || {}));
-      localStorage.setItem("admin", JSON.stringify(response?.data?.admin || {}));
       localStorage.setItem(
-        "institute",
+        storageKeys.accessToken,
+        response?.data?.token || ""
+      );
+      localStorage.setItem("user", JSON.stringify(response?.data?.user || {}));
+      localStorage.setItem(
+        storageKeys.userDetails,
+        JSON.stringify(response?.data?.admin || {})
+      );
+      localStorage.setItem(
+        storageKeys.instituteDetails,
         JSON.stringify(response?.data?.institute || {})
       );
-      localStorage.setItem("role", response?.data?.user?.role || "");
+      localStorage.setItem(
+        storageKeys.userRole,
+        response?.data?.user?.role || ""
+      );
       const expiresMs = Number(response?.data?.expires_in ?? 0);
-      localStorage.setItem("expiresIn", expiresMs + Date.now());
+      localStorage.setItem(storageKeys.expiresAt, expiresMs + Date.now());
       console.log(response);
+
       if (response.data.user?.role === "admin") {
         navigate("/admin");
       }

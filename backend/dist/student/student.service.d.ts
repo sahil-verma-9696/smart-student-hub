@@ -10,7 +10,11 @@ export declare class StudentService {
         __v: number;
     }>;
     findAll(): string;
-    findOne(id: number): string;
+    findOne(id: string): Promise<(import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }) | null>;
     update(id: number, updateStudentDto: UpdateStudentDto): string;
     remove(id: number): string;
 }

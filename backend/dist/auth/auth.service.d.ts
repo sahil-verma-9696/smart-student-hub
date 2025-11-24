@@ -58,7 +58,7 @@ export declare class AuthService {
             email: string;
             role: string;
             gender: string;
-            contactInfo: import("../user/schema/user.schema").ContactInfo;
+            contactInfo: import("../user/dto/contact-info.dto").ContactInfoDto;
             instituteId: import("mongoose").Types.ObjectId;
             adminId?: import("mongoose").Types.ObjectId;
             studentId?: import("mongoose").Types.ObjectId;
@@ -93,7 +93,7 @@ export declare class AuthService {
             email: string;
             role: string;
             gender: string;
-            contactInfo: import("../user/schema/user.schema").ContactInfo;
+            contactInfo: import("../user/dto/contact-info.dto").ContactInfoDto;
             instituteId: import("mongoose").Types.ObjectId;
             adminId?: import("mongoose").Types.ObjectId;
             studentId?: import("mongoose").Types.ObjectId;

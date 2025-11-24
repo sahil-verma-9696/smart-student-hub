@@ -1,7 +1,24 @@
-import { UserPlus, Users, Bell, Activity, User, CalendarDays, AlertCircle, GraduationCap, Building2 } from "lucide-react";
+import {
+  UserPlus,
+  Users,
+  Bell,
+  Activity,
+  User,
+  CalendarDays,
+  AlertCircle,
+  GraduationCap,
+  Building2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import useGlobalContext from "@/hooks/useGlobalContext";
 
 export default function AdminDashboardPage() {
   const [recentItems, setRecentItems] = useState([]);
@@ -10,9 +27,27 @@ export default function AdminDashboardPage() {
   // Simulated data
   useEffect(() => {
     setRecentItems([
-      { id: 1, name: "Amit Verma", role: "Student", email: "amit@gmail.com", date: "2025-11-23" },
-      { id: 2, name: "Priya Sharma", role: "Faculty", email: "priya@college.com", date: "2025-11-22" },
-      { id: 3, name: "Rohit Singh", role: "Student", email: "rohit@gmail.com", date: "2025-11-22" },
+      {
+        id: 1,
+        name: "Amit Verma",
+        role: "Student",
+        email: "amit@gmail.com",
+        date: "2025-11-23",
+      },
+      {
+        id: 2,
+        name: "Priya Sharma",
+        role: "Faculty",
+        email: "priya@college.com",
+        date: "2025-11-22",
+      },
+      {
+        id: 3,
+        name: "Rohit Singh",
+        role: "Student",
+        email: "rohit@gmail.com",
+        date: "2025-11-22",
+      },
     ]);
 
     setRecentActivities([
@@ -22,26 +57,23 @@ export default function AdminDashboardPage() {
     ]);
   }, []);
 
+  const { user } = useGlobalContext();
+
   return (
     <div className="min-h-screen max-h-screen overflow-y-auto bg-[#f8f9fa]">
       <main className="p-6">
         <div className="max-w-7xl mx-auto space-y-10">
-
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-semibold text-[#111827]">
-                Welcome to Your Institute Panel
+              <h1 className="text-3xl font-semibold text-[#111827] space-x-2">
+                <span>Welcome</span>
+                <span className="capitalize">{user?.name || "admin"}</span>
               </h1>
               <p className="text-sm text-[#6b7280] mt-1">
                 Manage students, faculty, departments, and activities.
               </p>
             </div>
-
-            <Button className="bg-black text-white hover:bg-neutral-900">
-              <Bell className="w-4 h-4 mr-2" />
-              Notifications
-            </Button>
           </div>
 
           {/* Stats Overview */}
@@ -90,12 +122,13 @@ export default function AdminDashboardPage() {
           {/* Quick Actions */}
           <Card className="shadow-sm border">
             <CardHeader>
-              <CardTitle className="text-lg text-[#111827]">Quick Actions</CardTitle>
+              <CardTitle className="text-lg text-[#111827]">
+                Quick Actions
+              </CardTitle>
               <CardDescription>Perform common tasks quickly</CardDescription>
             </CardHeader>
 
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
               <Button className="w-full bg-black text-white hover:bg-neutral-800">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Register Student
@@ -114,17 +147,19 @@ export default function AdminDashboardPage() {
               <Button className="w-full bg-black text-white hover:bg-neutral-800">
                 Manage Faculty
               </Button>
-
             </CardContent>
           </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
             {/* Recent Registrations */}
             <Card className="shadow-sm border">
               <CardHeader>
-                <CardTitle className="text-lg text-[#111827]">Recent Registrations</CardTitle>
-                <CardDescription>Latest users added to the institute</CardDescription>
+                <CardTitle className="text-lg text-[#111827]">
+                  Recent Registrations
+                </CardTitle>
+                <CardDescription>
+                  Latest users added to the institute
+                </CardDescription>
               </CardHeader>
 
               <CardContent className="space-y-4">
@@ -135,7 +170,9 @@ export default function AdminDashboardPage() {
                   >
                     <div>
                       <p className="font-medium">{item.name}</p>
-                      <p className="text-xs text-[#6b7280]">{item.role} • {item.email}</p>
+                      <p className="text-xs text-[#6b7280]">
+                        {item.role} • {item.email}
+                      </p>
                     </div>
                     <span className="text-xs text-[#6b7280]">{item.date}</span>
                   </div>
@@ -146,7 +183,9 @@ export default function AdminDashboardPage() {
             {/* Recent Activity */}
             <Card className="shadow-sm border">
               <CardHeader>
-                <CardTitle className="text-lg text-[#111827]">Recent Activity</CardTitle>
+                <CardTitle className="text-lg text-[#111827]">
+                  Recent Activity
+                </CardTitle>
                 <CardDescription>System logs and actions</CardDescription>
               </CardHeader>
 
