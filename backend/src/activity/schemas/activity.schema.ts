@@ -54,6 +54,12 @@ export class Activity {
   })
   status: string;
 
+  @Prop({
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending',
+  })
+  state: string;
+
   @Prop()
   certificateUrl: string;
 
