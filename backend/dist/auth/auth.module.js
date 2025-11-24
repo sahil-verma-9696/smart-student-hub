@@ -17,6 +17,7 @@ const admin_module_1 = require("../admin/admin.module");
 const config_1 = require("@nestjs/config");
 const student_module_1 = require("../student/student.module");
 const faculty_module_1 = require("../faculty/faculty.module");
+const jwt_strategy_1 = require("./strategies/jwt.strategy");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -38,7 +39,7 @@ exports.AuthModule = AuthModule = __decorate([
             faculty_module_1.FacultyModule,
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService],
+        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

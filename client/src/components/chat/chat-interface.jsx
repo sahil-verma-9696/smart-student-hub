@@ -2,7 +2,7 @@ import { useState, memo, useCallback, useEffect, useRef } from "react";
 import { Send, Paperclip } from "lucide-react";
 
 import { useChatSocketContext } from "@/contexts/ChatSocket";
-import { useGlobalContext } from "@/contexts/Global";
+import { useGlobalContext } from "@/contexts/global-context";
 import { CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

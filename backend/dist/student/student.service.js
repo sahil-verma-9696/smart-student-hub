@@ -32,8 +32,8 @@ let StudentService = class StudentService {
     findAll() {
         return `This action returns all student`;
     }
-    findOne(id) {
-        return `This action returns a #${id} student`;
+    async findOne(id) {
+        return await this.studentModel.findById(id).populate('basicUserDetails');
     }
     update(id, updateStudentDto) {
         return `This action updates a #${id} student`;

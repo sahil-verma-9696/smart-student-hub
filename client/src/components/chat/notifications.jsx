@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useChatSocketContext } from "@/contexts/ChatSocket";
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "@/contexts/Global";
+import { useGlobalContext } from "@/contexts/global-context";
 
 export function Notifications({ onMarkAllAsRead }) {
   const [notifications, setNotifications] = useState([]);

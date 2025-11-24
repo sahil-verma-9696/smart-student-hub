@@ -46,11 +46,9 @@ let AuthService = class AuthService {
             instituteId: institute._id.toString(),
         });
         const admin = await this.adminService.create(user._id.toString());
-        const token = this.jwtService.sign({
-            user_id: user._id,
-            institute_id: institute._id,
-            role: 'admin',
-        });
+        const { passwordHash, ...sanitizedUser } = user.toObject();
+        const payload = this.buildJwtPayload(user);
+        const token = this.jwtService.sign(payload);
         return {
             institute,
             admin,
@@ -73,12 +71,11 @@ let AuthService = class AuthService {
             gender: data.gender,
         });
         const studentData = await this.studentService.create(user._id.toString());
-        const token = this.jwtService.sign({
-            user_id: user._id,
-            role: 'student',
-        });
+        const { passwordHash, ...sanitizedUser } = user.toObject();
+        const payload = this.buildJwtPayload(user);
+        const token = this.jwtService.sign(payload);
         return {
-            user,
+            user: sanitizedUser,
             studentData,
             token,
             expires_in: process.env.JWT_EXPIRES_IN_MILI,
@@ -98,12 +95,9 @@ let AuthService = class AuthService {
             instituteId,
         });
         const faculty = await this.facultyService.create(user._id.toString());
-        const token = this.jwtService.sign({
-            user_id: user._id,
-            role: 'faculty',
-            instituteId,
-        });
         const { passwordHash, ...sanitizedUser } = user.toObject();
+        const payload = this.buildJwtPayload(user);
+        const token = this.jwtService.sign(payload);
         return {
             user: sanitizedUser,
             faculty,
@@ -125,17 +119,32 @@ let AuthService = class AuthService {
         if (!isValidPassword) {
             throw new common_1.UnauthorizedException('Invalid email or password');
         }
-        const token = this.jwtService.sign({
-            sub: user._id.toString(),
-            role: user.role,
-            instituteId: user.instituteId,
-        });
         const { passwordHash, ...sanitizedUser } = user.toObject();
+        const payload = this.buildJwtPayload(user);
+        const token = this.jwtService.sign(payload);
         return {
             user: sanitizedUser,
             token,
             expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
             msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
+        };
+    }
+    async me(user) {
+        const userData = await this.userService.findById(user.sub);
+        return {
+            userData,
+            payload: user,
+            msg: `User ${userData?.name} (role: ${userData?.role}) successfully logged in`,
+        };
+    }
+    buildJwtPayload(user) {
+        return {
+            sub: user._id.toString(),
+            userId: user.userId,
+            email: user.email,
+            role: user.role,
+            instituteId: user.instituteId.toString(),
+            name: user.name,
         };
     }
 };

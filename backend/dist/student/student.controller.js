@@ -25,7 +25,7 @@ let StudentController = class StudentController {
         return this.studentService.findAll();
     }
     findOne(id) {
-        return this.studentService.findOne(+id);
+        return this.studentService.findOne(id);
     }
     update(id, updateStudentDto) {
         return this.studentService.update(+id, updateStudentDto);
