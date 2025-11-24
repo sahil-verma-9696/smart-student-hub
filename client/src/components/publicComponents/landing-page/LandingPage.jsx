@@ -19,7 +19,7 @@ const LandingPage = () => {
     if (!isUserAuthenticated) {
       setAuthOpen(true);
     } else {
-      window.location.href = `/admin`;
+      navigate(`/${userRole}`);
     }
   }
 

@@ -44,7 +44,7 @@ export default function Sidebar({
           <div className="flex items-center space-x-2">
             <GraduationCap className="h-8 w-8 text-sidebar-primary" />
             <span className="text-lg font-semibold text-sidebar-foreground">
-              Smart Student Hub
+              Smart <br /> Student Hub
             </span>
           </div>
         )}

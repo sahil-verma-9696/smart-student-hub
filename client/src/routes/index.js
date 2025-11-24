@@ -12,6 +12,12 @@ import ActivitiesFilterPage from "@/pages/admin-pages/student-panel";
 import AdminAnalyticsPage from "@/pages/admin-pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-pages/admin-settings";
 import { createBrowserRouter } from "react-router";
+import { UpDocs } from "@/pages/student-pages/UpDocs";
+import PortfolioPage from "@/pages/student-pages/portfolio";
+import MindPilot from "@/pages/student-pages/MindPilot";
+import ShareAchivos from "@/pages/student-pages/ShareAchivos";
+import PrivateVault from "@/pages/student-pages/PrivateVault";
+import Settings from "@/pages/student-pages/Settings";
 
 export default createBrowserRouter([
   {
@@ -26,6 +32,30 @@ export default createBrowserRouter([
       {
         index: true,
         Component: ScholarWindowPage,
+      },
+      {
+        path: "updocs",
+        Component: UpDocs,
+      },
+      {
+        path: "fastfolo",
+        Component: PortfolioPage,
+      },
+      {
+        path: "mind-piolet",
+        Component: MindPilot,
+      },
+      {
+        path: "share-achivos",
+        Component: ShareAchivos,
+      },
+      {
+        path: "private-vault",
+        Component: PrivateVault,
+      },
+      {
+        path: "setting",
+        Component: Settings,
       },
     ],
   },
