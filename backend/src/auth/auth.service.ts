@@ -69,7 +69,7 @@ export class AuthService {
     /**
      *  Create Admin profile
      */
-    const admin = await this.adminService.create(user._id.toString());
+    const admin = await this.adminService.create(user._id);
 
     /****** Sanitize User **************/
 
@@ -218,16 +218,25 @@ export class AuthService {
   async me(user: JwtPayload) {
     const userData = await this.userService.findById(user.sub);
 
+    if (!userData) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Convert document → plain object
+    const obj = userData.toObject();
+
+    // Remove password from output
+    const { passwordHash, ...sanitizedUser } = obj;
+
     return {
-      userData,
-      payload: user,
-      msg: `User ${userData?.name} (role: ${userData?.role}) successfully logged in`,
+      userData: user,
+      msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
     };
   }
 
   private buildJwtPayload(user: User): JwtPayload {
     return {
-      sub: user._id.toString(),
+      sub: user._id.toString() as string,
       userId: user.userId,
       email: user.email,
       role: user.role,

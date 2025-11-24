@@ -1,8 +1,6 @@
 import storageKeys from "@/common/storage-keys";
 import React from "react";
 import useAuthContext from "./useAuthContext";
-import useGlobalContext from "./useGlobalContext";
-import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 
 export default function useAuthantication() {
@@ -26,8 +24,7 @@ export default function useAuthantication() {
   /******************************************
    * Custom hooks invokation
    ********************************************/
-  const { setIsUserAuthenticated, setUserRole } = useAuthContext();
-  const { setUser } = useGlobalContext();
+  const { setIsUserAuthenticated, setUserRole, setUser } = useAuthContext();
 
   /******************************************
    * Functions
@@ -45,6 +42,7 @@ export default function useAuthantication() {
       console.log("LOGIN API RESPONSE:", response);
 
       if (!res.ok) {
+        setLoading(false);
         throw new Error(response?.msg || "Login failed");
       }
 
@@ -78,9 +76,12 @@ export default function useAuthantication() {
       const expiresMs = Number(response?.data?.expires_in ?? 0);
       localStorage.setItem(storageKeys.expiresAt, expiresMs + Date.now());
 
+      setLoading(false);
+
       window.location.href = `/${response?.data?.user?.role?.toLowerCase()}`;
     } catch (err) {
       console.log(err);
+      setLoading(false);
       toast.error(err.message);
       setError(err.message);
     }

@@ -75,6 +75,9 @@ let AuthController = class AuthController {
         return await this.authService.facultyRegistration(body, institueId);
     }
     getMe(req) {
+        if (!req.user) {
+            throw new common_1.UnauthorizedException('User not authenticated');
+        }
         return this.authService.me(req.user);
     }
 };

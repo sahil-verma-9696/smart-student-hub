@@ -30,9 +30,9 @@ export class User {
   @Prop({ type: ContactInfoDto, required: true })
   contactInfo: ContactInfoDto;
 
-  /**
+  /*************************************
    * REFERENCES for deriving relations
-   */
+   *************************************/
   @Prop({
     type: Types.ObjectId,
     ref: 'Institute',
@@ -50,7 +50,7 @@ export class User {
 
   @Prop({ type: Types.ObjectId, ref: 'Faculty', default: null })
   facultyId?: Types.ObjectId;
-  private _id: any;
+  _id: any;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

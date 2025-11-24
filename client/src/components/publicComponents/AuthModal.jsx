@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import {
   Dialog,
@@ -7,22 +8,24 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import useRegisterInstitute from "@/hooks/useRegisterInstitute";
-import useLoginUser from "@/hooks/useLoginUser";
 import useAuthantication from "@/hooks/useAuthantication";
+import { cn } from "@/lib/utils";
 
 export default function AuthModal({ open, onOpenChange }) {
   const [mode, setMode] = useState("");
 
-  // Login fields
+  // Login fields + errors
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginErrors, setLoginErrors] = useState({});
 
-  // Institute registration fields
+  // Institute registration fields + errors
   const [institute, setInstitute] = useState({
     institute_name: "",
     institute_type: "",
@@ -49,7 +52,21 @@ export default function AuthModal({ open, onOpenChange }) {
     affiliation_id: "",
   });
 
-  // Update functions
+  const [registerErrors, setRegisterErrors] = useState({});
+
+  // Hooks
+  const {
+    registerInstitute,
+    loading: registerLoading,
+    error: registerError,
+  } = useRegisterInstitute();
+  const {
+    login,
+    loading: loginLoading,
+    error: loginError,
+  } = useAuthantication();
+
+  // Update fields
   const handleInstituteChange = (field, value) => {
     setInstitute((prev) => ({ ...prev, [field]: value }));
   };
@@ -64,36 +81,68 @@ export default function AuthModal({ open, onOpenChange }) {
     }));
   };
 
-  // Hooks
-  const { registerInstitute, loading: registerLoading } =
-    useRegisterInstitute();
-  const { login, loading: loginLoading } = useAuthantication();
+  /******************************************
+   * FORM VALIDATION
+   ******************************************/
+  const validateLogin = () => {
+    const errs = {};
+    if (!email) errs.email = "Email is required";
+    if (!password) errs.password = "Password is required";
+    setLoginErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
-  /**************************************
+  const validateInstitute = () => {
+    const errs = {};
+    const fields = [
+      "institute_name",
+      "institute_type",
+      "official_email",
+      "official_phone",
+      "address_line1",
+      "city",
+      "state",
+      "pincode",
+      "admin_name",
+      "admin_email",
+      "admin_password",
+      "admin_gender",
+      "affiliation_university",
+      "affiliation_id",
+    ];
+
+    fields.forEach((f) => {
+      if (!institute[f]) errs[f] = "Required field";
+    });
+
+    if (!institute.admin_contactInfo.phone)
+      errs["admin_contactInfo.phone"] = "Required";
+    if (!institute.admin_contactInfo.address)
+      errs["admin_contactInfo.address"] = "Required";
+
+    setRegisterErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  /******************************************
    * SUBMIT HANDLER
-   **************************************/
+   ******************************************/
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    /* ---------------------- LOGIN ---------------------- */
-    if (mode.includes("login")) {
-      const payload = {
-        email,
-        password,
-      };
-
-      login(payload);
+    if (mode === "login") {
+      if (!validateLogin()) return;
+      login({ email, password });
       return;
     }
 
-    /* ------------------ REGISTER INSTITUTE ------------------ */
     if (mode === "register-institute") {
-      const payload = {
+      if (!validateInstitute()) return;
+
+      registerInstitute({
         ...institute,
         is_affiliated: institute.is_affiliated === "true",
-      };
-
-      registerInstitute(payload);
+      });
     }
   };
 
@@ -104,25 +153,16 @@ export default function AuthModal({ open, onOpenChange }) {
           <DialogTitle className="text-center">
             {mode ? mode.replace("-", " ").toUpperCase() : "Choose an Option"}
           </DialogTitle>
-
           <DialogDescription className="text-center text-sm text-muted-foreground">
-            {mode === "register-institute"
-              ? "Please fill the required information to register your institute."
-              : "Please choose an option to continue."}
+            {mode === "" ? "Please choose how you want to continue." : ""}
           </DialogDescription>
         </DialogHeader>
 
-        {/* ================= MAIN OPTIONS ================= */}
+        {/* ================= SIMPLE TWO OPTIONS ================= */}
         {!mode && (
           <div className="grid gap-3 py-4">
-            <Button onClick={() => setMode("admin-login")} variant="outline">
-              Admin Login
-            </Button>
-            <Button onClick={() => setMode("student-login")} variant="outline">
-              Student Login
-            </Button>
-            <Button onClick={() => setMode("faculty-login")} variant="outline">
-              Faculty Login
+            <Button onClick={() => setMode("login")} variant="outline">
+              Login
             </Button>
             <Button onClick={() => setMode("register-institute")}>
               Register Institute
@@ -133,28 +173,57 @@ export default function AuthModal({ open, onOpenChange }) {
         {/* ================= FORMS ================= */}
         {mode && (
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+            {/* ================= SHOW API ERRORS ================= */}
+            {mode === "login" && loginError && (
+              <p className="text-red-500 text-sm border p-2 rounded">
+                {loginError}
+              </p>
+            )}
+
+            {mode === "register-institute" && registerError && (
+              <p className="text-red-500 text-sm border p-2 rounded">
+                {registerError}
+              </p>
+            )}
+
             {/* ================= LOGIN FORM ================= */}
-            {(mode === "admin-login" ||
-              mode === "student-login" ||
-              mode === "faculty-login") && (
+            {mode === "login" && (
               <>
+                {/* EMAIL */}
                 <div className="grid gap-2">
                   <Label>Email</Label>
                   <Input
+                    className={cn(loginErrors.email && "border-red-500")}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setLoginErrors({ ...loginErrors, email: "" });
+                    }}
                   />
+                  {loginErrors.email && (
+                    <span className="text-red-500 text-xs">
+                      {loginErrors.email}
+                    </span>
+                  )}
                 </div>
 
+                {/* PASSWORD */}
                 <div className="grid gap-2">
                   <Label>Password</Label>
                   <Input
                     type="password"
+                    className={cn(loginErrors.password && "border-red-500")}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setLoginErrors({ ...loginErrors, password: "" });
+                    }}
                   />
+                  {loginErrors.password && (
+                    <span className="text-red-500 text-xs">
+                      {loginErrors.password}
+                    </span>
+                  )}
                 </div>
 
                 <Button
@@ -176,10 +245,7 @@ export default function AuthModal({ open, onOpenChange }) {
 
                 {[
                   ["institute_name", "Institute Name"],
-                  [
-                    "institute_type",
-                    "Institute Type (Autonomous/Private/Govt)",
-                  ],
+                  ["institute_type", "Institute Type"],
                   ["official_email", "Official Email"],
                   ["official_phone", "Official Phone"],
                   ["address_line1", "Address Line 1"],
@@ -190,12 +256,18 @@ export default function AuthModal({ open, onOpenChange }) {
                   <div key={key} className="grid gap-2">
                     <Label>{label}</Label>
                     <Input
+                      className={cn(registerErrors[key] && "border-red-500")}
                       value={institute[key]}
-                      onChange={(e) =>
-                        handleInstituteChange(key, e.target.value)
-                      }
-                      required
+                      onChange={(e) => {
+                        handleInstituteChange(key, e.target.value);
+                        setRegisterErrors({ ...registerErrors, [key]: "" });
+                      }}
                     />
+                    {registerErrors[key] && (
+                      <span className="text-red-500 text-xs">
+                        {registerErrors[key]}
+                      </span>
+                    )}
                   </div>
                 ))}
 
@@ -205,18 +277,24 @@ export default function AuthModal({ open, onOpenChange }) {
                   ["admin_name", "Admin Name"],
                   ["admin_email", "Admin Email"],
                   ["admin_password", "Admin Password"],
-                  ["admin_gender", "Admin Gender (male/female)"],
+                  ["admin_gender", "Admin Gender"],
                 ].map(([key, label]) => (
                   <div key={key} className="grid gap-2">
                     <Label>{label}</Label>
                     <Input
-                      value={institute[key]}
-                      onChange={(e) =>
-                        handleInstituteChange(key, e.target.value)
-                      }
                       type={key === "admin_password" ? "password" : "text"}
-                      required
+                      className={cn(registerErrors[key] && "border-red-500")}
+                      value={institute[key]}
+                      onChange={(e) => {
+                        handleInstituteChange(key, e.target.value);
+                        setRegisterErrors({ ...registerErrors, [key]: "" });
+                      }}
                     />
+                    {registerErrors[key] && (
+                      <span className="text-red-500 text-xs">
+                        {registerErrors[key]}
+                      </span>
+                    )}
                   </div>
                 ))}
 
@@ -232,12 +310,20 @@ export default function AuthModal({ open, onOpenChange }) {
                   <div key={key} className="grid gap-2">
                     <Label>{label}</Label>
                     <Input
+                      className={cn(
+                        registerErrors[`admin_contactInfo.${key}`] &&
+                          "border-red-500"
+                      )}
                       value={institute.admin_contactInfo[key]}
                       onChange={(e) =>
                         handleAdminContactChange(key, e.target.value)
                       }
-                      required
                     />
+                    {registerErrors[`admin_contactInfo.${key}`] && (
+                      <span className="text-red-500 text-xs">
+                        {registerErrors[`admin_contactInfo.${key}`]}
+                      </span>
+                    )}
                   </div>
                 ))}
 
@@ -259,20 +345,26 @@ export default function AuthModal({ open, onOpenChange }) {
                   </select>
                 </div>
 
-                {["affiliation_university", "affiliation_id"].map((field) => (
-                  <div key={field} className="grid gap-2">
+                {["affiliation_university", "affiliation_id"].map((key) => (
+                  <div key={key} className="grid gap-2">
                     <Label>
-                      {field === "affiliation_university"
+                      {key === "affiliation_university"
                         ? "Affiliation University"
                         : "Affiliation ID"}
                     </Label>
                     <Input
-                      value={institute[field]}
-                      onChange={(e) =>
-                        handleInstituteChange(field, e.target.value)
-                      }
-                      required
+                      className={cn(registerErrors[key] && "border-red-500")}
+                      value={institute[key]}
+                      onChange={(e) => {
+                        handleInstituteChange(key, e.target.value);
+                        setRegisterErrors({ ...registerErrors, [key]: "" });
+                      }}
                     />
+                    {registerErrors[key] && (
+                      <span className="text-red-500 text-xs">
+                        {registerErrors[key]}
+                      </span>
+                    )}
                   </div>
                 ))}
 
@@ -286,12 +378,15 @@ export default function AuthModal({ open, onOpenChange }) {
               </>
             )}
 
-            {/* BACK BUTTON */}
             <Button
               type="button"
               variant="ghost"
               className="w-full"
-              onClick={() => setMode("")}
+              onClick={() => {
+                setMode("");
+                setLoginErrors({});
+                setRegisterErrors({});
+              }}
             >
               Back
             </Button>

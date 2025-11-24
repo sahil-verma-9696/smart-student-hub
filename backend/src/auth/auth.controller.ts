@@ -5,6 +5,7 @@ import {
   Post,
   Query,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -75,6 +76,9 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   getMe(@Req() req: authType.AuthenticatedRequest) {
+    if (!req.user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
     return this.authService.me(req.user); // comes from JwtStrategy.validate()
   }
 }

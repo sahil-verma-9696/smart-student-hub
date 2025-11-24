@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import useGlobalContext from "@/hooks/useGlobalContext";
+import useAuthContext from "@/hooks/useAuthContext";
 
 export default function AdminDashboardPage() {
   const [recentItems, setRecentItems] = useState([]);
@@ -57,7 +58,7 @@ export default function AdminDashboardPage() {
     ]);
   }, []);
 
-  const { user } = useGlobalContext();
+  const { user } = useAuthContext();
 
   return (
     <div className="min-h-screen max-h-screen overflow-y-auto bg-[#f8f9fa]">

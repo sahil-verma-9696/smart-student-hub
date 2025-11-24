@@ -5,6 +5,8 @@ const AuthContext = createContext({
   userRole: "",
   setIsUserAuthenticated: () => {},
   setUserRole: () => {},
+  setUser: () => {},
+  user: null,
 });
 
 export default AuthContext;

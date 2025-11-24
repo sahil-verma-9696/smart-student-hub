@@ -45,7 +45,7 @@ let AuthService = class AuthService {
             gender: admin_gender,
             instituteId: institute._id.toString(),
         });
-        const admin = await this.adminService.create(user._id.toString());
+        const admin = await this.adminService.create(user._id);
         const { passwordHash, ...sanitizedUser } = user.toObject();
         const payload = this.buildJwtPayload(user);
         const token = this.jwtService.sign(payload);
@@ -131,10 +131,14 @@ let AuthService = class AuthService {
     }
     async me(user) {
         const userData = await this.userService.findById(user.sub);
+        if (!userData) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const obj = userData.toObject();
+        const { passwordHash, ...sanitizedUser } = obj;
         return {
-            userData,
-            payload: user,
-            msg: `User ${userData?.name} (role: ${userData?.role}) successfully logged in`,
+            userData: user,
+            msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
         };
     }
     buildJwtPayload(user) {

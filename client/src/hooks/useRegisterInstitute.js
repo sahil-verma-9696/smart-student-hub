@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import storageKeys from "@/common/storage-keys";
 import useAuthContext from "./useAuthContext";
-import useGlobalContext from "./useGlobalContext";
 
 export default function useRegisterInstitute() {
   /******************************************
@@ -25,8 +24,7 @@ export default function useRegisterInstitute() {
   /******************************************
    * Custom hooks invokation
    ********************************************/
-  const { setIsUserAuthenticated, setUserRole } = useAuthContext();
-  const { setUser } = useGlobalContext();
+  const { setIsUserAuthenticated, setUserRole, setUser } = useAuthContext();
 
   /******************************************
    * Functions
@@ -45,6 +43,7 @@ export default function useRegisterInstitute() {
       const response = await res.json();
 
       if (!res.ok) {
+        setLoading(false);
         toast.error(response.msg);
         throw new Error(response.message || "Registration failed");
       }
