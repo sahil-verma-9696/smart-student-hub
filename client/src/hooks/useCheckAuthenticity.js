@@ -22,7 +22,7 @@ export default function useCheckAuthenticity() {
    ******************************************/
   const fetchUser = useCallback(async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/user/me`, {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -48,18 +48,18 @@ export default function useCheckAuthenticity() {
   const validateAuth = useCallback(() => {
     // 1️⃣ No token → logout immediately
     if (!accessToken) {
-      logout();
+      if (window.location.pathname !== "/") window.location.href = "/";
       return;
     }
 
     // 2️⃣ Check expiry time
     if (!expiresAt || now >= expiresAt) {
-      logout();
+      if (window.location.pathname !== "/") window.location.href = "/";
       return;
     }
 
     // 3️⃣ Token exists & valid time → verify with backend
-    fetchUser();
+    // fetchUser();
   }, [accessToken, expiresAt, fetchUser, logout, now]);
 
   /******************************************
@@ -67,47 +67,48 @@ export default function useCheckAuthenticity() {
    ******************************************/
   useEffect(() => {
     validateAuth();
-  }, [validateAuth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /******************************************
    * Run whenever route changes
    ******************************************/
-  useEffect(() => {
-    validateAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [window.location.pathname]);
+  // useEffect(() => {
+  //   validateAuth();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [window.location.pathname]);
 
   /******************************************
    * Auto logout when token expires (timer)
    ******************************************/
-  useEffect(() => {
-    if (!expiresAt) return;
+  // useEffect(() => {
+  //   if (!expiresAt) return;
 
-    const timeout = expiresAt - Date.now();
-    if (timeout <= 0) {
-      logout();
-      return;
-    }
+  //   const timeout = expiresAt - Date.now();
+  //   if (timeout <= 0) {
+  //     logout();
+  //     return;
+  //   }
 
-    const timer = setTimeout(() => {
-      logout();
-    }, timeout);
+  //   const timer = setTimeout(() => {
+  //     logout();
+  //   }, timeout);
 
-    return () => clearTimeout(timer);
-  }, [expiresAt, logout]);
+  //   return () => clearTimeout(timer);
+  // }, [expiresAt, logout]);
 
   /******************************************
    * Detect token removal from other tabs
    ******************************************/
-  useEffect(() => {
-    const syncLogout = (e) => {
-      if (e.key === storageKeys.accessToken && !e.newValue) {
-        logout();
-      }
-    };
-    window.addEventListener("storage", syncLogout);
-    return () => window.removeEventListener("storage", syncLogout);
-  }, []);
+  // useEffect(() => {
+  //   const syncLogout = (e) => {
+  //     if (e.key === storageKeys.accessToken && !e.newValue) {
+  //       logout();
+  //     }
+  //   };
+  //   window.addEventListener("storage", syncLogout);
+  //   return () => window.removeEventListener("storage", syncLogout);
+  // }, []);
 
   /******************************************
    * Return states

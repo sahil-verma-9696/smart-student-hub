@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 
 import useRegisterInstitute from "@/hooks/useRegisterInstitute";
 import useLoginUser from "@/hooks/useLoginUser";
+import useAuthantication from "@/hooks/useAuthantication";
 
 export default function AuthModal({ open, onOpenChange }) {
   const [mode, setMode] = useState("");
@@ -64,8 +65,9 @@ export default function AuthModal({ open, onOpenChange }) {
   };
 
   // Hooks
-  const { registerInstitute, loading: registerLoading } = useRegisterInstitute();
-  const { loginUser, loading: loginLoading } = useLoginUser();
+  const { registerInstitute, loading: registerLoading } =
+    useRegisterInstitute();
+  const { login, loading: loginLoading } = useAuthantication();
 
   /**************************************
    * SUBMIT HANDLER
@@ -74,18 +76,15 @@ export default function AuthModal({ open, onOpenChange }) {
     e.preventDefault();
 
     /* ---------------------- LOGIN ---------------------- */
-    // if (mode.includes("login")) {
-    //   const role = mode.replace("-login", ""); // admin/student/faculty
+    if (mode.includes("login")) {
+      const payload = {
+        email,
+        password,
+      };
 
-    //   const payload = {
-    //     email,
-    //     password,
-    //     role,
-    //   };
-
-    //   loginUser(payload);
-    //   return;
-    // }
+      login(payload);
+      return;
+    }
 
     /* ------------------ REGISTER INSTITUTE ------------------ */
     if (mode === "register-institute") {
@@ -134,7 +133,6 @@ export default function AuthModal({ open, onOpenChange }) {
         {/* ================= FORMS ================= */}
         {mode && (
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-
             {/* ================= LOGIN FORM ================= */}
             {(mode === "admin-login" ||
               mode === "student-login" ||
@@ -178,7 +176,10 @@ export default function AuthModal({ open, onOpenChange }) {
 
                 {[
                   ["institute_name", "Institute Name"],
-                  ["institute_type", "Institute Type (Autonomous/Private/Govt)"],
+                  [
+                    "institute_type",
+                    "Institute Type (Autonomous/Private/Govt)",
+                  ],
                   ["official_email", "Official Email"],
                   ["official_phone", "Official Phone"],
                   ["address_line1", "Address Line 1"],
