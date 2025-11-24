@@ -6,7 +6,10 @@ export class JournalPaperDetails {
   doi?: string;
   publisher?: string;
   indexing: 'SCI' | 'Scopus' | 'UGC' | 'Other';
-  authors: string[];
+  authors: {
+    firstAuthor:string;
+    coAuthors?: string[];
+  };
   pageNumbers?: string;
 }
 
@@ -26,6 +29,9 @@ export class OnlineCourseDetails {
   scorePercent?: number;
   certificateId?: string;
   verificationLink?: string;
+  courseCategory?: string;
+  courseUrl?: string;
+  completionDate?: Date;
 }
 
 export class WorkshopSeminarDetails {
@@ -33,6 +39,9 @@ export class WorkshopSeminarDetails {
   mode: 'online' | 'offline';
   durationDays?: number;
   role: 'participant' | 'speaker';
+  skillGained?: string;
+  organizerContact?: string; //contact object se ayega;
+  attendanceCertificateUrl?: string;
 }
 
 export class AchievementAwardDetails {
@@ -40,10 +49,14 @@ export class AchievementAwardDetails {
   awardedBy: string;
   eventName?: string;
   rankPosition?: string;
+  skilledGained?: string;
+  awardCertificateUrl?: string;
+
 }
 
 export class CertificationDetails {
   certifyingBody: string;
   validTill?: Date;
   skillCategory?: string;
+  verificationLink?: string;
 }

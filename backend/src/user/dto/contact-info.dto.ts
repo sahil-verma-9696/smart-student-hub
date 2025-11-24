@@ -1,5 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 
+
 export class ContactInfoDto {
   @IsString()
   phone: string;
