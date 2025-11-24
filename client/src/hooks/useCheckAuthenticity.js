@@ -25,19 +25,23 @@ export default function useCheckAuthenticity() {
       const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "ngrok-skip-browser-warning": "true",
+
         },
       });
 
       if (!res.ok) throw new Error("Unauthorized");
 
       const payload = await res.json();
-      setUser(payload.data);
-      setIsUserAuthenticated(true);
+      // setUser(payload.data);
+      // setIsUserAuthenticated(true);
 
       return payload.data;
     } catch (err) {
       console.error(err);
-      logout();
+      // logout();
       return null;
     }
   }, [accessToken, logout, setIsUserAuthenticated, setUser]);
@@ -59,7 +63,7 @@ export default function useCheckAuthenticity() {
     }
 
     // 3️⃣ Token exists & valid time → verify with backend
-    // fetchUser();
+    fetchUser();
   }, [accessToken, expiresAt, fetchUser, logout, now]);
 
   /******************************************
