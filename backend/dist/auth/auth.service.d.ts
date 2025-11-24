@@ -8,6 +8,7 @@ import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 import { FacultyService } from 'src/faculty/faculty.service';
+import { JwtPayload } from './types/auth.type';
 export declare class AuthService {
     private readonly instituteService;
     private readonly adminService;
@@ -27,21 +28,13 @@ export declare class AuthService {
         }> & {
             __v: number;
         };
-        user: import("mongoose").Document<unknown, {}, import("../user/schema/user.schema").UserDocument, {}, {}> & import("../user/schema/user.schema").User & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & import("../user/schema/user.schema").UserMethods & Required<{
-            _id: import("mongoose").Types.ObjectId;
-        }> & {
-            __v: number;
-        };
+        user: never;
         token: string;
         expires_in: string | undefined;
         msg: string;
     }>;
     studentRegistration(data: StudentRegistrationBodyDto, instituteId: string): Promise<{
-        user: import("mongoose").Document<unknown, {}, import("../user/schema/user.schema").UserDocument, {}, {}> & import("../user/schema/user.schema").User & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & import("../user/schema/user.schema").UserMethods & Required<{
-            _id: import("mongoose").Types.ObjectId;
-        }> & {
-            __v: number;
-        };
+        user: any;
         studentData: import("mongoose").Document<unknown, {}, import("../student/schema/student.schema").Student, {}, {}> & import("../student/schema/student.schema").Student & Required<{
             _id: import("mongoose").Types.ObjectId;
         }> & {
@@ -52,31 +45,7 @@ export declare class AuthService {
         msg: string;
     }>;
     facultyRegistration(data: FacultyRegistrationDto, instituteId: string): Promise<{
-        user: {
-            userId: string;
-            name: string;
-            email: string;
-            role: string;
-            gender: string;
-            contactInfo: import("../user/dto/contact-info.dto").ContactInfoDto;
-            instituteId: import("mongoose").Types.ObjectId;
-            adminId?: import("mongoose").Types.ObjectId;
-            studentId?: import("mongoose").Types.ObjectId;
-            facultyId?: import("mongoose").Types.ObjectId;
-            _id: import("mongoose").Types.ObjectId;
-            $locals: Record<string, unknown>;
-            $op: "save" | "validate" | "remove" | null;
-            $where: Record<string, unknown>;
-            baseModelName?: string;
-            collection: import("mongoose").Collection;
-            db: import("mongoose").Connection;
-            errors?: import("mongoose").Error.ValidationError;
-            id?: any;
-            isNew: boolean;
-            schema: import("mongoose").Schema;
-            comparePassword(plainPassword: string): Promise<boolean>;
-            __v: number;
-        };
+        user: any;
         faculty: import("mongoose").Document<unknown, {}, import("../faculty/schemas/faculty.schema").Faculty, {}, {}> & import("../faculty/schemas/faculty.schema").Faculty & Required<{
             _id: import("mongoose").Types.ObjectId;
         }> & {
@@ -87,33 +56,15 @@ export declare class AuthService {
         msg: string;
     }>;
     userLogin(userLoginDto: UserLoginBodyDto): Promise<{
-        user: {
-            userId: string;
-            name: string;
-            email: string;
-            role: string;
-            gender: string;
-            contactInfo: import("../user/dto/contact-info.dto").ContactInfoDto;
-            instituteId: import("mongoose").Types.ObjectId;
-            adminId?: import("mongoose").Types.ObjectId;
-            studentId?: import("mongoose").Types.ObjectId;
-            facultyId?: import("mongoose").Types.ObjectId;
-            _id: import("mongoose").Types.ObjectId;
-            $locals: Record<string, unknown>;
-            $op: "save" | "validate" | "remove" | null;
-            $where: Record<string, unknown>;
-            baseModelName?: string;
-            collection: import("mongoose").Collection;
-            db: import("mongoose").Connection;
-            errors?: import("mongoose").Error.ValidationError;
-            id?: any;
-            isNew: boolean;
-            schema: import("mongoose").Schema;
-            comparePassword(plainPassword: string): Promise<boolean>;
-            __v: number;
-        };
+        user: any;
         token: string;
         expires_in: number;
         msg: string;
     }>;
+    me(user: JwtPayload): Promise<{
+        userData: null;
+        payload: JwtPayload;
+        msg: string;
+    }>;
+    private buildJwtPayload;
 }

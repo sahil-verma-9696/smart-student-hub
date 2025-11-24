@@ -1,9 +1,19 @@
-import { Body, Controller, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import InstitueRegistrationDto from './dto/institute-registration-body.dto';
 import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import * as authType from './types/auth.type';
 
 @Controller('auth')
 export class AuthController {
@@ -60,5 +70,11 @@ export class AuthController {
     @Query('instituteId') institueId: string,
   ) {
     return await this.authService.facultyRegistration(body, institueId);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req: authType.AuthenticatedRequest) {
+    return this.authService.me(req.user); // comes from JwtStrategy.validate()
   }
 }

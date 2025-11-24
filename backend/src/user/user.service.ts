@@ -19,6 +19,6 @@ export class UserService {
   }
 
   findById(id: string) {
-    return this.userModel.findById(id).exec();
+    return this.userModel.findById(id).populate('instituteId').exec();
   }
 }
