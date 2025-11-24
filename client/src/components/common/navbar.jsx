@@ -26,7 +26,7 @@ function Navbar({ title }) {
     <header className="border-b border-border bg-card px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h2 className="text-xl font-semibold text-card-foreground">
+          <h2 className="text-xl font-semibold text-card-foreground capitalize">
             {title}
           </h2>
         </div>

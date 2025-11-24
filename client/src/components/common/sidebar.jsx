@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const studentNavigation = [
+const defaultNavigationConfig = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Activities", href: "/activities", icon: Calendar },
   { name: "Achievements", href: "/achievements", icon: Trophy },
@@ -27,9 +27,9 @@ const studentNavigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-
-
-export default function Sidebar({ navigationConfig }) {
+export default function Sidebar({
+  navigationConfig = defaultNavigationConfig,
+}) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (

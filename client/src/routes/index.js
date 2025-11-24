@@ -19,7 +19,7 @@ export default createBrowserRouter([
     Component: PublicLayout,
   },
   {
-    path: "/students",
+    path: "/student",
 
     Component: StudentLayout,
     children: [
@@ -30,7 +30,7 @@ export default createBrowserRouter([
     ],
   },
   {
-    path: "/faculties",
+    path: "/faculty",
     Component: FacultyLayout,
     children: [
       {
