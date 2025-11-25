@@ -25,17 +25,22 @@ export class UpDocsService {
     return `This action removes a #${id} upDoc`;
   }
 
-  getAccessToken() {
+  getAccessToken(folderName = 'ssh-up-docs') {
     const timestamp = Math.floor(Date.now() / 1000);
 
+    // ✨ IMPORTANT: sign the same params you'll send from frontend
     const signature = cloudinary.utils.api_sign_request(
-      { timestamp },
+      {
+        timestamp,
+        folder: folderName,
+      },
       process.env.CLOUDINARY_API_SECRET!,
     );
 
     return {
       timestamp,
       signature,
+      folder: folderName,
       apiKey: process.env.CLOUDINARY_API_KEY,
       cloudName: process.env.CLOUDINARY_NAME,
     };

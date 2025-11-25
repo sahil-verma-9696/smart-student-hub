@@ -35,7 +35,7 @@ export default function useUpDocs() {
     (cloudName) =>
     async (fieldName, file, metadata, load, error, progress, abort) => {
       try {
-        const { timestamp, signature, apiKey, cloudName } =
+        const { timestamp, signature, apiKey, cloudName, folder } =
           await getUploadSignature();
 
         console.log(timestamp, signature, apiKey, cloudName);
@@ -45,6 +45,7 @@ export default function useUpDocs() {
         form.append("api_key", apiKey);
         form.append("timestamp", Number(timestamp));
         form.append("signature", signature);
+        form.append("folder", folder);
 
         const upload = axios.post(
           `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
