@@ -14,12 +14,13 @@ import {
   Settings,
   Share,
   Trophy,
+  Upload,
 } from "lucide-react";
 import React from "react";
 import { Outlet } from "react-router";
 const studentNavigationConfig = [
   { name: "Scholar Window", href: "/student", icon: Home },
-  { name: "Activities", href: "/student/updocs", icon: Calendar },
+  { name: "Up Docs", href: "/student/updocs", icon: Upload },
   { name: "Fastfolo", href: "/student/fastfolo", icon: DockIcon },
   { name: "Mind Piolet", href: "/student/mind-piolet", icon: Brain },
   { name: "Share Achivos", href: "/student/share-achivos", icon: Share },

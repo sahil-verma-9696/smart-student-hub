@@ -1,18 +1,17 @@
-import { v2 as cloudinary } from "cloudinary";
-import { env } from "../env/config.js";
+import { v2 as cloudinary } from 'cloudinary';
 
 // Server-side function used to sign an upload with a couple of
 // example eager transformations included in the request.
-const signuploadform = (folderName) => {
+const signuploadform = (folderName: string) => {
   const expirySeconds = 300; // 5 minutes
   const timestamp = Math.round((Date.now() + expirySeconds * 1000) / 1000);
   const signature = cloudinary.utils.api_sign_request(
     {
       timestamp: timestamp,
-      eager: "c_pad,h_300,w_400|c_crop,h_200,w_260",
+      eager: 'c_pad,h_300,w_400|c_crop,h_200,w_260',
       folder: folderName,
     },
-    env.CLOUDINARY_SECRET
+    process.env.CLOUDINARY_SECRET!,
   );
 
   return { timestamp, signature };

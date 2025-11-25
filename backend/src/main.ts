@@ -4,9 +4,14 @@ import { ValidationPipe } from '@nestjs/common';
 import morgan from 'morgan';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './common/filters/exception.filter';
+import { v2 as cloudinary } from 'cloudinary';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  // for dot env variables
+  const config = app.get(ConfigService);
 
   /**********************************
    * CORS
@@ -31,6 +36,13 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
+
+  // Cloudinary
+  cloudinary.config({
+    cloud_name: config.get('CLOUDINARY_NAME'),
+    api_key: config.get('CLOUDINARY_API_KEY'),
+    api_secret: config.get('CLOUDINARY_API_SECRET'),
+  });
 
   // Morgan Logger (useful for HTTP request tracking)
   app.use(morgan('combined'));

@@ -9,6 +9,7 @@ import { InstituteModule } from './institute/institute.module';
 import { FacultyModule } from './faculty/faculty.module';
 import { ActivityModule } from './activity/activity.module';
 import { AdminModule } from './admin/admin.module';
+import { UpDocsModule } from './up-docs/up-docs.module';
 
 @Module({
   imports: [
@@ -33,6 +34,8 @@ import { AdminModule } from './admin/admin.module';
     FacultyModule,
 
     AdminModule,
+
+    UpDocsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -18,6 +18,7 @@ const institute_module_1 = require("./institute/institute.module");
 const faculty_module_1 = require("./faculty/faculty.module");
 const activity_module_1 = require("./activity/activity.module");
 const admin_module_1 = require("./admin/admin.module");
+const up_docs_module_1 = require("./up-docs/up-docs.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -35,6 +36,7 @@ exports.AppModule = AppModule = __decorate([
             activity_module_1.ActivityModule,
             faculty_module_1.FacultyModule,
             admin_module_1.AdminModule,
+            up_docs_module_1.UpDocsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
