@@ -100,6 +100,17 @@ export default function useUpDocs() {
   const handleEdit = (activity) => {
     setSelectedActivity(activity);
     setDescription(activity.description);
+
+    // Preload existing file
+    setFiles([
+      {
+        source: activity.media,
+        options: {
+          type: "local",
+        },
+      },
+    ]);
+
     setEditMode(true);
     setOpen(true);
   };

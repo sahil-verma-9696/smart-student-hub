@@ -64,8 +64,15 @@ export const UpDocs = () => {
               allowMultiple={false}
               maxFiles={1}
               name="file"
+              allowRevert={true}
+              allowProcess={true}
+              instantUpload={false}
               server={{
                 process: processFile(cloudName),
+                revert: async (uniqueFileId, load) => {
+                  // you can add Cloudinary delete here too
+                  load();
+                },
               }}
               labelIdle='Drag & Drop or <span class="filepond--label-action">Browse</span>'
             />
