@@ -68,7 +68,7 @@ export const UpDocs = () => {
               allowProcess={true}
               instantUpload={false}
               server={{
-                process: processFile(cloudName),
+                process: processFile(),
                 revert: async (uniqueFileId, load) => {
                   // you can add Cloudinary delete here too
                   load();

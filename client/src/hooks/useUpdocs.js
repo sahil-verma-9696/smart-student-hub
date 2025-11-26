@@ -30,10 +30,37 @@ export default function useUpDocs() {
     return data.data; // { timestamp, signature, apiKey }
   };
 
+  const postUpDoc = async (upDoc) => {
+    const { created_at, ...payload } = upDoc || {};
+    delete payload?.api_key;
+    delete payload?.placeholder;
+    try {
+      const res = await fetch("http://localhost:3000/up-docs", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          createdAtCloudinary: created_at,
+          ...payload,
+        }),
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
+      const data = await res.json();
+
+      toast.success(data.msg);
+    } catch (error) {
+      toast.error(error.message);
+      console.error(error);
+    }
+  };
+
   // FilePond Upload Handler
   const processFile =
-    (cloudName) =>
-    async (fieldName, file, metadata, load, error, progress, abort) => {
+    () => async (fieldName, file, metadata, load, error, progress, abort) => {
       try {
         const { timestamp, signature, apiKey, cloudName, folder } =
           await getUploadSignature();
@@ -58,6 +85,9 @@ export default function useUpDocs() {
         const result = await upload;
 
         load(result.data.public_id);
+
+        await postUpDoc({ ...result.data });
+
         return result.data;
       } catch (err) {
         toast.error(err.message);

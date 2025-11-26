@@ -10,6 +10,7 @@ import { FacultyModule } from './faculty/faculty.module';
 import { ActivityModule } from './activity/activity.module';
 import { AdminModule } from './admin/admin.module';
 import { UpDocsModule } from './up-docs/up-docs.module';
+import { AttachmentModule } from './attachment/attachment.module';
 
 @Module({
   imports: [
@@ -36,6 +37,8 @@ import { UpDocsModule } from './up-docs/up-docs.module';
     AdminModule,
 
     UpDocsModule,
+
+    AttachmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

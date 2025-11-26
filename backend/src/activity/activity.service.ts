@@ -1,39 +1,70 @@
-// activity.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Activity } from './schemas/activity.schema';
+import mongoose, { Model } from 'mongoose';
+
+import { Activity, ActivityDocument } from './schema/activity.schema';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 
 @Injectable()
 export class ActivityService {
   constructor(
-    @InjectModel(Activity.name) private activityModel: Model<Activity>,
+    @InjectModel(Activity.name)
+    private readonly activityModel: Model<ActivityDocument>,
   ) {}
 
-  async create(data: CreateActivityDto): Promise<Activity> {
-    return await this.activityModel.create(data);
+  // -----------------------------
+  // CREATE ACTIVITY
+  // -----------------------------
+  async create(dto: CreateActivityDto) {
+    return this.activityModel.create(dto);
   }
 
-  async findAll(): Promise<Activity[]> {
-    return await this.activityModel.find().exec();
+  // -----------------------------
+  // FIND ALL
+  // -----------------------------
+  async findAll() {
+    return this.activityModel
+      .find()
+      .populate('student')
+      .exec();
   }
 
-  async findOne(id: string): Promise<Activity> {
-    const activity = await this.activityModel.findById(id);
+  // -----------------------------
+  // FIND ONE
+  // -----------------------------
+  async findOne(id: string) {
+    const activity = await this.activityModel
+      .findById(id)
+      .populate('student')
+      .exec();
+
     if (!activity) throw new NotFoundException('Activity not found');
+
     return activity;
   }
 
-  async update(id: string, data: UpdateActivityDto): Promise<Activity> {
-    const activity = await this.activityModel.findByIdAndUpdate(id, data, { new: true });
-    if (!activity) throw new NotFoundException('Activity not found');
-    return activity;
+  // -----------------------------
+  // UPDATE
+  // -----------------------------
+  async update(id: string, dto: UpdateActivityDto) {
+    const updated = await this.activityModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+
+    if (!updated) throw new NotFoundException('Activity not found');
+
+    return updated;
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.activityModel.findByIdAndDelete(id);
-    if (!result) throw new NotFoundException('Activity not found');
+  // -----------------------------
+  // DELETE
+  // -----------------------------
+  async remove(id: string) {
+    const deleted = await this.activityModel.findByIdAndDelete(id);
+
+    if (!deleted) throw new NotFoundException('Activity not found');
+
+    return { message: 'Activity deleted successfully' };
   }
 }

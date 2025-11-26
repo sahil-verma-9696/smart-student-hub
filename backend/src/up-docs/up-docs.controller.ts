@@ -23,7 +23,7 @@ export class UpDocsController {
 
   @Get('/access-token')
   accessToken(@Query('folderName') folderName: string) {
-    return this.upDocsService.getAccessToken();
+    return this.upDocsService.getAccessToken(folderName);
   }
 
   @Get(':id')
