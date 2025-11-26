@@ -23,7 +23,11 @@ export class Activity {
   @Prop()
   description?: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student',
+    required: true,
+  })
   student: Types.ObjectId;
 
   @Prop({ enum: ACTIVITY_TYPES, required: true })
@@ -44,7 +48,10 @@ export class Activity {
   @Prop({ type: Date, default: Date.now })
   dateEnd?: Date;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }], default: [] })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Attachment' }],
+    default: [],
+  })
   attachments?: Types.ObjectId[];
 }
 

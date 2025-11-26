@@ -8,4 +8,5 @@ export class CustomActivity {
   fields: Record<string, any>;
 }
 
-export const CustomActivitySchema = SchemaFactory.createForClass(CustomActivity);
+export const CustomActivitySchema =
+  SchemaFactory.createForClass(CustomActivity);

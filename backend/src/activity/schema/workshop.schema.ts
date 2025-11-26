@@ -20,4 +20,5 @@ export class WorkshopActivity {
   location?: string;
 }
 
-export const WorkshopActivitySchema = SchemaFactory.createForClass(WorkshopActivity);
+export const WorkshopActivitySchema =
+  SchemaFactory.createForClass(WorkshopActivity);
