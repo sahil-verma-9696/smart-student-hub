@@ -13,9 +13,11 @@ import {
   GraduationCap,
   Users,
   Award,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { href } from "react-router";
 
 const defaultNavigationConfig = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -25,6 +27,7 @@ const defaultNavigationConfig = [
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Certifications", href: "/certifications", icon: Award },
   { name: "Settings", href: "/settings", icon: Settings },
+  {name:"profile",href:"/profile",icon:User}
 ];
 
 export default function Sidebar({

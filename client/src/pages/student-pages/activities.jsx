@@ -1,16 +1,12 @@
 import { ActivityTracker } from "@/components/activities/activity-tracker";
 import { ActivityList } from "@/components/activities/activity-list";
 import { ActivityStats } from "@/components/activities/activity-stats";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 
 export default function ActivitiesPage() {
   return (
     <div className="flex h-screen bg-background">
-      <DashboardSidebar />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader />
 
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto space-y-6">

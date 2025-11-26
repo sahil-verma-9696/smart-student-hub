@@ -14,8 +14,8 @@ import {
 
 const adminNavigation = [
   { name: "Dashboard", href: "/admin/", icon: Home },
-  { name: "Student Panel", href: "/admin/add-student", icon: Users },
-  { name: "Faculty Panel", href: "/admin/add-faculty", icon: Users },
+  { name: "Student Panel", href: "/admin/students-panel", icon: Users },
+  { name: "Faculty Panel", href: "/admin/faculty-panel", icon: Users },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];

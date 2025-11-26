@@ -31,73 +31,82 @@ import {
 
 import { Pencil, Trash, Search } from "lucide-react";
 
-export default function StudentPanel() {
-  // Course list
-  const courseList = [
-    "B.Tech",
-    "MBA",
-    "MCA",
-    "BBA",
-    "BCA",
-    "Polytechnic",
+export default function FacultyPanel() {
+  // Lists
+  const departmentList = ["CSE", "IT", "ECE", "ME", "CIVIL", "EN", "MBA", "MCA"];
+
+  const designationList = [
+    "Professor",
+    "Assistant Professor",
+    "Associate Professor",
+    "Lecturer",
+    "HOD",
   ];
 
-  const years = ["1", "2", "3", "4"];
-
-  // Initial sample data
-  const [students, setStudents] = useState([
-    { id: 1, name: "Sahil Verma", email: "sahil@example.com", roll: "202101", course: "B.Tech", year: "3" },
-    { id: 2, name: "Sonal Verma", email: "sonal@example.com", roll: "202102", course: "MBA", year: "2" },
-    { id: 3, name: "Aarav Mehta", email: "aarav@example.com", roll: "202103", course: "BCA", year: "1" },
+  // Sample data
+  const [faculty, setFaculty] = useState([
+    {
+      id: 1,
+      name: "Dr. Amit Sharma",
+      email: "amit@college.com",
+      empId: "FAC001",
+      department: "CSE",
+      designation: "Professor",
+    },
+    {
+      id: 2,
+      name: "Prof. Riya Singh",
+      email: "riya@college.com",
+      empId: "FAC002",
+      department: "IT",
+      designation: "Assistant Professor",
+    },
   ]);
 
-  // Add Dialog State
+  // Add Dialog
   const [addDialog, setAddDialog] = useState(false);
   const [addForm, setAddForm] = useState({
     name: "",
     email: "",
-    roll: "",
-    course: "",
-    year: "",
+    empId: "",
+    department: "",
+    designation: "",
   });
 
-  // Edit Dialog State
+  // Edit Dialog
   const [editOpen, setEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
 
-  // Delete Dialog State
+  // Delete Dialog
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toDelete, setToDelete] = useState(null);
 
   // Filters
   const [globalFilter, setGlobalFilter] = useState("");
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedDept, setSelectedDept] = useState("");
+  const [selectedDesignation, setSelectedDesignation] = useState("");
 
-  // -----------------------
-  // Table Columns
-  // -----------------------
+  // TABLE COLUMNS
   const columns = useMemo(
     () => [
       { accessorKey: "id", header: "ID" },
       { accessorKey: "name", header: "Name" },
       { accessorKey: "email", header: "Email" },
-      { accessorKey: "roll", header: "Roll" },
-      { accessorKey: "course", header: "Course" },
-      { accessorKey: "year", header: "Year" },
+      { accessorKey: "empId", header: "Employee ID" },
+      { accessorKey: "department", header: "Department" },
+      { accessorKey: "designation", header: "Designation" },
 
       {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {
-          const s = row.original;
-
+          const f = row.original;
           return (
             <div className="flex items-center gap-3">
               <Pencil
                 className="h-5 w-5 text-blue-600 cursor-pointer"
                 onClick={() => {
-                  setEditData({ ...s });
+                  setEditData({ ...f });
                   setEditOpen(true);
                 }}
               />
@@ -105,7 +114,7 @@ export default function StudentPanel() {
               <Trash
                 className="h-5 w-5 text-red-600 cursor-pointer"
                 onClick={() => {
-                  setToDelete(s);
+                  setToDelete(f);
                   setDeleteOpen(true);
                 }}
               />
@@ -117,18 +126,17 @@ export default function StudentPanel() {
     []
   );
 
-  // -----------------------
-  // Filter Logic
-  // -----------------------
+  // FILTER LOGIC
   const filteredData = useMemo(() => {
-    return students.filter((s) => {
-      if (selectedCourse && s.course !== selectedCourse) return false;
-      if (selectedYear && s.year !== selectedYear) return false;
+    return faculty.filter((f) => {
+      if (selectedDept && f.department !== selectedDept) return false;
+      if (selectedDesignation && f.designation !== selectedDesignation)
+        return false;
       return true;
     });
-  }, [students, selectedCourse, selectedYear]);
+  }, [faculty, selectedDept, selectedDesignation]);
 
-  // Table instance
+  // TABLE INSTANCE
   const table = useReactTable({
     data: filteredData,
     columns,
@@ -140,44 +148,38 @@ export default function StudentPanel() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  // -----------------------
-  // Add Student Submit
-  // -----------------------
+  // ADD FACULTY SUBMIT
   const handleAddSubmit = (e) => {
     e.preventDefault();
 
-    const newStudent = {
+    const newFaculty = {
       id: Date.now(),
       ...addForm,
     };
 
-    setStudents((prev) => [newStudent, ...prev]);
+    setFaculty((prev) => [newFaculty, ...prev]);
     setAddDialog(false);
 
     setAddForm({
       name: "",
       email: "",
-      roll: "",
-      course: "",
-      year: "",
+      empId: "",
+      department: "",
+      designation: "",
     });
   };
 
-  // -----------------------
-  // Save Edit
-  // -----------------------
+  // SAVE EDIT
   const saveEdit = () => {
-    setStudents((prev) =>
-      prev.map((s) => (s.id === editData.id ? editData : s))
+    setFaculty((prev) =>
+      prev.map((f) => (f.id === editData.id ? editData : f))
     );
     setEditOpen(false);
   };
 
-  // -----------------------
-  // Delete Student
-  // -----------------------
+  // DELETE
   const confirmDelete = () => {
-    setStudents((prev) => prev.filter((s) => s.id !== toDelete.id));
+    setFaculty((prev) => prev.filter((f) => f.id !== toDelete.id));
     setDeleteOpen(false);
   };
 
@@ -186,13 +188,13 @@ export default function StudentPanel() {
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Student Panel</h1>
+        <h1 className="text-3xl font-bold">Faculty Panel</h1>
 
         <div className="flex items-center gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
             <Input
-              placeholder="Search students..."
+              placeholder="Search faculty..."
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
               className="pl-10"
@@ -203,7 +205,7 @@ export default function StudentPanel() {
             className="bg-blue-600 text-white"
             onClick={() => setAddDialog(true)}
           >
-            Add Student
+            Add Faculty
           </Button>
         </div>
       </div>
@@ -211,29 +213,29 @@ export default function StudentPanel() {
       {/* Filters */}
       <div className="flex items-center gap-4">
         <div>
-          <Label>Course</Label>
+          <Label>Department</Label>
           <select
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
+            value={selectedDept}
+            onChange={(e) => setSelectedDept(e.target.value)}
             className="border rounded p-2"
           >
-            <option value="">All Courses</option>
-            {courseList.map((c) => (
-              <option key={c}>{c}</option>
+            <option value="">All Departments</option>
+            {departmentList.map((d) => (
+              <option key={d}>{d}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <Label>Year</Label>
+          <Label>Designation</Label>
           <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
+            value={selectedDesignation}
+            onChange={(e) => setSelectedDesignation(e.target.value)}
             className="border rounded p-2"
           >
-            <option value="">All Years</option>
-            {years.map((y) => (
-              <option key={y}>{y} Year</option>
+            <option value="">All Designations</option>
+            {designationList.map((d) => (
+              <option key={d}>{d}</option>
             ))}
           </select>
         </div>
@@ -271,7 +273,7 @@ export default function StudentPanel() {
                   colSpan={columns.length}
                   className="text-center p-6 text-gray-500"
                 >
-                  No students found.
+                  No faculty found.
                 </TableCell>
               </TableRow>
             )}
@@ -279,11 +281,11 @@ export default function StudentPanel() {
         </Table>
       </div>
 
-      {/* ADD Student POPUP */}
+      {/* ADD FACULTY POPUP */}
       <Dialog open={addDialog} onOpenChange={setAddDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Student</DialogTitle>
+            <DialogTitle>Add Faculty</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddSubmit} className="space-y-4">
@@ -307,44 +309,44 @@ export default function StudentPanel() {
             </div>
 
             <div>
-              <Label>Roll No</Label>
+              <Label>Employee ID</Label>
               <Input
                 required
-                value={addForm.roll}
-                onChange={(e) => setAddForm({ ...addForm, roll: e.target.value })}
+                value={addForm.empId}
+                onChange={(e) => setAddForm({ ...addForm, empId: e.target.value })}
               />
             </div>
 
             <div>
-              <Label>Course</Label>
+              <Label>Department</Label>
               <select
                 required
                 className="border rounded p-2 w-full"
-                value={addForm.course}
+                value={addForm.department}
                 onChange={(e) =>
-                  setAddForm({ ...addForm, course: e.target.value })
+                  setAddForm({ ...addForm, department: e.target.value })
                 }
               >
-                <option value="">Select Course</option>
-                {courseList.map((c) => (
-                  <option key={c}>{c}</option>
+                <option value="">Select Department</option>
+                {departmentList.map((d) => (
+                  <option key={d}>{d}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <Label>Year</Label>
+              <Label>Designation</Label>
               <select
                 required
                 className="border rounded p-2 w-full"
-                value={addForm.year}
+                value={addForm.designation}
                 onChange={(e) =>
-                  setAddForm({ ...addForm, year: e.target.value })
+                  setAddForm({ ...addForm, designation: e.target.value })
                 }
               >
-                <option value="">Select Year</option>
-                {years.map((y) => (
-                  <option key={y}>{y} Year</option>
+                <option value="">Select Designation</option>
+                {designationList.map((d) => (
+                  <option key={d}>{d}</option>
                 ))}
               </select>
             </div>
@@ -359,11 +361,11 @@ export default function StudentPanel() {
         </DialogContent>
       </Dialog>
 
-      {/* EDIT Student POPUP */}
+      {/* EDIT FACULTY POPUP */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Student</DialogTitle>
+            <DialogTitle>Edit Faculty</DialogTitle>
           </DialogHeader>
 
           {editData && (
@@ -390,41 +392,41 @@ export default function StudentPanel() {
               </div>
 
               <div>
-                <Label>Roll</Label>
+                <Label>Employee ID</Label>
                 <Input
-                  value={editData.roll}
+                  value={editData.empId}
                   onChange={(e) =>
-                    setEditData({ ...editData, roll: e.target.value })
+                    setEditData({ ...editData, empId: e.target.value })
                   }
                 />
               </div>
 
               <div>
-                <Label>Course</Label>
+                <Label>Department</Label>
                 <select
                   className="border rounded p-2 w-full"
-                  value={editData.course}
+                  value={editData.department}
                   onChange={(e) =>
-                    setEditData({ ...editData, course: e.target.value })
+                    setEditData({ ...editData, department: e.target.value })
                   }
                 >
-                  {courseList.map((c) => (
-                    <option key={c}>{c}</option>
+                  {departmentList.map((d) => (
+                    <option key={d}>{d}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <Label>Year</Label>
+                <Label>Designation</Label>
                 <select
                   className="border rounded p-2 w-full"
-                  value={editData.year}
+                  value={editData.designation}
                   onChange={(e) =>
-                    setEditData({ ...editData, year: e.target.value })
+                    setEditData({ ...editData, designation: e.target.value })
                   }
                 >
-                  {years.map((y) => (
-                    <option key={y}>{y} Year</option>
+                  {designationList.map((d) => (
+                    <option key={d}>{d}</option>
                   ))}
                 </select>
               </div>
@@ -444,7 +446,7 @@ export default function StudentPanel() {
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Student</DialogTitle>
+            <DialogTitle>Delete Faculty</DialogTitle>
           </DialogHeader>
 
           <p className="text-gray-600">

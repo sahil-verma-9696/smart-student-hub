@@ -66,10 +66,10 @@ export default function AdminDashboardPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-semibold text-[#111827] space-x-2">
+              {/* <h1 className="text-3xl font-semibold text-[#111827] space-x-2">
                 <span>Welcome</span>
                 <span className="capitalize">{user?.name || "admin"}</span>
-              </h1>
+              </h1> */}
               <p className="text-sm text-[#6b7280] mt-1">
                 Manage students, faculty, departments, and activities.
               </p>

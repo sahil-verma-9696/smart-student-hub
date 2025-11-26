@@ -6,12 +6,12 @@ import ScholarWindowPage from "@/pages/student-pages/student-scholarwindow";
 import FacultyDashboardPage from "@/pages/faculty-pages/faculty-dashboard";
 import AdminDashboardPage from "@/pages/admin-pages/admin-dashboard";
 import ApprovalPannel from "@/pages/faculty-pages/approval-pannel";
-import AdminAddStudentsPage from "@/pages/admin-pages/add-students";
-import AdminAddFacultyPage from "@/pages/admin-pages/add-faculty";
-import ActivitiesFilterPage from "@/pages/admin-pages/student-panel";
 import AdminAnalyticsPage from "@/pages/admin-pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-pages/admin-settings";
 import { createBrowserRouter } from "react-router";
+import StudentPanel from "@/pages/admin-pages/student-panel";
+import FacultyPanel from "@/pages/admin-pages/faculty-panel";
+import profile from "@/pages/student-pages/Profile";
 
 export default createBrowserRouter([
   {
@@ -25,8 +25,13 @@ export default createBrowserRouter([
     children: [
       {
         index: true,
+        path:"dashboard",
         Component: ScholarWindowPage,
       },
+      {
+        path:"profile",
+        Component:profile
+      }
     ],
   },
   {
@@ -51,17 +56,21 @@ export default createBrowserRouter([
         index: true,
         Component: AdminDashboardPage,
       },
-      {
-        path: "add-student",
-        Component: AdminAddStudentsPage,
-      },
-      {
-        path: "add-faculty",
-        Component: AdminAddFacultyPage,
-      },
+      // {
+      //   path: "add-student",
+      //   Component: AdminAddStudentsPage,
+      // },
+      // {
+      //   path: "add-faculty",
+      //   Component: AdminAddFacultyPage,
+      // },
       {
         path: "students-panel",
-        Component: ActivitiesFilterPage,
+        Component: StudentPanel,
+      },
+      {
+        path: "faculty-panel",
+        Component: FacultyPanel,
       },
       {
         path: "analytics",

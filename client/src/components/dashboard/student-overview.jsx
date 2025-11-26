@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar, Clock, GraduationCap, Target, Plus } from "lucide-react"
 
-export function StudentOverview() {
+export function StudentOverview({ onAddClick }) {
   return (
     <div className="space-y-6">
+
       {/* Academic Progress Card */}
       <Card>
         <CardHeader>
@@ -66,61 +67,38 @@ export function StudentOverview() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button variant="outline" className="h-auto flex-col gap-2 p-4 bg-transparent">
+
+            {/* UPDATED BUTTON */}
+            <Button 
+              variant="outline" 
+              className="h-auto flex-col gap-2 p-4 bg-transparent"
+              onClick={onAddClick}
+            >
               <Plus className="h-5 w-5" />
               <span className="text-xs">Add Activity</span>
             </Button>
+
             <Button variant="outline" className="h-auto flex-col gap-2 p-4 bg-transparent">
               <Calendar className="h-5 w-5" />
               <span className="text-xs">View Schedule</span>
             </Button>
+
             <Button variant="outline" className="h-auto flex-col gap-2 p-4 bg-transparent">
               <GraduationCap className="h-5 w-5" />
               <span className="text-xs">Certificates</span>
             </Button>
+
             <Button variant="outline" className="h-auto flex-col gap-2 p-4 bg-transparent">
               <Clock className="h-5 w-5" />
               <span className="text-xs">Portfolio</span>
             </Button>
+
           </div>
         </CardContent>
       </Card>
 
       {/* Current Semester Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Semester - Fall 2024</CardTitle>
-          <CardDescription>Enrolled courses and progress tracking</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[
-              { code: "CS301", name: "Data Structures & Algorithms", progress: 75, grade: "A-" },
-              { code: "CS302", name: "Database Management Systems", progress: 82, grade: "A" },
-              { code: "CS303", name: "Computer Networks", progress: 68, grade: "B+" },
-              { code: "CS304", name: "Software Engineering", progress: 90, grade: "A+" },
-            ].map((course) => (
-              <div key={course.code} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <Badge variant="secondary" className="text-xs">
-                      {course.code}
-                    </Badge>
-                    <span className="font-medium text-sm">{course.name}</span>
-                  </div>
-                  <div className="mt-2">
-                    <Progress value={course.progress} className="h-1.5" />
-                  </div>
-                </div>
-                <div className="ml-4 text-right">
-                  <Badge variant={course.grade.startsWith("A") ? "default" : "outline"}>{course.grade}</Badge>
-                  <div className="text-xs text-muted-foreground mt-1">{course.progress}%</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* ... keep your existing code ... */}
     </div>
   )
 }
