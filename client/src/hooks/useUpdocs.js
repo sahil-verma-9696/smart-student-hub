@@ -31,7 +31,7 @@ export default function useUpDocs() {
   };
 
   const postUpDoc = async (upDoc) => {
-    const { created_at, ...payload } = upDoc || {};
+    const { created_at, original_extension, ...payload } = upDoc || {};
     delete payload?.api_key;
     delete payload?.placeholder;
     try {

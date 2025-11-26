@@ -12,7 +12,7 @@ import ActivitiesFilterPage from "@/pages/admin-pages/student-panel";
 import AdminAnalyticsPage from "@/pages/admin-pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-pages/admin-settings";
 import { createBrowserRouter } from "react-router";
-import { UpDocs } from "@/pages/student-pages/UpDocs";
+import UpDocs from "@/pages/student-pages/UpDocs";
 import PortfolioPage from "@/pages/student-pages/portfolio";
 import MindPilot from "@/pages/student-pages/MindPilot";
 import ShareAchivos from "@/pages/student-pages/ShareAchivos";

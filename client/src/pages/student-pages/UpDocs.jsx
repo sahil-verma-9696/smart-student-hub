@@ -23,7 +23,7 @@ registerPlugin(
   FilePondPluginFileValidateSize
 );
 
-export const UpDocs = () => {
+ const UpDocs = () => {
   const cloudName = "dfqdx3ieb";
 
   const {
@@ -116,3 +116,5 @@ export const UpDocs = () => {
     </div>
   );
 };
+
+export default UpDocs;
