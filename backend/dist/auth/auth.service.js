@@ -36,16 +36,16 @@ let AuthService = class AuthService {
         const { admin_name, admin_email, admin_password, admin_contactInfo, admin_gender, ...instituteData } = data || {};
         const institute = await this.instituteService.create(instituteData);
         const user = await this.userService.create({
-            userId: institute._id.toString(),
+            userId: institute.id,
             email: admin_email,
             passwordHash: admin_password,
             name: admin_name,
             role: 'admin',
             contactInfo: admin_contactInfo,
             gender: admin_gender,
-            instituteId: institute._id.toString(),
+            instituteId: institute.id,
         });
-        const admin = await this.adminService.create(user._id.toString());
+        const admin = await this.adminService.create(user.id);
         const { passwordHash, ...sanitizedUser } = user.toObject();
         const payload = this.buildJwtPayload(user);
         const token = this.jwtService.sign(payload);
@@ -70,7 +70,7 @@ let AuthService = class AuthService {
             role: 'student',
             gender: data.gender,
         });
-        const studentData = await this.studentService.create(user._id.toString());
+        const studentData = await this.studentService.create(user.id);
         const { passwordHash, ...sanitizedUser } = user.toObject();
         const payload = this.buildJwtPayload(user);
         const token = this.jwtService.sign(payload);
@@ -94,7 +94,7 @@ let AuthService = class AuthService {
             role: 'faculty',
             instituteId,
         });
-        const faculty = await this.facultyService.create(user._id.toString());
+        const faculty = await this.facultyService.create(user.id);
         const { passwordHash, ...sanitizedUser } = user.toObject();
         const payload = this.buildJwtPayload(user);
         const token = this.jwtService.sign(payload);
@@ -139,7 +139,7 @@ let AuthService = class AuthService {
     }
     buildJwtPayload(user) {
         return {
-            sub: user._id.toString(),
+            sub: user.id,
             userId: user.userId,
             email: user.email,
             role: user.role,

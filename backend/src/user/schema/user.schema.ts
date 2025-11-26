@@ -50,7 +50,7 @@ export class User {
 
   @Prop({ type: Types.ObjectId, ref: 'Faculty', default: null })
   facultyId?: Types.ObjectId;
-  private _id: any;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

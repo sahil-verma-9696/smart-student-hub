@@ -14,7 +14,7 @@ import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 import { FacultyService } from 'src/faculty/faculty.service';
-import { User } from 'src/user/schema/user.schema';
+import { User, UserDocument } from 'src/user/schema/user.schema';
 import { JwtPayload } from './types/auth.type';
 
 @Injectable()
@@ -56,20 +56,20 @@ export class AuthService {
      *  Create User (role = admin)
      *********************************/
     const user = await this.userService.create({
-      userId: institute._id.toString(),
+      userId: institute.id,
       email: admin_email,
       passwordHash: admin_password,
       name: admin_name,
       role: 'admin',
       contactInfo: admin_contactInfo,
       gender: admin_gender,
-      instituteId: institute._id.toString(),
+      instituteId: institute.id,
     });
 
     /**
      *  Create Admin profile
      */
-    const admin = await this.adminService.create(user._id.toString());
+    const admin = await this.adminService.create(user.id);
 
     /****** Sanitize User **************/
 
@@ -114,7 +114,7 @@ export class AuthService {
     /********************************
      *  Create Student profile
      ********************************/
-    const studentData = await this.studentService.create(user._id.toString());
+    const studentData = await this.studentService.create(user.id);
 
     /****** Sanitize User **************/
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -153,7 +153,7 @@ export class AuthService {
     });
 
     /** Create Faculty profile */
-    const faculty = await this.facultyService.create(user._id.toString());
+    const faculty = await this.facultyService.create(user.id);
 
     /********************************
      *  Sanitize User
@@ -225,9 +225,9 @@ export class AuthService {
     };
   }
 
-  private buildJwtPayload(user: User): JwtPayload {
+  private buildJwtPayload(user: UserDocument): JwtPayload {
     return {
-      sub: user._id.toString(),
+      sub: user.id,
       userId: user.userId,
       email: user.email,
       role: user.role,

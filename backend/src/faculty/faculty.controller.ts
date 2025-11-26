@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { FacultyService } from './faculty.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { PartialType } from '@nestjs/mapped-types';
@@ -8,7 +16,6 @@ class UpdateFacultyDto extends PartialType(CreateFacultyDto) {}
 @Controller('faculty')
 export class FacultyController {
   constructor(private readonly facultyService: FacultyService) {}
-
 
   @Get()
   async findAll() {

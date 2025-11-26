@@ -1,5 +1,14 @@
 // dto/create-faculty.dto.ts
-import { IsNotEmpty, IsString, IsEmail, IsOptional, IsEnum, IsDateString, ValidateNested, IsArray } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+  ValidateNested,
+  IsArray,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class ContactInfoDto {

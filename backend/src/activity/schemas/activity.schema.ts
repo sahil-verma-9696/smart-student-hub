@@ -1,83 +1,74 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import {
-  JournalPaperDetails,
-  ConferencePaperDetails,
-  OnlineCourseDetails,
-  WorkshopSeminarDetails,
-  AchievementAwardDetails,
-  CertificationDetails,
-} from './activity-details.schemas';
+import mongoose from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Activity {
-  @Prop({ required: true })
-  activityId: string;
-
   @Prop({ required: true })
   studentId: string;
 
   @Prop({
     required: true,
     enum: [
-      'JournalPaper',
-      'ConferencePaper',
-      'OnlineCourse',
-      'WorkshopSeminar',
-      'AchievementAward',
-      'Certification',
+      'MOOC',
+      'CERTIFICATION',
+      'CONFERENCE',
+      'CONFERENCE_PAPER',
+      'WORKSHOP',
+      'WEBINAR',
+      'COMPETITION',
+      'INTERNSHIP',
+      'LEADERSHIP',
+      'VOLUNTEERING',
+      'CLUB_ACTIVITY',
+      'PROJECT',
+      'SPORTS',
+      'CULTURAL',
+      'RESEARCH',
+      'PATENT',
+      'OTHER',
     ],
   })
-  activityType: string;
+  category: string;
 
   @Prop({ required: true })
   title: string;
 
-  @Prop()
-  description: string;
+  @Prop() description?: string;
 
-  @Prop()
-  dateStart: Date;
+  @Prop() dateStart?: Date;
 
-  @Prop()
-  dateEnd: Date;
+  @Prop() dateEnd?: Date;
 
   @Prop({
-    enum: [
-      'Completed',
-      'Ongoing',
-      'Published',
-      'Submitted',
-      'Won',
-      'Participated',
-    ],
-    default: 'Completed',
+    required: true,
+    enum: ['PENDING', 'APPROVED', 'REJECTED'],
+    default: 'PENDING',
   })
-  status: string;
+  verificationStatus: string;
 
-  @Prop({
-    enum: ['pending', 'approved', 'rejected'],
-    default: 'pending',
-  })
-  state: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  approved_by?: string;
 
-  @Prop()
-  certificateUrl: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  rejected_by?: string;
 
-  @Prop()
-  documentUrl: string;
+  @Prop() rejectionReason?: string;
 
-  @Prop()
-  remarks: string;
+  @Prop({ type: Object, required: true })
+  details: Record<string, any>;
 
-  // Dynamic details object
-  @Prop({ type: Object })
-  details:
-    | JournalPaperDetails
-    | ConferencePaperDetails
-    | OnlineCourseDetails
-    | WorkshopSeminarDetails
-    | AchievementAwardDetails
-    | CertificationDetails;
+  @Prop({ type: [String], default: [] })
+  certificateUrls?: string[];
+
+  @Prop({ type: [String], default: [] })
+  mediaUrls?: string[];
+
+  @Prop() level?: string;
+
+  @Prop() hoursCount?: number;
+
+  @Prop({ type: [String] })
+  tags?: string[];
 }
 
 export const ActivitySchema = SchemaFactory.createForClass(Activity);

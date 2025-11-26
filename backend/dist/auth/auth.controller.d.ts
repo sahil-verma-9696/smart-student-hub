@@ -18,7 +18,7 @@ export declare class AuthController {
         }> & {
             __v: number;
         };
-        user: never;
+        user: import("../user/schema/user.schema").UserDocument;
         token: string;
         expires_in: string | undefined;
         msg: string;
@@ -52,7 +52,11 @@ export declare class AuthController {
         msg: string;
     }>;
     getMe(req: authType.AuthenticatedRequest): Promise<{
-        userData: null;
+        userData: (import("mongoose").Document<unknown, {}, import("../user/schema/user.schema").UserDocument, {}, {}> & import("../user/schema/user.schema").User & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & import("../user/schema/user.schema").UserMethods & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        }) | null;
         payload: authType.JwtPayload;
         msg: string;
     }>;

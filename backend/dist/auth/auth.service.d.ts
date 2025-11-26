@@ -8,6 +8,7 @@ import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
 import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 import { FacultyService } from 'src/faculty/faculty.service';
+import { User, UserDocument } from 'src/user/schema/user.schema';
 import { JwtPayload } from './types/auth.type';
 export declare class AuthService {
     private readonly instituteService;
@@ -28,7 +29,7 @@ export declare class AuthService {
         }> & {
             __v: number;
         };
-        user: never;
+        user: UserDocument;
         token: string;
         expires_in: string | undefined;
         msg: string;
@@ -62,7 +63,11 @@ export declare class AuthService {
         msg: string;
     }>;
     me(user: JwtPayload): Promise<{
-        userData: null;
+        userData: (import("mongoose").Document<unknown, {}, UserDocument, {}, {}> & User & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & import("src/user/schema/user.schema").UserMethods & Required<{
+            _id: import("mongoose").Types.ObjectId;
+        }> & {
+            __v: number;
+        }) | null;
         payload: JwtPayload;
         msg: string;
     }>;
