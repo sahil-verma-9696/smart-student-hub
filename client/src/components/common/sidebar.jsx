@@ -26,6 +26,15 @@ const defaultNavigationConfig = [
   { name: "Certifications", href: "/certifications", icon: Award },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
+const facultyNavigationConfig = [
+  { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Activities", href: "/activities", icon: Calendar },
+  { name: "Achievements", href: "/achievements", icon: Trophy },
+  { name: "Portfolio", href: "/portfolio", icon: FileText },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Certifications", href: "/certifications", icon: Award },
+  { name: "Settings", href: "/settings", icon: Settings },
+];
 
 export default function Sidebar({
   navigationConfig = defaultNavigationConfig,

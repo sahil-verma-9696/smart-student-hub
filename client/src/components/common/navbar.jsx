@@ -1,4 +1,4 @@
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search, User, School, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,14 +12,8 @@ import {
 import useAuthantication from "@/hooks/useAuthantication";
 
 function Navbar({ title }) {
-  /******************************************
-   * Custom hooks
-   ********************************************/
-  const { logout } = useAuthantication();
+  const { user, logout } = useAuthantication();
 
-  /******************************************
-   * Handler Functions
-   ********************************************/
   const handleSignOut = () => logout();
 
   return (
@@ -50,15 +44,41 @@ function Navbar({ title }) {
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+
+            <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
+
+              {/* If Faculty → Show institution details */}
+              {user?.role === "faculty" && (
+                <>
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    Institution
+                  </DropdownMenuLabel>
+
+                  <DropdownMenuItem className="flex items-center space-x-2">
+                    <School className="h-4 w-4" />
+                    <span>
+                      {user?.institutionName || "Institution Not Assigned"}
+                    </span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem className="flex items-center space-x-2">
+                    <UserCog className="h-4 w-4" />
+                    <span>{user?.adminName || "Admin Not Assigned"}</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+                </>
+              )}
+
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Button variant="ghost" onClick={handleSignOut}>
-                <DropdownMenuItem>Sign out</DropdownMenuItem>
-              </Button>
+
+              <DropdownMenuItem onClick={handleSignOut}>
+                Sign out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -66,4 +86,5 @@ function Navbar({ title }) {
     </header>
   );
 }
+
 export default Navbar;
