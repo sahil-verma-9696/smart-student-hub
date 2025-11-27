@@ -13,6 +13,8 @@ import {
   Lock,
   Settings,
   Share,
+  Share2,
+  Share2Icon,
   Trophy,
   Upload,
 } from "lucide-react";
@@ -20,6 +22,7 @@ import React from "react";
 import { Outlet } from "react-router";
 const studentNavigationConfig = [
   { name: "Scholar Window", href: "/student", icon: Home },
+  { name: "Activities", href: "/student/activities", icon: Share2Icon },
   { name: "Up Docs", href: "/student/updocs", icon: Upload },
   { name: "Fastfolo", href: "/student/fastfolo", icon: DockIcon },
   { name: "Mind Piolet", href: "/student/mind-piolet", icon: Brain },

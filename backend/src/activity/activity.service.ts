@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import  { Model } from 'mongoose';
+import { Model } from 'mongoose';
 
 import { Activity, ActivityDocument } from './schema/activity.schema';
 import { CreateActivityDto } from './dto/create-activity.dto';
@@ -24,7 +24,11 @@ export class ActivityService {
   // FIND ALL
   // -----------------------------
   async findAll() {
-    return this.activityModel.find().populate('student').exec();
+    return this.activityModel
+      .find()
+      .populate('student')
+      .populate('attachments')
+      .exec();
   }
 
   // -----------------------------

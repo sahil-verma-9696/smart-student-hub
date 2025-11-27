@@ -8,4 +8,5 @@ export enum ACTIVITY_TYPES {
   CUSTOM = 'custom',
   WORKSHOP = 'workshop',
   HACKATHON = 'hackathon',
+  DEFAULT = 'default',
 }

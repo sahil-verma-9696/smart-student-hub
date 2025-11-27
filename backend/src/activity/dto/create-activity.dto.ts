@@ -22,7 +22,8 @@ export class CreateActivityDto {
   student: string;
 
   @IsEnum(ACTIVITY_TYPES)
-  activityType: ACTIVITY_TYPES;
+  @IsOptional()
+  activityType?: ACTIVITY_TYPES;
 
   @IsOptional()
   @IsEnum(ACTIVITY_STATUS)

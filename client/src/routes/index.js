@@ -20,6 +20,7 @@ import PrivateVault from "@/pages/student-pages/PrivateVault";
 import Settings from "@/pages/student-pages/Settings";
 import { IntegrationOverview } from "@/pages/student-pages/integrations/integration-overview";
 import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-preview";
+import ActivitiesPage from "@/pages/student-pages/activity/page";
 
 export default createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export default createBrowserRouter([
       {
         path: "updocs",
         Component: UpDocs,
+      },
+      {
+        path: "activities",
+        Component: ActivitiesPage,
       },
       {
         path: "fastfolo",

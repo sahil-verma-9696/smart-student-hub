@@ -28,7 +28,7 @@ export default function useUpDocs() {
     console.log(data);
 
     return data.data; // { timestamp, signature, apiKey }
-  };
+  };   
 
   const postUpDoc = async (upDoc) => {
     const { created_at, original_extension, ...payload } = upDoc || {};

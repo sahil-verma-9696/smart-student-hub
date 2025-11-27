@@ -30,7 +30,11 @@ export class Activity {
   })
   student: Types.ObjectId;
 
-  @Prop({ enum: ACTIVITY_TYPES, required: true })
+  @Prop({
+    enum: ACTIVITY_TYPES,
+    required: true,
+    default: ACTIVITY_TYPES.DEFAULT,
+  })
   activityType: ACTIVITY_TYPES;
 
   @Prop({ enum: ACTIVITY_STATUS, default: ACTIVITY_STATUS.PENDING })

@@ -1,23 +1,34 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { BarChart3, TrendingUp, Clock, CheckCircle } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { BarChart3, TrendingUp, Clock, CheckCircle } from "lucide-react";
 
 const monthlyStats = [
   { month: "Jan", activities: 5, points: 85 },
   { month: "Dec", activities: 3, points: 45 },
   { month: "Nov", activities: 7, points: 120 },
   { month: "Oct", activities: 4, points: 60 },
-]
+];
 
 const categoryStats = [
   { category: "Workshops", count: 8, points: 40, color: "bg-blue-500" },
   { category: "Certifications", count: 3, points: 45, color: "bg-green-500" },
   { category: "Competitions", count: 2, points: 50, color: "bg-purple-500" },
-  { category: "Community Service", count: 5, points: 25, color: "bg-orange-500" },
-]
+  {
+    category: "Community Service",
+    count: 5,
+    points: 25,
+    color: "bg-orange-500",
+  },
+];
 
-export function ActivityStats() {
+export function ActivityStats({ totalActivities = 0 }) {
   return (
     <div className="space-y-6">
       {/* Overall Stats */}
@@ -32,8 +43,10 @@ export function ActivityStats() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-3 border rounded-lg">
-              <div className="text-2xl font-bold text-primary">18</div>
-              <div className="text-xs text-muted-foreground">Total Activities</div>
+              <div className="text-2xl font-bold text-primary">{totalActivities}</div>
+              <div className="text-xs text-muted-foreground">
+                Total Activities
+              </div>
             </div>
             <div className="text-center p-3 border rounded-lg">
               <div className="text-2xl font-bold text-secondary">160</div>
@@ -126,7 +139,10 @@ export function ActivityStats() {
         </CardHeader>
         <CardContent className="space-y-3">
           {monthlyStats.map((month) => (
-            <div key={month.month} className="flex items-center justify-between">
+            <div
+              key={month.month}
+              className="flex items-center justify-between"
+            >
               <span className="text-sm font-medium">{month.month}</span>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>{month.activities} activities</span>
@@ -154,5 +170,5 @@ export function ActivityStats() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
