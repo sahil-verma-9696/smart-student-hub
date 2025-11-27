@@ -22,16 +22,14 @@ import React from "react";
 import { Outlet } from "react-router";
 const studentNavigationConfig = [
   { name: "Scholar Window", href: "/student", icon: Home },
-  { name: "Activities", href: "/student/activities", icon: Share2Icon },
-  { name: "Up Docs", href: "/student/updocs", icon: Upload },
+  { name: "Activities", href: "/student/activities", icon: Trophy },
   { name: "Fastfolo", href: "/student/fastfolo", icon: DockIcon },
   { name: "Mind Piolet", href: "/student/mind-piolet", icon: Brain },
-  { name: "Share Achivos", href: "/student/share-achivos", icon: Share },
   { name: "Private Vault", href: "/student/private-vault", icon: Lock },
   { name: "Settings", href: "/student/setting", icon: Settings },
   {
-    name: "Social Integrations",
-    href: "/student/social-integrations",
+    name: "Profile",
+    href: "/student/profile",
     icon: LinkIcon,
   },
 ];

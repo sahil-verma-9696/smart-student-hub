@@ -37,24 +37,16 @@ export default createBrowserRouter([
         Component: ScholarWindowPage,
       },
       {
-        path: "updocs",
-        Component: UpDocs,
-      },
-      {
         path: "activities",
         Component: ActivitiesPage,
-      },
-      {
-        path: "fastfolo",
-        Component: PortfolioPreview,
       },
       {
         path: "mind-piolet",
         Component: MindPilot,
       },
       {
-        path: "share-achivos",
-        Component: ShareAchivos,
+        path: "fastfolo",
+        Component: PortfolioPreview,
       },
       {
         path: "private-vault",
@@ -65,8 +57,8 @@ export default createBrowserRouter([
         Component: Settings,
       },
       {
-        path: "social-integrations",
-        Component: IntegrationOverview,
+        path: "profile",
+        Component: Settings,
       },
     ],
   },
