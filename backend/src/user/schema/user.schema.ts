@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { ContactInfoDto } from '../dto/contact-info.dto';
 
@@ -9,9 +9,6 @@ export interface UserMethods {
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ required: true, unique: true })
-  userId: string;
-
   @Prop({ required: true })
   name: string;
 
@@ -29,28 +26,6 @@ export class User {
 
   @Prop({ type: ContactInfoDto, required: true })
   contactInfo: ContactInfoDto;
-
-  /*************************************
-   * REFERENCES for deriving relations
-   *************************************/
-  @Prop({
-    type: Types.ObjectId,
-    ref: 'Institute',
-    default: null,
-    required: true,
-  })
-  instituteId: Types.ObjectId;
-
-  // MongoDB references (expandable later)
-  @Prop({ type: Types.ObjectId, ref: 'Admin', default: null })
-  adminId?: Types.ObjectId;
-
-  @Prop({ type: Types.ObjectId, ref: 'Student', default: null })
-  studentId?: Types.ObjectId;
-
-  @Prop({ type: Types.ObjectId, ref: 'Faculty', default: null })
-  facultyId?: Types.ObjectId;
-  _id: any;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

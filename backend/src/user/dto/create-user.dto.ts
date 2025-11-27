@@ -2,6 +2,7 @@ import {
   IsEmail,
   IsEnum,
   IsObject,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -9,9 +10,6 @@ import { ContactInfoDto } from './contact-info.dto';
 import { Type } from 'class-transformer';
 
 export class CreateUserDto {
-  @IsString()
-  userId: string;
-
   @IsString()
   name: string;
 
@@ -33,5 +31,6 @@ export class CreateUserDto {
   contactInfo: ContactInfoDto;
 
   @IsString()
+  @IsOptional()
   instituteId: string;
 }

@@ -3,9 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
+import { IUserService } from './types/service.interface';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async create(dto: CreateUserDto) {
@@ -14,11 +16,73 @@ export class UserService {
     return user;
   }
 
-  findByEmail(email: string) {
-    return this.userModel.findOne({ email }).exec();
+  async createUser(dto: CreateUserDto): Promise<User> {
+    const user = await this.userModel.create(dto);
+
+    if (!user) {
+      throw new Error('User not created');
+    }
+
+    return user;
   }
 
-  async findById(id: string) {
-    return await this.userModel.findById(id).populate('instituteId').exec();
+  async getUserByEmail(email: string): Promise<User> {
+    const user = await this.userModel.findOne({ email }).exec();
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user;
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await this.userModel.deleteOne({ _id: userId }).exec();
+  }
+  async getUserById(userId: string): Promise<User> {
+    const user = await this.userModel.findById(userId).exec();
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user;
+  }
+
+  async validateUserCredentials(
+    email: string,
+    password: string,
+  ): Promise<User> {
+    const user = await this.userModel.findOne({ email }).exec();
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+
+    if (!isPasswordValid) {
+      throw new Error('Invalid password');
+    }
+
+    return user;
+  }
+
+  async updateUser(userId: string, dto: UpdateUserDto): Promise<User> {
+    const user = await this.userModel.findById(userId).exec();
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (dto.name && dto.email && dto.gender && dto.contactInfo) {
+      user.name = dto.name;
+      user.email = dto.email;
+      user.gender = dto.gender;
+      user.contactInfo = dto.contactInfo;
+    }
+
+    await user.save();
+    return user;
   }
 }
