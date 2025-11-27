@@ -17,10 +17,10 @@ import {
 } from "lucide-react";
 
 const navigationConfig = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Activities", href: "/activities", icon: Calendar },
-  { name: "Achievements", href: "/achievements", icon: Trophy },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Crono Compose", href: "/dashboard", icon: Home },
+  { name: "Approval pannel", href: "/approval-pannel", icon: Calendar },
+  { name: "Activities", href: "/faculty/activities", icon: Trophy },
+  { name: "Profile", href: "/profile", icon: BarChart3 },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 const FacultyLayout = () => {

@@ -93,6 +93,10 @@ export default createBrowserRouter([
         Component: AdminAddFacultyPage,
       },
       {
+        path: "activities",
+        Component: ActivitiesPage,
+      },
+      {
         path: "students-panel",
         Component: ActivitiesFilterPage,
       },

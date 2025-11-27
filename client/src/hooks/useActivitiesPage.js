@@ -13,6 +13,10 @@ export default function useActivitiesPage() {
   /***********************************
    ************ UseEffects ************
    ***********************************/
+
+  /*********************
+   * Get all activities
+   ********************/
   React.useEffect(() => {
     (async function getAllActivities() {
       const res = await fetch("http://localhost:3000/activities");
@@ -20,11 +24,6 @@ export default function useActivitiesPage() {
       setActivities(responce.data);
     })();
   }, []);
-
-  /*********************
-   * Get all activities
-   ********************/
-  //   const getActivities = async () => {};
 
   return {
     activities,
