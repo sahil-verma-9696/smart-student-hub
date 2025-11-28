@@ -30,4 +30,7 @@ export class CreateStudentDto {
   @ValidateNested()
   @Type(() => ContactInfoDto)
   contactInfo: ContactInfoDto;
+
+  @IsString()
+  instituteId: string;
 }

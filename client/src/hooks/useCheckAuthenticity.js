@@ -50,13 +50,14 @@ export default function useCheckAuthenticity({
 
         const payload = await res.json();
 
-        const userInfo = payload?.data?.userData;
+        const user = payload?.data?.userData;
+        const userInfo = payload?.data?.userData?.basicUserDetails;
         const userRole = userInfo?.role;
 
         // 5️⃣ Valid token → set user state + update auth status + role
-        setUser(payload?.data?.userData);
+        setUser(user);
         setIsUserAuthenticated(true);
-        setUserRole(payload?.data?.userData?.basicUserDetails?.role);
+        setUserRole(userRole);
 
         // 6️⃣ Valid token but invalid role → redirect to valid route
         switch (userRole) {
