@@ -1,9 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { InstituteType } from 'src/auth/types/auth.enum';
 
+export type InstituteDocument = Institute & Document;
+
 @Schema({ timestamps: true })
-export default class Institute extends Document {
+export default class Institute {
   @Prop({ required: true })
   institute_name: string;
 
@@ -39,6 +41,9 @@ export default class Institute extends Document {
 
   @Prop()
   affiliation_id?: string;
+
+  @Prop({ type: [Types.ObjectId], default: [], ref: 'Admin' })
+  admins: Types.ObjectId[];
 }
 
 export const InstituteSchema = SchemaFactory.createForClass(Institute);
