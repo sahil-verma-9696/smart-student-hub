@@ -9,13 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import InstitueRegistrationDto from './dto/institute-registration-body.dto';
-import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
-import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import * as authType from './types/auth.type';
 import { RegisterInstituteDto } from './dto/register-institute.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -41,10 +39,10 @@ export class AuthController {
    * Return : AdminRegistrationDto
    * desc : Register Admin
    *********************************/
-  // @Post('user/login')
-  // userLogin(@Body() userLoginDto: UserLoginBodyDto) {
-  //   return this.authService.userLogin(userLoginDto);
-  // }
+  @Post('user/login')
+  userLogin(@Body() userLoginDto: LoginDto) {
+    return this.authService.userLogin(userLoginDto);
+  }
 
   /**********************************
    * POST : auth/student/register
@@ -74,12 +72,12 @@ export class AuthController {
   //   return await this.authService.facultyRegistration(body, institueId);
   // }
 
-  // @Get('me')
-  // @UseGuards(JwtAuthGuard)
-  // getMe(@Req() req: authType.AuthenticatedRequest) {
-  //   if (!req.user) {
-  //     throw new UnauthorizedException('User not authenticated');
-  //   }
-  //   return this.authService.me(req.user); // comes from JwtStrategy.validate()
-  // }
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req: authType.AuthenticatedRequest) {
+    if (!req.user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.authService.me(req.user); // comes from JwtStrategy.validate()
+  }
 }

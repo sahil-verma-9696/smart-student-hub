@@ -39,6 +39,44 @@ let AuthService = class AuthService {
         this.facultyService = facultyService;
         this.connection = connection;
     }
+    async userLogin(userLoginDto) {
+        const { email, password } = userLoginDto;
+        if (!email || !password) {
+            throw new common_1.BadRequestException('Email and password are required');
+        }
+        const user = await this.userService.getUserByEmail(email);
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const isValidPassword = await user.comparePassword(password);
+        if (!isValidPassword) {
+            throw new common_1.UnauthorizedException('Invalid email or password');
+        }
+        const payload = {
+            email: user.email,
+            sub: user._id.toString(),
+            role: user.role,
+            name: user.name,
+            userId: user._id.toString(),
+        };
+        const token = this.jwtService.sign(payload);
+        return {
+            user,
+            token,
+            expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
+            msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
+        };
+    }
+    async me(user) {
+        const userData = await this.userService.getUserById(user.sub);
+        if (!userData) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return {
+            userData,
+            msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
+        };
+    }
     async registerInstitute(dto) {
         const session = await this.connection.startSession();
         session.startTransaction();
@@ -76,7 +114,6 @@ let AuthService = class AuthService {
                 email: user.email,
                 name: user.name,
                 role: user.role,
-                instituteId: joinedAdmin.institute._id.toString(),
                 sub: joinedAdmin._id.toString(),
                 userId: joinedAdmin._id.toString(),
             };

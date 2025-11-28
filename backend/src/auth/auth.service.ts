@@ -17,6 +17,7 @@ import { CreateAdminDto } from 'src/admin/dto/create-admin.dto';
 import CreateInstituteDto from 'src/institute/dto/create-institute.dto';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -35,68 +36,66 @@ export class AuthService {
   /*******************************************
    * User Login
    *******************************************/
-  // async userLogin(userLoginDto: UserLoginBodyDto) {
-  //   const { email, password } = userLoginDto;
+  async userLogin(userLoginDto: LoginDto) {
+    const { email, password } = userLoginDto;
 
-  //   /****** Validate input **************/
-  //   if (!email || !password) {
-  //     throw new BadRequestException('Email and password are required');
-  //   }
+    /****** Validate input **************/
+    if (!email || !password) {
+      throw new BadRequestException('Email and password are required');
+    }
 
-  //   /****** Find User **************/
-  //   const user = await this.userService.findByEmail(email);
+    /****** Find User **************/
+    const user = await this.userService.getUserByEmail(email);
 
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-  //   /****** Validate Password **************/
-  //   const isValidPassword = await user.comparePassword(password);
+    /****** Validate Password **************/
+    const isValidPassword = await user.comparePassword(password);
 
-  //   if (!isValidPassword) {
-  //     throw new UnauthorizedException('Invalid email or password');
-  //   }
+    if (!isValidPassword) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
 
-  //   /****** Sanitize User **************/
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   const { passwordHash, ...sanitizedUser } = user.toObject();
+    const payload: JwtPayload = {
+      email: user.email,
+      sub: user._id.toString(),
+      role: user.role,
+      name: user.name,
+      userId: user._id.toString(),
+    };
 
-  //   /****** Generate Token **************/
-  //   const token = this.jwtService.sign(payload);
+    /****** Generate Token **************/
+    const token = this.jwtService.sign(payload);
 
-  //   return {
-  //     user: sanitizedUser,
-  //     token,
-  //     expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
-  //     msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
-  //   };
-  // }
+    return {
+      user,
+      token,
+      expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
+      msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
+    };
+  }
 
-  // async me(user: JwtPayload) {
-  //   const userData = await this.userService.findById(user.sub);
+  async me(user: JwtPayload) {
+    const userData = await this.userService.getUserById(user.sub);
 
-  //   if (!userData) {
-  //     throw new NotFoundException('User not found');
-  //   }
+    if (!userData) {
+      throw new NotFoundException('User not found');
+    }
 
-  //   // Convert document → plain object
-  //   const obj = userData.toObject();
-
-  //   // Remove password from output
-  //   const { passwordHash, ...sanitizedUser } = obj;
-
-  //   return {
-  //     userData: sanitizedUser,
-  //     msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
-  //   };
-  // }
+    return {
+      userData,
+      msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
+    };
+  }
 
   async registerInstitute(dto: RegisterInstituteDto): Promise<AuthResponse> {
     const session = await this.connection.startSession();
     session.startTransaction();
 
     try {
-      /****** 1. Create admin user + admin profile **************/
+      /****** 1. Create user + admin profile **************/
       const createAdminDto: CreateAdminDto = {
         contactInfo: dto.admin_contactInfo,
         email: dto.admin_email,
@@ -152,7 +151,6 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
-        instituteId: joinedAdmin.institute!._id.toString(),
         sub: joinedAdmin._id.toString(),
         userId: joinedAdmin._id.toString(),
       };
