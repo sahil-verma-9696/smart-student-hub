@@ -19,37 +19,37 @@ export class StudentService {
    *    - Create user (role: STUDENT)
    *    - Create student profile
    ******************************/
-  // async create(
-  //   dto: CreateStudentDto,
-  //   session?: ClientSession,
-  // ): Promise<StudentDocument> {
-  //   /***** 1. Create User *****/
-  //   const userDto: CreateUserDto = {
-  //     name: dto.name,
-  //     email: dto.email,
-  //     password: dto.password,
-  //     gender: dto.gender,
-  //     role: USER_ROLE.STUDENT,
-  //     contactInfo: dto.contactInfo,
-  //   };
+  async create(
+    dto: CreateStudentDto,
+    session?: ClientSession,
+  ): Promise<StudentDocument> {
+    /***** 1. Create User *****/
+    const userDto: CreateUserDto = {
+      name: dto.name,
+      email: dto.email,
+      password: dto.password,
+      gender: dto.gender,
+      role: USER_ROLE.STUDENT,
+      contactInfo: dto.contactInfo,
+    };
 
-  //   const user = await this.userService.createUser(userDto, session);
+    const user = await this.userService.createUser(userDto, session);
 
-  //   /***** 2. Create Student Profile *****/
-  //   const created = await this.studentModel.create(
-  //     [
-  //       {
-  //         basicUserDetails: user._id,
-  //         institute: dto.instituteId
-  //           ? new Types.ObjectId(dto.instituteId)
-  //           : null,
-  //       },
-  //     ],
-  //     { session },
-  //   );
+    /***** 2. Create Student Profile *****/
+    const created = await this.studentModel.create(
+      [
+        {
+          basicUserDetails: user._id,
+          institute: dto.instituteId
+            ? new Types.ObjectId(dto.instituteId)
+            : null,
+        },
+      ],
+      { session },
+    );
 
-  //   return created[0];
-  // }
+    return created[0];
+  }
 
   /******************************
    * 2. Create Students in Bulk

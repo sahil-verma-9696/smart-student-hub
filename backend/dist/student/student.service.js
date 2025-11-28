@@ -18,12 +18,33 @@ const mongoose_1 = require("@nestjs/mongoose");
 const student_schema_1 = require("./schema/student.schema");
 const mongoose_2 = require("mongoose");
 const user_service_1 = require("../user/user.service");
+const enum_1 = require("../user/types/enum");
 let StudentService = class StudentService {
     studentModel;
     userService;
     constructor(studentModel, userService) {
         this.studentModel = studentModel;
         this.userService = userService;
+    }
+    async create(dto, session) {
+        const userDto = {
+            name: dto.name,
+            email: dto.email,
+            password: dto.password,
+            gender: dto.gender,
+            role: enum_1.USER_ROLE.STUDENT,
+            contactInfo: dto.contactInfo,
+        };
+        const user = await this.userService.createUser(userDto, session);
+        const created = await this.studentModel.create([
+            {
+                basicUserDetails: user._id,
+                institute: dto.instituteId
+                    ? new mongoose_2.Types.ObjectId(dto.instituteId)
+                    : null,
+            },
+        ], { session });
+        return created[0];
     }
     async getByUserId(userId) {
         const student = (await this.studentModel

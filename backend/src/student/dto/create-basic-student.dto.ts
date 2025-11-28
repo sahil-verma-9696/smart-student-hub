@@ -18,7 +18,7 @@ export class CreateStudentDto {
   email: string;
 
   @IsString()
-  password: string; 
+  password: string;
 
   @IsEnum(USER_ROLE)
   role: USER_ROLE;

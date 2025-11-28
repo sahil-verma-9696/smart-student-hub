@@ -28,7 +28,7 @@ export declare class AuthService {
         msg: string;
     }>;
     me(user: JwtPayload): Promise<{
-        userData: AdminDocument | StudentDocument | FacultyDocument;
+        userData: StudentDocument | AdminDocument | FacultyDocument;
         msg: string;
     }>;
     registerInstitute(dto: RegisterInstituteDto): Promise<AuthResponse>;
