@@ -16,8 +16,15 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async createUser(dto: CreateUserDto): Promise<User> {
-    const user = await this.userModel.create(dto);
+  async createUser(dto: CreateUserDto): Promise<UserDocument> {
+    const user = await this.userModel.create({
+      passwordHash: dto.password,
+      name: dto.name,
+      email: dto.email,
+      role: dto.role,
+      gender: dto.gender,
+      contactInfo: dto.contactInfo,
+    });
 
     if (!user) {
       throw new Error('User not created');
@@ -26,7 +33,7 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<UserDocument> {
     const user = await this.userModel.findOne({ email }).exec();
 
     if (!user) {
@@ -39,7 +46,7 @@ export class UserService implements IUserService {
   async deleteUser(userId: string): Promise<void> {
     await this.userModel.deleteOne({ _id: userId }).exec();
   }
-  async getUserById(userId: string): Promise<User> {
+  async getUserById(userId: string): Promise<UserDocument> {
     const user = await this.userModel.findById(userId).exec();
 
     if (!user) {
@@ -52,7 +59,7 @@ export class UserService implements IUserService {
   async validateUserCredentials(
     email: string,
     password: string,
-  ): Promise<User> {
+  ): Promise<UserDocument> {
     const user = await this.userModel.findOne({ email }).exec();
 
     if (!user) {
@@ -68,7 +75,7 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async updateUser(userId: string, dto: UpdateUserDto): Promise<User> {
+  async updateUser(userId: string, dto: UpdateUserDto): Promise<UserDocument> {
     const user = await this.userModel.findById(userId).exec();
 
     if (!user) {

@@ -19,7 +19,6 @@ exports.InstituteController = void 0;
 const common_1 = require("@nestjs/common");
 const institute_service_1 = require("./institute.service");
 const create_institute_dto_1 = __importDefault(require("./dto/create-institute.dto"));
-const update_institute_dto_1 = require("./dto/update-institute.dto");
 let InstituteController = class InstituteController {
     instituteService;
     constructor(instituteService) {
@@ -28,17 +27,8 @@ let InstituteController = class InstituteController {
     create(createInstituteDto) {
         return this.instituteService.create(createInstituteDto);
     }
-    findAll() {
-        return this.instituteService.findAll();
-    }
     findOne(id) {
-        return this.instituteService.findOne(+id);
-    }
-    update(id, updateInstituteDto) {
-        return this.instituteService.update(+id, updateInstituteDto);
-    }
-    remove(id) {
-        return this.instituteService.remove(+id);
+        return this.instituteService.getInstituteById(id);
     }
 };
 exports.InstituteController = InstituteController;
@@ -50,33 +40,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], InstituteController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], InstituteController.prototype, "findAll", null);
-__decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], InstituteController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_institute_dto_1.UpdateInstituteDto]),
-    __metadata("design:returntype", void 0)
-], InstituteController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], InstituteController.prototype, "remove", null);
 exports.InstituteController = InstituteController = __decorate([
     (0, common_1.Controller)('institute'),
     __metadata("design:paramtypes", [institute_service_1.InstituteService])

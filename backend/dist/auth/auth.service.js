@@ -32,123 +32,50 @@ let AuthService = class AuthService {
         this.studentService = studentService;
         this.facultyService = facultyService;
     }
-    async instituteRegistration(data) {
-        const { admin_name, admin_email, admin_password, admin_contactInfo, admin_gender, ...instituteData } = data || {};
-        const institute = await this.instituteService.create(instituteData);
-        const user = await this.userService.create({
-            userId: institute._id.toString(),
-            email: admin_email,
-            passwordHash: admin_password,
-            name: admin_name,
-            role: 'admin',
-            contactInfo: admin_contactInfo,
-            gender: admin_gender,
-            instituteId: institute._id.toString(),
-        });
-        const admin = await this.adminService.create(user._id);
-        const { passwordHash, ...sanitizedUser } = user.toObject();
-        const payload = this.buildJwtPayload(user);
+    async registerInstitute(dto) {
+        console.log(dto, 'dto');
+        const createAdminDto = {
+            contactInfo: dto.admin_contactInfo,
+            email: dto.admin_email,
+            gender: dto.admin_gender,
+            name: dto.admin_name,
+            password: dto.admin_password,
+        };
+        const admin = await this.adminService.createAdmin(createAdminDto);
+        const createInstituteDto = {
+            address_line1: dto.inst_address_line1,
+            city: dto.inst_city,
+            institute_name: dto.inst_name,
+            institute_type: dto.inst_type,
+            official_email: dto.inst_email,
+            official_phone: dto.inst_phone,
+            pincode: dto.inst_pincode,
+            state: dto.inst_state,
+            is_affiliated: dto.inst_is_affiliated,
+            affiliation_id: dto.inst_affiliation_id,
+            affiliation_university: dto.inst_affiliation_university,
+        };
+        const institute = await this.instituteService.createInstitute(createInstituteDto);
+        const joinedAdmin = await this.adminService.joinInstitute(admin._id.toString(), institute._id.toString());
+        if (!joinedAdmin) {
+            throw new common_1.NotFoundException('Admin not found');
+        }
+        const user = joinedAdmin.basicUserDetails;
+        const payload = {
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            instituteId: joinedAdmin.institute._id.toString(),
+            sub: joinedAdmin._id.toString(),
+            userId: joinedAdmin._id.toString(),
+        };
         const token = this.jwtService.sign(payload);
         return {
+            user: joinedAdmin,
             institute,
-            admin,
-            user,
             token,
             expires_in: process.env.JWT_EXPIRES_IN_MILI,
             msg: 'Institute Successfully Registered',
-        };
-    }
-    async studentRegistration(data, instituteId) {
-        const { password } = data || {};
-        const user = await this.userService.create({
-            passwordHash: password,
-            userId: '22CSME017',
-            instituteId,
-            contactInfo: data.contactInfo,
-            email: data.email,
-            name: data.name,
-            role: 'student',
-            gender: data.gender,
-        });
-        const studentData = await this.studentService.create(user._id.toString());
-        const { passwordHash, ...sanitizedUser } = user.toObject();
-        const payload = this.buildJwtPayload(user);
-        const token = this.jwtService.sign(payload);
-        return {
-            user: sanitizedUser,
-            studentData,
-            token,
-            expires_in: process.env.JWT_EXPIRES_IN_MILI,
-            msg: 'Student Successfully Registered',
-        };
-    }
-    async facultyRegistration(data, instituteId) {
-        const { password } = data;
-        const user = await this.userService.create({
-            userId: 'FAC001',
-            email: data.email,
-            name: data.name,
-            gender: data.gender,
-            contactInfo: data.contactInfo,
-            passwordHash: password,
-            role: 'faculty',
-            instituteId,
-        });
-        const faculty = await this.facultyService.create(user._id.toString());
-        const { passwordHash, ...sanitizedUser } = user.toObject();
-        const payload = this.buildJwtPayload(user);
-        const token = this.jwtService.sign(payload);
-        return {
-            user: sanitizedUser,
-            faculty,
-            token,
-            expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
-            msg: 'Faculty Successfully Registered',
-        };
-    }
-    async userLogin(userLoginDto) {
-        const { email, password } = userLoginDto;
-        if (!email || !password) {
-            throw new common_1.BadRequestException('Email and password are required');
-        }
-        const user = await this.userService.findByEmail(email);
-        if (!user) {
-            throw new common_1.NotFoundException('User not found');
-        }
-        const isValidPassword = await user.comparePassword(password);
-        if (!isValidPassword) {
-            throw new common_1.UnauthorizedException('Invalid email or password');
-        }
-        const { passwordHash, ...sanitizedUser } = user.toObject();
-        const payload = this.buildJwtPayload(user);
-        const token = this.jwtService.sign(payload);
-        return {
-            user: sanitizedUser,
-            token,
-            expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
-            msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
-        };
-    }
-    async me(user) {
-        const userData = await this.userService.findById(user.sub);
-        if (!userData) {
-            throw new common_1.NotFoundException('User not found');
-        }
-        const obj = userData.toObject();
-        const { passwordHash, ...sanitizedUser } = obj;
-        return {
-            userData: user,
-            msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
-        };
-    }
-    buildJwtPayload(user) {
-        return {
-            sub: user._id.toString(),
-            userId: user.userId,
-            email: user.email,
-            role: user.role,
-            instituteId: user.instituteId.toString(),
-            name: user.name,
         };
     }
 };

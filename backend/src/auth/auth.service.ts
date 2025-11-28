@@ -4,18 +4,17 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import InstitueRegistrationDto from './dto/institute-registration-body.dto';
 import { InstituteService } from 'src/institute/institute.service';
 import { UserService } from 'src/user/user.service';
 import { AdminService } from 'src/admin/admin.service';
 import { JwtService } from '@nestjs/jwt';
 import { StudentService } from 'src/student/student.service';
-import StudentRegistrationBodyDto from './dto/student-registration-body.dto';
-import { UserLoginBodyDto } from './dto/user-login-body.dto.';
-import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 import { FacultyService } from 'src/faculty/faculty.service';
-import { User } from 'src/user/schema/user.schema';
-import { JwtPayload } from './types/auth.type';
+import { UserDocument } from 'src/user/schema/user.schema';
+import { AuthResponse, JwtPayload } from './types/auth.type';
+import { RegisterInstituteDto } from './dto/register-institute.dto';
+import { CreateAdminDto } from 'src/admin/dto/create-admin.dto';
+import CreateInstituteDto from 'src/institute/dto/create-institute.dto';
 
 @Injectable()
 export class AuthService {
@@ -30,218 +29,125 @@ export class AuthService {
     private readonly studentService: StudentService,
     private readonly facultyService: FacultyService,
   ) {}
-
-  /*******************************************
-   * Register Institute + User + Admin + Token
-   *******************************************/
-  async instituteRegistration(data: InstitueRegistrationDto) {
-    /************************************
-     *  Destructure data
-     *********************************/
-    const {
-      admin_name,
-      admin_email,
-      admin_password,
-      admin_contactInfo,
-      admin_gender,
-      ...instituteData
-    } = data || {};
-
-    /************************************
-     *  Create Institute
-     *********************************/
-    const institute = await this.instituteService.create(instituteData);
-
-    /************************************
-     *  Create User (role = admin)
-     *********************************/
-    const user = await this.userService.create({
-      userId: institute._id.toString(),
-      email: admin_email,
-      passwordHash: admin_password,
-      name: admin_name,
-      role: 'admin',
-      contactInfo: admin_contactInfo,
-      gender: admin_gender,
-      instituteId: institute._id.toString(),
-    });
-
-    /**
-     *  Create Admin profile
-     */
-    const admin = await this.adminService.create(user._id);
-
-    /****** Sanitize User **************/
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...sanitizedUser } = user.toObject();
-
-    /****** Generate Token **************/
-    const payload = this.buildJwtPayload(user);
-    const token = this.jwtService.sign(payload);
-    return {
-      institute,
-      admin,
-      user,
-      token,
-      expires_in: process.env.JWT_EXPIRES_IN_MILI,
-      msg: 'Institute Successfully Registered',
-    };
-  }
-
-  /*******************************************
-   * Register User & Student & Token
-   *******************************************/
-  async studentRegistration(
-    data: StudentRegistrationBodyDto,
-    instituteId: string,
-  ) {
-    const { password } = data || {};
-    /************************************
-     *  Create User (role = admin)
-     *********************************/
-    const user = await this.userService.create({
-      passwordHash: password,
-      userId: '22CSME017',
-      instituteId,
-      contactInfo: data.contactInfo,
-      email: data.email,
-      name: data.name,
-      role: 'student',
-      gender: data.gender,
-    });
-
-    /********************************
-     *  Create Student profile
-     ********************************/
-    const studentData = await this.studentService.create(user._id.toString());
-
-    /****** Sanitize User **************/
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...sanitizedUser } = user.toObject();
-
-    /****** Generate Token **************/
-    const payload = this.buildJwtPayload(user);
-    const token = this.jwtService.sign(payload);
-    return {
-      user: sanitizedUser,
-      studentData,
-      token,
-      expires_in: process.env.JWT_EXPIRES_IN_MILI,
-      msg: 'Student Successfully Registered',
-    };
-  }
-
-  /*******************************************
-   *Register User & Faculty & Token
-   *******************************************/
-  async facultyRegistration(data: FacultyRegistrationDto, instituteId: string) {
-    const { password } = data;
-
-    /********************************
-     *  Create User (role = faculty)
-     ********************************/
-    const user = await this.userService.create({
-      userId: 'FAC001', // or generate automatically
-      email: data.email,
-      name: data.name,
-      gender: data.gender,
-      contactInfo: data.contactInfo,
-      passwordHash: password,
-      role: 'faculty',
-      instituteId,
-    });
-
-    /** Create Faculty profile */
-    const faculty = await this.facultyService.create(user._id.toString());
-
-    /********************************
-     *  Sanitize User
-     ********************************/
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...sanitizedUser } = user.toObject();
-
-    /****** Generate Token **************/
-    const payload = this.buildJwtPayload(user);
-    const token = this.jwtService.sign(payload);
-
-    return {
-      user: sanitizedUser,
-      faculty,
-      token,
-      expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
-      msg: 'Faculty Successfully Registered',
-    };
-  }
-
   /*******************************************
    * User Login
    *******************************************/
-  async userLogin(userLoginDto: UserLoginBodyDto) {
-    const { email, password } = userLoginDto;
+  // async userLogin(userLoginDto: UserLoginBodyDto) {
+  //   const { email, password } = userLoginDto;
 
-    /****** Validate input **************/
-    if (!email || !password) {
-      throw new BadRequestException('Email and password are required');
+  //   /****** Validate input **************/
+  //   if (!email || !password) {
+  //     throw new BadRequestException('Email and password are required');
+  //   }
+
+  //   /****** Find User **************/
+  //   const user = await this.userService.findByEmail(email);
+
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   /****** Validate Password **************/
+  //   const isValidPassword = await user.comparePassword(password);
+
+  //   if (!isValidPassword) {
+  //     throw new UnauthorizedException('Invalid email or password');
+  //   }
+
+  //   /****** Sanitize User **************/
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   const { passwordHash, ...sanitizedUser } = user.toObject();
+
+  //   /****** Generate Token **************/
+  //   const token = this.jwtService.sign(payload);
+
+  //   return {
+  //     user: sanitizedUser,
+  //     token,
+  //     expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
+  //     msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
+  //   };
+  // }
+
+  // async me(user: JwtPayload) {
+  //   const userData = await this.userService.findById(user.sub);
+
+  //   if (!userData) {
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   // Convert document → plain object
+  //   const obj = userData.toObject();
+
+  //   // Remove password from output
+  //   const { passwordHash, ...sanitizedUser } = obj;
+
+  //   return {
+  //     userData: sanitizedUser,
+  //     msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
+  //   };
+  // }
+
+  async registerInstitute(dto: RegisterInstituteDto): Promise<AuthResponse> {
+    console.log(dto, 'dto');
+
+    /****** 1. Create admin profile **************/
+    const createAdminDto: CreateAdminDto = {
+      contactInfo: dto.admin_contactInfo,
+      email: dto.admin_email,
+      gender: dto.admin_gender,
+      name: dto.admin_name,
+      password: dto.admin_password,
+    };
+    const admin = await this.adminService.createAdmin(createAdminDto);
+
+    /****** 2. Create institute **************/
+    const createInstituteDto: CreateInstituteDto = {
+      address_line1: dto.inst_address_line1,
+      city: dto.inst_city,
+      institute_name: dto.inst_name,
+      institute_type: dto.inst_type,
+      official_email: dto.inst_email,
+      official_phone: dto.inst_phone,
+      pincode: dto.inst_pincode,
+      state: dto.inst_state,
+      is_affiliated: dto.inst_is_affiliated,
+      affiliation_id: dto.inst_affiliation_id,
+      affiliation_university: dto.inst_affiliation_university,
+    };
+    const institute =
+      await this.instituteService.createInstitute(createInstituteDto);
+
+    /****** 3. Link admin <-> institute **************/
+    const joinedAdmin = await this.adminService.joinInstitute(
+      admin._id.toString(),
+      institute._id.toString(),
+    );
+
+    if (!joinedAdmin) {
+      throw new NotFoundException('Admin not found');
     }
 
-    /****** Find User **************/
-    const user = await this.userService.findByEmail(email);
+    /****** 4. Generate auth token **************/
+    const user = joinedAdmin.basicUserDetails as UserDocument;
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const payload: JwtPayload = {
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      instituteId: joinedAdmin.institute!._id.toString(),
+      sub: joinedAdmin._id.toString(),
+      userId: joinedAdmin._id.toString(),
+    };
 
-    /****** Validate Password **************/
-    const isValidPassword = await user.comparePassword(password);
-
-    if (!isValidPassword) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    /****** Sanitize User **************/
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...sanitizedUser } = user.toObject();
-
-    /****** Generate Token **************/
-    const payload = this.buildJwtPayload(user);
     const token = this.jwtService.sign(payload);
 
     return {
-      user: sanitizedUser,
+      user: joinedAdmin,
+      institute,
       token,
-      expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
-      msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
-    };
-  }
-
-  async me(user: JwtPayload) {
-    const userData = await this.userService.findById(user.sub);
-
-    if (!userData) {
-      throw new NotFoundException('User not found');
-    }
-
-    // Convert document → plain object
-    const obj = userData.toObject();
-
-    // Remove password from output
-    const { passwordHash, ...sanitizedUser } = obj;
-
-    return {
-      userData: user,
-      msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
-    };
-  }
-
-  private buildJwtPayload(user: User): JwtPayload {
-    return {
-      sub: user._id.toString() as string,
-      userId: user.userId,
-      email: user.email,
-      role: user.role,
-      instituteId: user.instituteId.toString(),
-      name: user.name,
+      expires_in: process.env.JWT_EXPIRES_IN_MILI!,
+      msg: 'Institute Successfully Registered',
     };
   }
 }

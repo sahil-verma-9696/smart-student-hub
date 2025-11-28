@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { ContactInfoDto } from '../dto/contact-info.dto';
+import { USER_ROLE } from '../types/enum';
 
 export interface UserMethods {
   comparePassword(plainPassword: string): Promise<boolean>;
@@ -18,7 +19,7 @@ export class User {
   @Prop({ required: true })
   passwordHash: string;
 
-  @Prop({ required: true, enum: ['student', 'faculty', 'admin'] })
+  @Prop({ required: true, enum: USER_ROLE })
   role: string;
 
   @Prop({ enum: ['male', 'female', 'other'], required: true })

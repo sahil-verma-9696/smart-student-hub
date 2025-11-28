@@ -30,7 +30,7 @@ export class AdminService implements IAdminService {
     const userDto: CreateUserDto = {
       name: dto.name,
       email: dto.email,
-      passwordHash: dto.passwordHash,
+      password: dto.password,
       role: USER_ROLE.ADMIN,
       gender: dto.gender,
       contactInfo: dto.contactInfo,
@@ -95,7 +95,7 @@ export class AdminService implements IAdminService {
     // 5. Return updated admin (with populated user details if needed)
     const updatedAdmin = await this.adminModel
       .findById(adminId)
-      .populate('userBasicDetails')
+      .populate('basicUserDetails')
       .populate('institute');
 
     if (!updatedAdmin) {

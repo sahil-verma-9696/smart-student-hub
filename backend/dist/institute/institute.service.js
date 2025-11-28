@@ -36,17 +36,37 @@ let InstituteService = class InstituteService {
         await newInstitute.save();
         return newInstitute;
     }
-    findAll() {
-        return `This action returns all institute`;
+    async createInstitute(dto) {
+        const institute = await this.instituteModel.create(dto);
+        await institute.save();
+        return institute;
     }
-    findOne(id) {
-        return `This action returns a #${id} institute`;
+    async getInstituteById(instituteId) {
+        const inistitue = await this.instituteModel.findById(instituteId).exec();
+        if (!inistitue) {
+            throw new common_1.NotFoundException('Institute not found');
+        }
+        return inistitue;
     }
-    update(id, updateInstituteDto) {
-        return `This action updates a #${id} institute`;
-    }
-    remove(id) {
-        return `This action removes a #${id} institute`;
+    async addAdminToInstitute(instituteId, adminId) {
+        const adminObjectId = new mongoose_2.Types.ObjectId(adminId);
+        const instituteObjectId = new mongoose_2.Types.ObjectId(instituteId);
+        const institute = await this.instituteModel.findById(instituteObjectId);
+        if (!institute) {
+            throw new common_1.NotFoundException(`Institute ${instituteId} not found`);
+        }
+        const alreadyExists = institute.admins?.some((id) => id.toString() === adminId);
+        if (!alreadyExists) {
+            institute.admins.push(adminObjectId);
+            await institute.save();
+        }
+        const updatedInstitute = await this.instituteModel
+            .findById(instituteId)
+            .populate('admins');
+        if (!updatedInstitute) {
+            throw new common_1.NotFoundException(`Institute ${instituteId} not found`);
+        }
+        return updatedInstitute;
     }
 };
 exports.InstituteService = InstituteService;

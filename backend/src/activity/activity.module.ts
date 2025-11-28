@@ -8,6 +8,8 @@ import { WorkshopActivitySchema } from './schema/workshop.schema';
 
 import { ActivityController } from './activity.controller';
 import { ActivityService } from './activity.service';
+import { ACTIVITY_TYPES } from './types/enum';
+import { DefaultActivitySchema } from './schema/defaulty.schema';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { ActivityService } from './activity.service';
           const schema = ActivitySchema;
 
           schema.discriminator('custom', CustomActivitySchema);
+          schema.discriminator(ACTIVITY_TYPES.DEFAULT, DefaultActivitySchema);
           schema.discriminator('hackathon', HackathonActivitySchema);
           schema.discriminator('workshop', WorkshopActivitySchema);
 

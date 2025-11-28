@@ -13,7 +13,7 @@ exports.InstituteSchema = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const auth_enum_1 = require("../../auth/types/auth.enum");
-let Institute = class Institute extends mongoose_2.Document {
+let Institute = class Institute {
     institute_name;
     institute_type;
     official_email;
@@ -25,6 +25,7 @@ let Institute = class Institute extends mongoose_2.Document {
     is_affiliated;
     affiliation_university;
     affiliation_id;
+    admins;
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
@@ -73,6 +74,10 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Institute.prototype, "affiliation_id", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [mongoose_2.Types.ObjectId], default: [], ref: 'Admin' }),
+    __metadata("design:type", Array)
+], Institute.prototype, "admins", void 0);
 Institute = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Institute);

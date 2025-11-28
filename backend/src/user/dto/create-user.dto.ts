@@ -2,7 +2,6 @@ import {
   IsEmail,
   IsEnum,
   IsObject,
-  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -17,7 +16,7 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  passwordHash: string; // plain → hash later in service
+  password: string; // plain → hash later in service
 
   @IsEnum(['student', 'faculty', 'admin'])
   role: string;
@@ -29,8 +28,4 @@ export class CreateUserDto {
   @ValidateNested()
   @Type(() => ContactInfoDto)
   contactInfo: ContactInfoDto;
-
-  @IsString()
-  @IsOptional()
-  instituteId: string;
 }

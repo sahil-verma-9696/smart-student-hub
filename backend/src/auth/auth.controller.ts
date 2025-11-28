@@ -15,6 +15,7 @@ import { UserLoginBodyDto } from './dto/user-login-body.dto.';
 import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import * as authType from './types/auth.type';
+import { RegisterInstituteDto } from './dto/register-institute.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,8 +31,8 @@ export class AuthController {
    * desc : Register Institute
    *********************************/
   @Post('institute/register')
-  async register(@Body() body: InstitueRegistrationDto) {
-    return await this.authService.instituteRegistration(body);
+  async register(@Body() body: RegisterInstituteDto) {
+    return await this.authService.registerInstitute(body);
   }
 
   /**********************************
@@ -40,10 +41,10 @@ export class AuthController {
    * Return : AdminRegistrationDto
    * desc : Register Admin
    *********************************/
-  @Post('user/login')
-  userLogin(@Body() userLoginDto: UserLoginBodyDto) {
-    return this.authService.userLogin(userLoginDto);
-  }
+  // @Post('user/login')
+  // userLogin(@Body() userLoginDto: UserLoginBodyDto) {
+  //   return this.authService.userLogin(userLoginDto);
+  // }
 
   /**********************************
    * POST : auth/student/register
@@ -51,13 +52,13 @@ export class AuthController {
    * Return : InstitueRegistrationDto
    * desc : Register Student
    *********************************/
-  @Post('student/register')
-  async studentRegistration(
-    @Body() body: StudentRegistrationBodyDto,
-    @Query('instituteId') instituteId: string,
-  ) {
-    return await this.authService.studentRegistration(body, instituteId);
-  }
+  // @Post('student/register')
+  // async studentRegistration(
+  //   @Body() body: StudentRegistrationBodyDto,
+  //   @Query('instituteId') instituteId: string,
+  // ) {
+  //   return await this.authService.studentRegistration(body, instituteId);
+  // }
 
   /**********************************
    * POST : auth/faculty/register
@@ -65,20 +66,20 @@ export class AuthController {
    * Return : InstitueRegistrationDto
    * desc : Register Student
    *********************************/
-  @Post('faculty/register')
-  async facultyRegistration(
-    @Body() body: FacultyRegistrationDto,
-    @Query('instituteId') institueId: string,
-  ) {
-    return await this.authService.facultyRegistration(body, institueId);
-  }
+  // @Post('faculty/register')
+  // async facultyRegistration(
+  //   @Body() body: FacultyRegistrationDto,
+  //   @Query('instituteId') institueId: string,
+  // ) {
+  //   return await this.authService.facultyRegistration(body, institueId);
+  // }
 
-  @Get('me')
-  @UseGuards(JwtAuthGuard)
-  getMe(@Req() req: authType.AuthenticatedRequest) {
-    if (!req.user) {
-      throw new UnauthorizedException('User not authenticated');
-    }
-    return this.authService.me(req.user); // comes from JwtStrategy.validate()
-  }
+  // @Get('me')
+  // @UseGuards(JwtAuthGuard)
+  // getMe(@Req() req: authType.AuthenticatedRequest) {
+  //   if (!req.user) {
+  //     throw new UnauthorizedException('User not authenticated');
+  //   }
+  //   return this.authService.me(req.user); // comes from JwtStrategy.validate()
+  // }
 }

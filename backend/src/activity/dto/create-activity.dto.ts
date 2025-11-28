@@ -14,11 +14,11 @@ export class CreateActivityDto {
   @IsString()
   title: string;
 
-  // @IsOptional()
-  // @IsString()
-  // description?: string;
+  @IsOptional()
+  @IsString()
+  description?: string;
 
-  @IsMongoId()
+  @IsString()
   student: string;
 
   @IsEnum(ACTIVITY_TYPES)

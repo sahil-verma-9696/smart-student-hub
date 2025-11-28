@@ -1,17 +1,8 @@
 import { Type } from 'class-transformer';
-import {
-  IsString,
-  IsEmail,
-  IsEnum,
-  IsObject,
-  ValidateNested,
-} from 'class-validator';
+import { IsString, IsEmail, IsObject, ValidateNested } from 'class-validator';
 import { ContactInfoDto } from 'src/user/dto/contact-info.dto';
 
 export class CreateAdminDto {
-  @IsString()
-  userId: string;
-
   @IsString()
   name: string;
 
@@ -19,10 +10,7 @@ export class CreateAdminDto {
   email: string;
 
   @IsString()
-  passwordHash: string; // plain → hash later in service
-
-  @IsEnum(['student', 'faculty', 'admin'])
-  role: string;
+  password: string; // plain → hash later in service
 
   @IsString()
   gender: string;

@@ -1,17 +1,16 @@
-import { UpdateInstituteDto } from './dto/update-institute.dto';
-import Institute from './schemas/institute.schema';
-import { Model } from 'mongoose';
+import Institute, { InstituteDocument } from './schemas/institute.schema';
+import { Model, Types } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
-export declare class InstituteService {
+import { IInstituteService } from './types/service.interface';
+export declare class InstituteService implements IInstituteService {
     private instituteModel;
     constructor(instituteModel: Model<Institute>);
-    create(createInstituteDto: CreateInstituteDto): Promise<import("mongoose").Document<unknown, {}, Institute, {}, {}> & Institute & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }> & {
+    create(createInstituteDto: CreateInstituteDto): Promise<import("mongoose").Document<unknown, {}, Institute, {}, {}> & Institute & {
+        _id: Types.ObjectId;
+    } & {
         __v: number;
     }>;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: number, updateInstituteDto: UpdateInstituteDto): string;
-    remove(id: number): string;
+    createInstitute(dto: CreateInstituteDto): Promise<InstituteDocument>;
+    getInstituteById(instituteId: string): Promise<InstituteDocument>;
+    addAdminToInstitute(instituteId: string, adminId: string): Promise<InstituteDocument>;
 }

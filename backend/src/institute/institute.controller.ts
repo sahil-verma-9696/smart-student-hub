@@ -3,13 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  // Patch,
   Param,
-  Delete,
+  // Delete,
 } from '@nestjs/common';
 import { InstituteService } from './institute.service';
 import CreateInstituteDto from './dto/create-institute.dto';
-import { UpdateInstituteDto } from './dto/update-institute.dto';
+// import { UpdateInstituteDto } from './dto/update-institute.dto';
 
 @Controller('institute')
 export class InstituteController {
@@ -20,26 +20,26 @@ export class InstituteController {
     return this.instituteService.create(createInstituteDto);
   }
 
-  @Get()
-  findAll() {
-    return this.instituteService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.instituteService.findAll();
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.instituteService.findOne(+id);
+    return this.instituteService.getInstituteById(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateInstituteDto: UpdateInstituteDto,
-  ) {
-    return this.instituteService.update(+id, updateInstituteDto);
-  }
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateInstituteDto: UpdateInstituteDto,
+  // ) {
+  //   return this.instituteService.update(+id, updateInstituteDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.instituteService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.instituteService.remove(+id);
+  // }
 }

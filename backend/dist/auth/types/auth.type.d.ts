@@ -1,5 +1,8 @@
+import { AdminDocument } from 'src/admin/schema/admin.schema';
 import { Gender, Role } from './auth.enum';
 import { Request } from 'express';
+import { UserDocument } from 'src/user/schema/user.schema';
+import { InstituteDocument } from 'src/institute/schemas/institute.schema';
 export type User = {
     firstName: string;
     lastName: string;
@@ -29,4 +32,11 @@ export interface JwtPayload {
 }
 export type AuthenticatedRequest = Request & {
     user?: JwtPayload;
+};
+export type AuthResponse = {
+    user: AdminDocument | UserDocument;
+    institute: InstituteDocument;
+    token: string;
+    expires_in: string;
+    msg: string;
 };
