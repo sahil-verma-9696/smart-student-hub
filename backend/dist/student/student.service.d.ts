@@ -1,20 +1,9 @@
-import { UpdateStudentDto } from './dto/update-student.dto';
-import { Student } from './schema/student.schema';
+import { StudentDocument } from './schema/student.schema';
 import { Model } from 'mongoose';
+import { UserService } from 'src/user/user.service';
 export declare class StudentService {
     private studentModel;
-    constructor(studentModel: Model<Student>);
-    create(userId: string): Promise<import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }> & {
-        __v: number;
-    }>;
-    findAll(): string;
-    findOne(id: string): Promise<(import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }> & {
-        __v: number;
-    }) | null>;
-    update(id: number, updateStudentDto: UpdateStudentDto): string;
-    remove(id: number): string;
+    private readonly userService;
+    constructor(studentModel: Model<StudentDocument>, userService: UserService);
+    getByUserId(userId: string): Promise<StudentDocument>;
 }

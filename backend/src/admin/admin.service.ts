@@ -18,14 +18,6 @@ export class AdminService implements IAdminService {
     private readonly instituteService: InstituteService,
   ) {}
 
-  async create(userId: string) {
-    const admin = await this.adminModel.create({
-      basicUserDetails: userId,
-    });
-    await admin.save();
-    return admin;
-  }
-
   async createAdmin(
     dto: CreateAdminDto,
     session?: ClientSession,
@@ -83,6 +75,20 @@ export class AdminService implements IAdminService {
     if (!admin) {
       throw new Error('Admin not found');
     }
+    return admin;
+  }
+
+  async getByUserId(userId: string): Promise<AdminDocument> {
+    const admin = await this.adminModel
+      .findOne({ basicUserDetails: new Types.ObjectId(userId)  })
+      .populate<{ basicUserDetails: any }>('basicUserDetails')
+      .populate<{ institute: any }>('institute')
+      .exec();
+
+    if (!admin) {
+      throw new NotFoundException(`Admin with userId ${userId} not found`);
+    }
+
     return admin;
   }
 

@@ -18,6 +18,10 @@ import CreateInstituteDto from 'src/institute/dto/create-institute.dto';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { LoginDto } from './dto/login.dto';
+import { StudentDocument } from 'src/student/schema/student.schema';
+import { AdminDocument } from 'src/admin/schema/admin.schema';
+import { FacultyDocument } from 'src/faculty/schemas/faculty.schema';
+import { USER_ROLE } from 'src/user/types/enum';
 
 @Injectable()
 export class AuthService {
@@ -78,8 +82,23 @@ export class AuthService {
   }
 
   async me(user: JwtPayload) {
-    const userData = await this.userService.getUserById(user.sub);
+    let userData: StudentDocument | AdminDocument | FacultyDocument | null =
+      null;
+    const role = user.role as USER_ROLE;
 
+    switch (role) {
+      case USER_ROLE.STUDENT:
+        userData = await this.studentService.getByUserId(user.userId);
+        break;
+      case USER_ROLE.FACULTY:
+        userData = await this.facultyService.getByUserId(user.userId);
+        break;
+      case USER_ROLE.ADMIN:
+        userData = await this.adminService.getByUserId(user.userId);
+        break;
+      default:
+        break;
+    }
     if (!userData) {
       throw new NotFoundException('User not found');
     }

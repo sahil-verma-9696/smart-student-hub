@@ -17,35 +17,31 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const student_schema_1 = require("./schema/student.schema");
 const mongoose_2 = require("mongoose");
+const user_service_1 = require("../user/user.service");
 let StudentService = class StudentService {
     studentModel;
-    constructor(studentModel) {
+    userService;
+    constructor(studentModel, userService) {
         this.studentModel = studentModel;
+        this.userService = userService;
     }
-    async create(userId) {
-        const student = await this.studentModel.create({
-            basicUserDetails: userId,
-        });
-        await student.save();
+    async getByUserId(userId) {
+        const student = (await this.studentModel
+            .findOne({ basicUserDetails: userId })
+            .populate('basicUserDetails')
+            .populate('institute')
+            .exec());
+        if (!student) {
+            throw new common_1.NotFoundException(`Student with userId ${userId} not found`);
+        }
         return student;
-    }
-    findAll() {
-        return `This action returns all student`;
-    }
-    async findOne(id) {
-        return await this.studentModel.findById(id).populate('basicUserDetails');
-    }
-    update(id, updateStudentDto) {
-        return `This action updates a #${id} student`;
-    }
-    remove(id) {
-        return `This action removes a #${id} student`;
     }
 };
 exports.StudentService = StudentService;
 exports.StudentService = StudentService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(student_schema_1.Student.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        user_service_1.UserService])
 ], StudentService);
 //# sourceMappingURL=student.service.js.map

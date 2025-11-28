@@ -12,6 +12,7 @@ const student_service_1 = require("./student.service");
 const student_controller_1 = require("./student.controller");
 const mongoose_1 = require("@nestjs/mongoose");
 const student_schema_1 = require("./schema/student.schema");
+const user_module_1 = require("../user/user.module");
 let StudentModule = class StudentModule {
 };
 exports.StudentModule = StudentModule;
@@ -19,6 +20,7 @@ exports.StudentModule = StudentModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: student_schema_1.Student.name, schema: student_schema_1.StudentSchema }]),
+            user_module_1.UserModule,
         ],
         controllers: [student_controller_1.StudentController],
         providers: [student_service_1.StudentService],

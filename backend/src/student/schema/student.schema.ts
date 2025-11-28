@@ -2,8 +2,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+export type StudentDocument = Student & Document;
+
 @Schema({ timestamps: true })
-export class Student extends Document {
+export class Student {
   @Prop({
     type: Types.ObjectId,
     ref: 'User',

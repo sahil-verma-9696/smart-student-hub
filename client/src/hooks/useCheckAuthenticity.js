@@ -11,7 +11,6 @@ export default function useCheckAuthenticity({
    * Fetch localStorage values
    ******************************************/
   const accessToken = localStorage.getItem(storageKeys.accessToken);
-  const storedUserRole = localStorage.getItem(storageKeys.userRole);
   const expiresAt = Number(localStorage.getItem(storageKeys.expiresAt)); // ms timestamp
   const now = Date.now();
 
@@ -57,7 +56,7 @@ export default function useCheckAuthenticity({
         // 5️⃣ Valid token → set user state + update auth status + role
         setUser(payload?.data?.userData);
         setIsUserAuthenticated(true);
-        setUserRole(payload?.data?.userData?.role);
+        setUserRole(payload?.data?.userData?.basicUserDetails?.role);
 
         // 6️⃣ Valid token but invalid role → redirect to valid route
         switch (userRole) {

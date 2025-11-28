@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Faculty } from './schemas/faculty.schema';
+import { Faculty, FacultyDocument } from './schemas/faculty.schema';
 import { isValidObjectId } from 'mongoose';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
 
@@ -56,5 +56,20 @@ export class FacultyService {
     const faculty = await this.facultyModel.findByIdAndDelete(id);
     if (!faculty) throw new NotFoundException('Faculty not found');
     return 'Faculty deleted successfully';
+  }
+
+  async getByUserId(userId: string): Promise<FacultyDocument> {
+    const faculty = await this.facultyModel
+      .findOne({ basicUserDetails: userId })
+      .populate<{ basicUserDetails: any }>('basicUserDetails')
+      .populate<{ institute: any }>('institute')
+      .populate<{ department: any }>('department')
+      .exec();
+
+    if (!faculty) {
+      throw new NotFoundException(`Faculty with userId ${userId} not found`);
+    }
+
+    return faculty;
   }
 }

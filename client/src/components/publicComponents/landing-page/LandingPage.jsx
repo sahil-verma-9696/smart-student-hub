@@ -12,14 +12,14 @@ import { useNavigate } from "react-router";
 
 const LandingPage = () => {
   const [authOpen, setAuthOpen] = useState(false);
-  const { isUserAuthenticated, userRole } = useAuthContext();
+  const { isUserAuthenticated, user } = useAuthContext();
   const navigate = useNavigate();
 
   function handleGetStarted() {
     if (!isUserAuthenticated) {
       setAuthOpen(true);
     } else {
-      navigate(`/${userRole}`);
+      navigate(`/${user?.basicUserDetails?.role}`);
     }
   }
 

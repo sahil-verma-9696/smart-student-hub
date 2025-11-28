@@ -7,6 +7,7 @@ import {
 } from 'class-validator';
 import { ContactInfoDto } from './contact-info.dto';
 import { Type } from 'class-transformer';
+import { USER_ROLE } from '../types/enum';
 
 export class CreateUserDto {
   @IsString()
@@ -18,8 +19,8 @@ export class CreateUserDto {
   @IsString()
   password: string; // plain → hash later in service
 
-  @IsEnum(['student', 'faculty', 'admin'])
-  role: string;
+  @IsEnum(USER_ROLE)
+  role: USER_ROLE;
 
   @IsString()
   gender: string;

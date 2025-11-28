@@ -22,6 +22,7 @@ const student_service_1 = require("../student/student.service");
 const faculty_service_1 = require("../faculty/faculty.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const enum_1 = require("../user/types/enum");
 let AuthService = class AuthService {
     instituteService;
     adminService;
@@ -68,7 +69,21 @@ let AuthService = class AuthService {
         };
     }
     async me(user) {
-        const userData = await this.userService.getUserById(user.sub);
+        let userData = null;
+        const role = user.role;
+        switch (role) {
+            case enum_1.USER_ROLE.STUDENT:
+                userData = await this.studentService.getByUserId(user.userId);
+                break;
+            case enum_1.USER_ROLE.FACULTY:
+                userData = await this.facultyService.getByUserId(user.userId);
+                break;
+            case enum_1.USER_ROLE.ADMIN:
+                userData = await this.adminService.getByUserId(user.userId);
+                break;
+            default:
+                break;
+        }
         if (!userData) {
             throw new common_1.NotFoundException('User not found');
         }

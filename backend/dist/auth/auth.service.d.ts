@@ -9,6 +9,9 @@ import { AuthResponse, JwtPayload } from './types/auth.type';
 import { RegisterInstituteDto } from './dto/register-institute.dto';
 import { Connection } from 'mongoose';
 import { LoginDto } from './dto/login.dto';
+import { StudentDocument } from 'src/student/schema/student.schema';
+import { AdminDocument } from 'src/admin/schema/admin.schema';
+import { FacultyDocument } from 'src/faculty/schemas/faculty.schema';
 export declare class AuthService {
     private readonly instituteService;
     private readonly adminService;
@@ -25,7 +28,7 @@ export declare class AuthService {
         msg: string;
     }>;
     me(user: JwtPayload): Promise<{
-        userData: UserDocument;
+        userData: AdminDocument | StudentDocument | FacultyDocument;
         msg: string;
     }>;
     registerInstitute(dto: RegisterInstituteDto): Promise<AuthResponse>;

@@ -3,13 +3,11 @@ import {
   Controller,
   Get,
   Post,
-  Query,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import FacultyRegistrationDto from './dto/faculty-registration-body.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import * as authType from './types/auth.type';
 import { RegisterInstituteDto } from './dto/register-institute.dto';
@@ -45,33 +43,11 @@ export class AuthController {
   }
 
   /**********************************
-   * POST : auth/student/register
-   * Body : InstitueRegistrationDto
-   * Return : InstitueRegistrationDto
-   * desc : Register Student
+   * POST : auth/admin/login
+   * Body : AdminRegistrationDto
+   * Return : AdminRegistrationDto
+   * desc : Register Admin
    *********************************/
-  // @Post('student/register')
-  // async studentRegistration(
-  //   @Body() body: StudentRegistrationBodyDto,
-  //   @Query('instituteId') instituteId: string,
-  // ) {
-  //   return await this.authService.studentRegistration(body, instituteId);
-  // }
-
-  /**********************************
-   * POST : auth/faculty/register
-   * Body : InstitueRegistrationDto
-   * Return : InstitueRegistrationDto
-   * desc : Register Student
-   *********************************/
-  // @Post('faculty/register')
-  // async facultyRegistration(
-  //   @Body() body: FacultyRegistrationDto,
-  //   @Query('instituteId') institueId: string,
-  // ) {
-  //   return await this.authService.facultyRegistration(body, institueId);
-  // }
-
   @Get('me')
   @UseGuards(JwtAuthGuard)
   getMe(@Req() req: authType.AuthenticatedRequest) {
