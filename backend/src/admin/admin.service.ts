@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Admin, AdminDocument } from './schema/admin.schema';
-import { Model, Types } from 'mongoose';
+import { ClientSession, Model, Types } from 'mongoose';
 import { IAdminService } from './types/service.interface';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UserService } from 'src/user/user.service';
@@ -26,7 +26,13 @@ export class AdminService implements IAdminService {
     return admin;
   }
 
-  async createAdmin(dto: CreateAdminDto): Promise<AdminDocument> {
+  async createAdmin(
+    dto: CreateAdminDto,
+    session?: ClientSession,
+  ): Promise<AdminDocument> {
+    /***********************
+     * 1. Create base user
+     ***********************/
     const userDto: CreateUserDto = {
       name: dto.name,
       email: dto.email,
@@ -35,16 +41,27 @@ export class AdminService implements IAdminService {
       gender: dto.gender,
       contactInfo: dto.contactInfo,
     };
-    const user = await this.userService.createUser(userDto);
+
+    const user = await this.userService.createUser(userDto, session);
 
     if (!user) {
       throw new Error('User not created');
     }
 
-    const admin = await this.adminModel.create({
-      basicUserDetails: user._id, // correct field name from your schema
-      institute: null, // assigned later in joinInstitute()
-    });
+    /***********************
+     * 2. Create admin profile
+     ***********************/
+    const admin = await this.adminModel
+      .create(
+        [
+          {
+            basicUserDetails: user._id, // ← correct field name
+            institute: null,
+          },
+        ],
+        { session },
+      )
+      .then((res) => res[0]); // because create([...]) returns an array
 
     return admin;
   }
@@ -72,34 +89,48 @@ export class AdminService implements IAdminService {
   async joinInstitute(
     adminId: string,
     instituteId: string,
+    session?: ClientSession,
   ): Promise<AdminDocument> {
-    // 1. Validate existing admin
-    const admin = await this.adminModel.findById(adminId);
+    // 1. Validate admin exists
+    const admin = await this.adminModel
+      .findById(adminId)
+      .session(session ?? null);
     if (!admin) {
       throw new NotFoundException(`Admin ${adminId} not found`);
     }
 
-    // 2. Validate existing institute
-    const institute = await this.instituteService.getInstituteById(instituteId);
+    // 2. Validate institute exists
+    const institute = await this.instituteService.getInstituteById(
+      instituteId,
+      session,
+    );
     if (!institute) {
       throw new NotFoundException(`Institute ${instituteId} not found`);
     }
 
-    // 3. Update admin.institute (Admin owns the relationship)
-    admin.institute = new Types.ObjectId(instituteId);
-    await admin.save();
+    // 3. Update admin.institute inside transaction
+    await this.adminModel.updateOne(
+      { _id: adminId },
+      { $set: { institute: new Types.ObjectId(instituteId) } },
+      { session },
+    );
 
-    // 4. Update institute.admins[] (for bidirectional reference)
-    await this.instituteService.addAdminToInstitute(instituteId, adminId);
+    // 4. Update institute.admins[] inside transaction
+    await this.instituteService.addAdminToInstitute(
+      instituteId,
+      adminId,
+      session,
+    );
 
-    // 5. Return updated admin (with populated user details if needed)
+    // 5. Return updated, populated admin
     const updatedAdmin = await this.adminModel
       .findById(adminId)
-      .populate('basicUserDetails')
-      .populate('institute');
+      .populate('basicUserDetails') // correct field
+      .populate('institute')
+      .session(session ?? null);
 
     if (!updatedAdmin) {
-      throw new NotFoundException(`Admin ${adminId} not found`);
+      throw new NotFoundException(`Admin ${adminId} not found after update`);
     }
 
     return updatedAdmin;
@@ -117,7 +148,7 @@ export class AdminService implements IAdminService {
     }
     return this.adminModel
       .findById(adminId)
-      .populate('userBasicDetails')
+      .populate('basicUserDetails')
       .exec()
       .then((admin) => {
         if (!admin) {

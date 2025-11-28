@@ -2,6 +2,7 @@ import Institute, { InstituteDocument } from './schemas/institute.schema';
 import { Model, Types } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
 import { IInstituteService } from './types/service.interface';
+import { ClientSession } from 'mongoose';
 export declare class InstituteService implements IInstituteService {
     private instituteModel;
     constructor(instituteModel: Model<Institute>);
@@ -10,7 +11,7 @@ export declare class InstituteService implements IInstituteService {
     } & {
         __v: number;
     }>;
-    createInstitute(dto: CreateInstituteDto): Promise<InstituteDocument>;
-    getInstituteById(instituteId: string): Promise<InstituteDocument>;
-    addAdminToInstitute(instituteId: string, adminId: string): Promise<InstituteDocument>;
+    createInstitute(dto: CreateInstituteDto, session?: ClientSession): Promise<InstituteDocument>;
+    getInstituteById(instituteId: string, session?: ClientSession): Promise<InstituteDocument>;
+    addAdminToInstitute(instituteId: string, adminId: string, session?: ClientSession): Promise<InstituteDocument>;
 }

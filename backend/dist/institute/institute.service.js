@@ -36,33 +36,24 @@ let InstituteService = class InstituteService {
         await newInstitute.save();
         return newInstitute;
     }
-    async createInstitute(dto) {
-        const institute = await this.instituteModel.create(dto);
-        await institute.save();
-        return institute;
+    async createInstitute(dto, session) {
+        const created = await this.instituteModel.create([dto], { session });
+        return created[0];
     }
-    async getInstituteById(instituteId) {
-        const inistitue = await this.instituteModel.findById(instituteId).exec();
-        if (!inistitue) {
+    async getInstituteById(instituteId, session) {
+        const institute = await this.instituteModel
+            .findById(instituteId)
+            .session(session ?? null);
+        if (!institute) {
             throw new common_1.NotFoundException('Institute not found');
         }
-        return inistitue;
+        return institute;
     }
-    async addAdminToInstitute(instituteId, adminId) {
-        const adminObjectId = new mongoose_2.Types.ObjectId(adminId);
-        const instituteObjectId = new mongoose_2.Types.ObjectId(instituteId);
-        const institute = await this.instituteModel.findById(instituteObjectId);
-        if (!institute) {
-            throw new common_1.NotFoundException(`Institute ${instituteId} not found`);
-        }
-        const alreadyExists = institute.admins?.some((id) => id.toString() === adminId);
-        if (!alreadyExists) {
-            institute.admins.push(adminObjectId);
-            await institute.save();
-        }
+    async addAdminToInstitute(instituteId, adminId, session) {
         const updatedInstitute = await this.instituteModel
-            .findById(instituteId)
-            .populate('admins');
+            .findByIdAndUpdate(instituteId, { $addToSet: { admins: new mongoose_2.Types.ObjectId(adminId) } }, { new: true, session })
+            .populate('admins')
+            .session(session ?? null);
         if (!updatedInstitute) {
             throw new common_1.NotFoundException(`Institute ${instituteId} not found`);
         }

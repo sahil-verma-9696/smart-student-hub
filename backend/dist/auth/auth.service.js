@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
@@ -17,6 +20,8 @@ const admin_service_1 = require("../admin/admin.service");
 const jwt_1 = require("@nestjs/jwt");
 const student_service_1 = require("../student/student.service");
 const faculty_service_1 = require("../faculty/faculty.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 let AuthService = class AuthService {
     instituteService;
     adminService;
@@ -24,69 +29,83 @@ let AuthService = class AuthService {
     jwtService;
     studentService;
     facultyService;
-    constructor(instituteService, adminService, userService, jwtService, studentService, facultyService) {
+    connection;
+    constructor(instituteService, adminService, userService, jwtService, studentService, facultyService, connection) {
         this.instituteService = instituteService;
         this.adminService = adminService;
         this.userService = userService;
         this.jwtService = jwtService;
         this.studentService = studentService;
         this.facultyService = facultyService;
+        this.connection = connection;
     }
     async registerInstitute(dto) {
-        console.log(dto, 'dto');
-        const createAdminDto = {
-            contactInfo: dto.admin_contactInfo,
-            email: dto.admin_email,
-            gender: dto.admin_gender,
-            name: dto.admin_name,
-            password: dto.admin_password,
-        };
-        const admin = await this.adminService.createAdmin(createAdminDto);
-        const createInstituteDto = {
-            address_line1: dto.inst_address_line1,
-            city: dto.inst_city,
-            institute_name: dto.inst_name,
-            institute_type: dto.inst_type,
-            official_email: dto.inst_email,
-            official_phone: dto.inst_phone,
-            pincode: dto.inst_pincode,
-            state: dto.inst_state,
-            is_affiliated: dto.inst_is_affiliated,
-            affiliation_id: dto.inst_affiliation_id,
-            affiliation_university: dto.inst_affiliation_university,
-        };
-        const institute = await this.instituteService.createInstitute(createInstituteDto);
-        const joinedAdmin = await this.adminService.joinInstitute(admin._id.toString(), institute._id.toString());
-        if (!joinedAdmin) {
-            throw new common_1.NotFoundException('Admin not found');
+        const session = await this.connection.startSession();
+        session.startTransaction();
+        try {
+            const createAdminDto = {
+                contactInfo: dto.admin_contactInfo,
+                email: dto.admin_email,
+                gender: dto.admin_gender,
+                name: dto.admin_name,
+                password: dto.admin_password,
+            };
+            const admin = await this.adminService.createAdmin(createAdminDto, session);
+            const createInstituteDto = {
+                address_line1: dto.inst_address_line1,
+                city: dto.inst_city,
+                institute_name: dto.inst_name,
+                institute_type: dto.inst_type,
+                official_email: dto.inst_email,
+                official_phone: dto.inst_phone,
+                pincode: dto.inst_pincode,
+                state: dto.inst_state,
+                is_affiliated: dto.inst_is_affiliated,
+                affiliation_id: dto.inst_affiliation_id,
+                affiliation_university: dto.inst_affiliation_university,
+            };
+            const institute = await this.instituteService.createInstitute(createInstituteDto, session);
+            const joinedAdmin = await this.adminService.joinInstitute(admin._id.toString(), institute._id.toString(), session);
+            if (!joinedAdmin) {
+                throw new common_1.NotFoundException('Admin not found after linking');
+            }
+            await session.commitTransaction();
+            session.endSession();
+            const user = joinedAdmin.basicUserDetails;
+            const payload = {
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                instituteId: joinedAdmin.institute._id.toString(),
+                sub: joinedAdmin._id.toString(),
+                userId: joinedAdmin._id.toString(),
+            };
+            const token = this.jwtService.sign(payload);
+            return {
+                user: joinedAdmin,
+                institute,
+                token,
+                expires_in: process.env.JWT_EXPIRES_IN_MILI,
+                msg: 'Institute Successfully Registered',
+            };
         }
-        const user = joinedAdmin.basicUserDetails;
-        const payload = {
-            email: user.email,
-            name: user.name,
-            role: user.role,
-            instituteId: joinedAdmin.institute._id.toString(),
-            sub: joinedAdmin._id.toString(),
-            userId: joinedAdmin._id.toString(),
-        };
-        const token = this.jwtService.sign(payload);
-        return {
-            user: joinedAdmin,
-            institute,
-            token,
-            expires_in: process.env.JWT_EXPIRES_IN_MILI,
-            msg: 'Institute Successfully Registered',
-        };
+        catch (error) {
+            await session.abortTransaction();
+            session.endSession();
+            throw error;
+        }
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
+    __param(6, (0, mongoose_1.InjectConnection)()),
     __metadata("design:paramtypes", [institute_service_1.InstituteService,
         admin_service_1.AdminService,
         user_service_1.UserService,
         jwt_1.JwtService,
         student_service_1.StudentService,
-        faculty_service_1.FacultyService])
+        faculty_service_1.FacultyService,
+        mongoose_2.Connection])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

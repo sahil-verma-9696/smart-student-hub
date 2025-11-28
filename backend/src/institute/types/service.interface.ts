@@ -1,3 +1,4 @@
+import { ClientSession } from 'mongoose';
 import CreateInstituteDto from '../dto/create-institute.dto';
 import { InstituteDocument } from '../schemas/institute.schema';
 
@@ -7,7 +8,10 @@ export interface IInstituteService {
    * Handles only institute-level data (name, code, address, etc.).
    * Does NOT create admin or users here.
    */
-  createInstitute(dto: CreateInstituteDto): Promise<InstituteDocument>;
+  createInstitute(
+    dto: CreateInstituteDto,
+    session?: ClientSession,
+  ): Promise<InstituteDocument>;
 
   /**
    * Fetch institute details using institute ID.

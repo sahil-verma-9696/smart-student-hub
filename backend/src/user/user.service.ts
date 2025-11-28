@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { User, UserDocument } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IUserService } from './types/service.interface';
@@ -16,15 +16,27 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async createUser(dto: CreateUserDto): Promise<UserDocument> {
-    const user = await this.userModel.create({
-      passwordHash: dto.password,
-      name: dto.name,
-      email: dto.email,
-      role: dto.role,
-      gender: dto.gender,
-      contactInfo: dto.contactInfo,
-    });
+  async createUser(
+    dto: CreateUserDto,
+    session?: ClientSession,
+  ): Promise<UserDocument> {
+    // Use array syntax so session works properly
+    const created = await this.userModel.create(
+      [
+        {
+          passwordHash: dto.password, // pre-save hook will hash it
+          name: dto.name,
+          email: dto.email,
+          role: dto.role,
+          gender: dto.gender,
+          contactInfo: dto.contactInfo,
+        },
+      ],
+      { session },
+    );
+
+    // create() returns an array when used with [data]
+    const user = created[0];
 
     if (!user) {
       throw new Error('User not created');

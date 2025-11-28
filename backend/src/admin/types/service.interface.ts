@@ -1,3 +1,4 @@
+import { ClientSession } from 'mongoose';
 import { CreateAdminDto } from '../dto/create-admin.dto';
 import { UpdateAdminDto } from '../dto/update-admin.dto';
 import { AdminDocument } from '../schema/admin.schema';
@@ -9,7 +10,10 @@ export interface IAdminService {
    * - Creates Admin record with reference to userBasicDetails
    * - Does NOT assign institute here unless required by your flow
    */
-  createAdmin(dto: CreateAdminDto): Promise<AdminDocument>;
+  createAdmin(
+    dto: CreateAdminDto,
+    session?: ClientSession,
+  ): Promise<AdminDocument>;
 
   /**
    * Assign an admin to an institute.

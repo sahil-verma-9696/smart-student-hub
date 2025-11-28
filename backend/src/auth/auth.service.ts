@@ -15,6 +15,8 @@ import { AuthResponse, JwtPayload } from './types/auth.type';
 import { RegisterInstituteDto } from './dto/register-institute.dto';
 import { CreateAdminDto } from 'src/admin/dto/create-admin.dto';
 import CreateInstituteDto from 'src/institute/dto/create-institute.dto';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +30,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly studentService: StudentService,
     private readonly facultyService: FacultyService,
+    @InjectConnection() private readonly connection: Connection,
   ) {}
   /*******************************************
    * User Login
@@ -89,65 +92,85 @@ export class AuthService {
   // }
 
   async registerInstitute(dto: RegisterInstituteDto): Promise<AuthResponse> {
-    console.log(dto, 'dto');
+    const session = await this.connection.startSession();
+    session.startTransaction();
 
-    /****** 1. Create admin profile **************/
-    const createAdminDto: CreateAdminDto = {
-      contactInfo: dto.admin_contactInfo,
-      email: dto.admin_email,
-      gender: dto.admin_gender,
-      name: dto.admin_name,
-      password: dto.admin_password,
-    };
-    const admin = await this.adminService.createAdmin(createAdminDto);
+    try {
+      /****** 1. Create admin user + admin profile **************/
+      const createAdminDto: CreateAdminDto = {
+        contactInfo: dto.admin_contactInfo,
+        email: dto.admin_email,
+        gender: dto.admin_gender,
+        name: dto.admin_name,
+        password: dto.admin_password,
+      };
 
-    /****** 2. Create institute **************/
-    const createInstituteDto: CreateInstituteDto = {
-      address_line1: dto.inst_address_line1,
-      city: dto.inst_city,
-      institute_name: dto.inst_name,
-      institute_type: dto.inst_type,
-      official_email: dto.inst_email,
-      official_phone: dto.inst_phone,
-      pincode: dto.inst_pincode,
-      state: dto.inst_state,
-      is_affiliated: dto.inst_is_affiliated,
-      affiliation_id: dto.inst_affiliation_id,
-      affiliation_university: dto.inst_affiliation_university,
-    };
-    const institute =
-      await this.instituteService.createInstitute(createInstituteDto);
+      const admin = await this.adminService.createAdmin(
+        createAdminDto,
+        session,
+      );
 
-    /****** 3. Link admin <-> institute **************/
-    const joinedAdmin = await this.adminService.joinInstitute(
-      admin._id.toString(),
-      institute._id.toString(),
-    );
+      /****** 2. Create institute **************/
+      const createInstituteDto: CreateInstituteDto = {
+        address_line1: dto.inst_address_line1,
+        city: dto.inst_city,
+        institute_name: dto.inst_name,
+        institute_type: dto.inst_type,
+        official_email: dto.inst_email,
+        official_phone: dto.inst_phone,
+        pincode: dto.inst_pincode,
+        state: dto.inst_state,
+        is_affiliated: dto.inst_is_affiliated,
+        affiliation_id: dto.inst_affiliation_id,
+        affiliation_university: dto.inst_affiliation_university,
+      };
 
-    if (!joinedAdmin) {
-      throw new NotFoundException('Admin not found');
+      const institute = await this.instituteService.createInstitute(
+        createInstituteDto,
+        session,
+      );
+
+      /****** 3. Link admin <-> institute **************/
+      const joinedAdmin = await this.adminService.joinInstitute(
+        admin._id.toString(),
+        institute._id.toString(),
+        session,
+      );
+
+      if (!joinedAdmin) {
+        throw new NotFoundException('Admin not found after linking');
+      }
+
+      /****** 4. COMMIT TRANSACTION **************/
+      await session.commitTransaction();
+      session.endSession();
+
+      /****** 5. Generate auth token **************/
+      const user = joinedAdmin.basicUserDetails as UserDocument;
+
+      const payload: JwtPayload = {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        instituteId: joinedAdmin.institute!._id.toString(),
+        sub: joinedAdmin._id.toString(),
+        userId: joinedAdmin._id.toString(),
+      };
+
+      const token = this.jwtService.sign(payload);
+
+      return {
+        user: joinedAdmin,
+        institute,
+        token,
+        expires_in: process.env.JWT_EXPIRES_IN_MILI!,
+        msg: 'Institute Successfully Registered',
+      };
+    } catch (error) {
+      /****** ROLLBACK ON FAILURE **************/
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
-
-    /****** 4. Generate auth token **************/
-    const user = joinedAdmin.basicUserDetails as UserDocument;
-
-    const payload: JwtPayload = {
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      instituteId: joinedAdmin.institute!._id.toString(),
-      sub: joinedAdmin._id.toString(),
-      userId: joinedAdmin._id.toString(),
-    };
-
-    const token = this.jwtService.sign(payload);
-
-    return {
-      user: joinedAdmin,
-      institute,
-      token,
-      expires_in: process.env.JWT_EXPIRES_IN_MILI!,
-      msg: 'Institute Successfully Registered',
-    };
   }
 }

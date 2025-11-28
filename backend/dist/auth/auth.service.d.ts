@@ -6,6 +6,7 @@ import { StudentService } from 'src/student/student.service';
 import { FacultyService } from 'src/faculty/faculty.service';
 import { AuthResponse } from './types/auth.type';
 import { RegisterInstituteDto } from './dto/register-institute.dto';
+import { Connection } from 'mongoose';
 export declare class AuthService {
     private readonly instituteService;
     private readonly adminService;
@@ -13,6 +14,7 @@ export declare class AuthService {
     private readonly jwtService;
     private readonly studentService;
     private readonly facultyService;
-    constructor(instituteService: InstituteService, adminService: AdminService, userService: UserService, jwtService: JwtService, studentService: StudentService, facultyService: FacultyService);
+    private readonly connection;
+    constructor(instituteService: InstituteService, adminService: AdminService, userService: UserService, jwtService: JwtService, studentService: StudentService, facultyService: FacultyService, connection: Connection);
     registerInstitute(dto: RegisterInstituteDto): Promise<AuthResponse>;
 }
