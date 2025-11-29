@@ -20,6 +20,7 @@ const activity_module_1 = require("./activity/activity.module");
 const admin_module_1 = require("./admin/admin.module");
 const up_docs_module_1 = require("./up-docs/up-docs.module");
 const attachment_module_1 = require("./attachment/attachment.module");
+const academic_module_1 = require("./academic/academic.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
             admin_module_1.AdminModule,
             up_docs_module_1.UpDocsModule,
             attachment_module_1.AttachmentModule,
+            academic_module_1.AcademicModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

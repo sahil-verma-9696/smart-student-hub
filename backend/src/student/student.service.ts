@@ -8,6 +8,8 @@ import { USER_ROLE } from 'src/user/types/enum';
 import { CreateStudentDto } from './dto/create-basic-student.dto';
 import * as fs from 'fs';
 import * as csv from 'fast-csv';
+import { AcademicService } from 'src/academic/academic.service';
+import { CSV_FIELD_MAP } from './constants';
 
 @Injectable()
 export class StudentService {
@@ -16,12 +18,14 @@ export class StudentService {
   constructor(
     @InjectModel(Student.name)
     private readonly studentModel: Model<StudentDocument>,
+
     private readonly userService: UserService,
+    private readonly academicService: AcademicService,
   ) {}
 
-  /********************************************
-   * VALIDATE instituteId BEFORE creating user
-   ********************************************/
+  /***************************************
+   * VALIDATE instituteId BEFORE creating
+   ***************************************/
   private async validateInstitute(instituteId: string): Promise<void> {
     if (!Types.ObjectId.isValid(instituteId)) {
       throw new Error(`Invalid instituteId: ${instituteId}`);
@@ -36,19 +40,19 @@ export class StudentService {
     }
   }
 
-  /********************************************
-   * 1. CREATE SINGLE STUDENT
-   ********************************************/
+  /***************************************
+   * CREATE SINGLE STUDENT WITH ACADEMIC
+   ***************************************/
   async createStudent(
     dto: CreateStudentDto,
     session?: ClientSession,
   ): Promise<StudentDocument> {
     await this.studentModel.syncIndexes();
 
-    // Ensure valid institute
+    // Validate institute
     await this.validateInstitute(dto.instituteId);
 
-    // Create user
+    /** STEP 1 — Create User */
     const userDto: CreateUserDto = {
       name: dto.name,
       email: dto.email,
@@ -60,29 +64,46 @@ export class StudentService {
 
     const user = await this.userService.createUser(userDto, session);
 
-    // Create student profile
-    const created = await this.studentModel.create(
+    /** STEP 2 — Create AcademicDetails using AcademicService */
+    const academic = await this.academicService.create({
+      department: dto.department ?? null,
+      backlogs: dto.backlogs ?? 0, // 🔥 NEW
+      studentId: null, // will assign after student is created
+    });
+
+    /** STEP 3 — Create Student with academicDetails ref */
+    const createdStudent = await this.studentModel.create(
       [
         {
           basicUserDetails: user._id,
           institute: new Types.ObjectId(dto.instituteId),
+          academicDetails: academic._id,
         },
       ],
       { session },
     );
 
-    return created[0].populate('basicUserDetails');
+    const student = createdStudent[0];
+
+    /** STEP 4 — Update academic.student reference */
+    await this.academicService.updateStudentId(academic._id, student._id);
+
+    return student.populate(['basicUserDetails', 'academicDetails']);
   }
 
-  /********************************************
-   * 2. BULK UPLOAD CSV
-   ********************************************/
+  /***************************************
+   * BULK UPLOAD STUDENTS WITH ACADEMIC
+   ***************************************/
   async bulkUploadStudents(csvPath: string): Promise<{
     total: number;
     successCount: number;
     failedCount: number;
     success: StudentDocument[];
-    failed: Array<{ rowNumber: number; row: CreateStudentDto; reason: string }>;
+    failed: Array<{
+      rowNumber: number;
+      row: CreateStudentDto;
+      reason: string;
+    }>;
   }> {
     const rows = await this.parseCsv(csvPath);
 
@@ -93,7 +114,6 @@ export class StudentService {
       reason: string;
     }> = [];
 
-    // Loop with row number
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       const dto = this.mapCsvRowToStudentDto(row);
@@ -102,7 +122,6 @@ export class StudentService {
         const createdStudent = await this.createStudent(dto);
         success.push(createdStudent);
       } catch (err: unknown) {
-        // Extract readable error
         const reason =
           err instanceof Error
             ? err.message
@@ -111,21 +130,19 @@ export class StudentService {
               : JSON.stringify(err);
 
         this.logger.error(
-          `Bulk student row ${i + 1} failed | Email: ${dto.email} | Reason: ${reason}`,
+          `CSV row ${i + 1} FAILED | Email: ${dto.email} | Reason: ${reason}`,
         );
 
-        failed.push({
-          rowNumber: i + 1,
-          row: dto,
-          reason,
-        });
+        failed.push({ rowNumber: i + 1, row: dto, reason });
       }
     }
 
-    // Delete CSV file
-    await fs.promises.unlink(csvPath).catch((err) => {
-      this.logger.warn(`Failed to delete CSV ${csvPath}: ${err}`);
-    });
+    /** Remove CSV file */
+    await fs.promises
+      .unlink(csvPath)
+      .catch((err) =>
+        this.logger.warn(`Failed to delete CSV ${csvPath}: ${err}`),
+      );
 
     return {
       total: rows.length,
@@ -136,18 +153,13 @@ export class StudentService {
     };
   }
 
-  /********************************************
-   * PARSE CSV STRICTLY
-   ********************************************/
+  /***************************************
+   * PARSE CSV ACCORDING TO FIELD MAP
+   ***************************************/
   private parseCsv(filePath: string): Promise<Record<string, string>[]> {
-    const REQUIRED_COLUMNS = [
-      'name',
-      'email',
-      'password',
-      'gender',
-      'phone',
-      'instituteId',
-    ];
+    const REQUIRED = Object.values(CSV_FIELD_MAP)
+      .filter((f) => f.required)
+      .map((f) => f.csv);
 
     return new Promise((resolve, reject) => {
       const rows: Record<string, string>[] = [];
@@ -155,18 +167,16 @@ export class StudentService {
 
       fs.createReadStream(filePath)
         .pipe(
-          csv.parse<Record<string, string>, Record<string, string>>({
+          csv.parse({
             headers: true,
             ignoreEmpty: true,
           }),
         )
         .on('headers', (headers: string[]) => {
-          const missing = REQUIRED_COLUMNS.filter(
-            (col) => !headers.includes(col),
-          );
+          const missing = REQUIRED.filter((col) => !headers.includes(col));
 
           if (missing.length > 0) {
-            reject(
+            return reject(
               new Error(`CSV missing required columns: ${missing.join(', ')}`),
             );
           }
@@ -185,42 +195,56 @@ export class StudentService {
     });
   }
 
-  /********************************************
-   * MAP CSV → STUDENT DTO
-   ********************************************/
+  /***************************************
+   * MAP CSV → DTO ACCORDING TO FIELD MAP
+   ***************************************/
   private mapCsvRowToStudentDto(row: Record<string, string>): CreateStudentDto {
+    const mapped: any = {};
+
+    for (const [key, conf] of Object.entries(CSV_FIELD_MAP)) {
+      mapped[key] = row[conf.csv]?.trim() ?? null;
+    }
+
     return {
-      name: row.name.trim(),
-      email: row.email.trim(),
-      password: row.password.trim(),
-      gender: row.gender.trim(),
-      instituteId: row.instituteId.trim(),
+      name: mapped.name,
+      email: mapped.email,
+      password: mapped.password,
+      gender: mapped.gender,
+      instituteId: mapped.instituteId,
+
+      department: mapped.department,
+      backlogs: mapped.backlogs ? Number(mapped.backlogs) : 0, // 🔥 NEW
+
       contactInfo: {
-        phone: row.phone.trim(),
-        alternatePhone: row.alternatePhone?.trim(),
-        address: row.address?.trim(),
+        phone: mapped.phone,
+        alternatePhone: mapped.alternatePhone,
+        address: mapped.address,
       },
     };
   }
 
-  /********************************************
-   * GET BY USER
-   ********************************************/
+  /***************************************
+   * GETTERS
+   ***************************************/
   async getByUserId(userId: string): Promise<StudentDocument> {
     const student = await this.studentModel
-      .findOne({ basicUserDetails: userId })
-      .populate('basicUserDetails')
-      .populate('institute')
+      .findOne({ basicUserDetails: new Types.ObjectId(userId) })
+      .populate(['basicUserDetails', 'academicDetails', 'institute'])
       .exec();
 
     if (!student) {
-      throw new NotFoundException(`Student with userId ${userId} not found`);
+      throw new NotFoundException(
+        `Student with basicUserDetails ${userId} not found`,
+      );
     }
 
     return student;
   }
 
   async getAllStudents(): Promise<StudentDocument[]> {
-    return this.studentModel.find().populate('basicUserDetails').exec();
+    return this.studentModel
+      .find()
+      .populate(['basicUserDetails', 'academicDetails'])
+      .exec();
   }
 }

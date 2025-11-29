@@ -2,11 +2,13 @@ import { StudentDocument } from './schema/student.schema';
 import { ClientSession, Model } from 'mongoose';
 import { UserService } from 'src/user/user.service';
 import { CreateStudentDto } from './dto/create-basic-student.dto';
+import { AcademicService } from 'src/academic/academic.service';
 export declare class StudentService {
     private readonly studentModel;
     private readonly userService;
+    private readonly academicService;
     private readonly logger;
-    constructor(studentModel: Model<StudentDocument>, userService: UserService);
+    constructor(studentModel: Model<StudentDocument>, userService: UserService, academicService: AcademicService);
     private validateInstitute;
     createStudent(dto: CreateStudentDto, session?: ClientSession): Promise<StudentDocument>;
     bulkUploadStudents(csvPath: string): Promise<{

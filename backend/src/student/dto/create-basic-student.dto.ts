@@ -1,8 +1,9 @@
 import { Type } from 'class-transformer';
 import {
   IsEmail,
-  IsEnum,
+  IsNumber,
   IsObject,
+  IsOptional,
   // IsEnum,
   IsString,
   ValidateNested,
@@ -29,4 +30,12 @@ export class CreateStudentDto {
 
   @IsString()
   instituteId: string;
+
+  @IsString()
+  @IsOptional()
+  department?: string;
+
+  @IsNumber()
+  @IsOptional()
+  backlogs?: number;
 }

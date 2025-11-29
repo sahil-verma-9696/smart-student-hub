@@ -3,18 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   BadRequestException,
   UseInterceptors,
   UploadedFile,
-  Query,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 // import { UpdateStudentDto } from './dto/update-student.dto';
 import { CreateStudentDto } from './dto/create-basic-student.dto';
-import { BulkStudentUploadQueryDto } from './dto/create-basic-student-bulk.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -27,16 +22,7 @@ export class StudentController {
   // SINGLE STUDENT CREATE
   // --------------------
   @Post()
-  create(
-    @Body() createStudentDto: CreateStudentDto,
-    @Query() query: BulkStudentUploadQueryDto,
-  ) {
-    if (query.bulk === 'true') {
-      throw new BadRequestException(
-        'Bulk upload requires CSV file. Use POST /student?bulk=true with file.',
-      );
-    }
-
+  create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentService.createStudent(createStudentDto);
   }
 
@@ -53,16 +39,13 @@ export class StudentController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (req.query.bulk === 'true') {
-          // bulk mode → allow only CSV
-          if (file && file.originalname.endsWith('.csv')) {
-            return cb(null, true);
-          }
-          return cb(
-            new BadRequestException('Only CSV files allowed in bulk mode'),
-            false,
-          );
+        if (file && file.originalname.endsWith('.csv')) {
+          return cb(null, true);
         }
+        return cb(
+          new BadRequestException('Only CSV files allowed in bulk mode'),
+          false,
+        );
         cb(null, true);
       },
     }),

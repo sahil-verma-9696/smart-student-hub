@@ -21,6 +21,14 @@ export class Student {
     required: false,
   })
   institute: Types.ObjectId;
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Academic',
+    default: null,
+    required: false,
+  })
+  academicDetails: Types.ObjectId;
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);

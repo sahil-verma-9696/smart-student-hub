@@ -16,7 +16,6 @@ exports.StudentController = void 0;
 const common_1 = require("@nestjs/common");
 const student_service_1 = require("./student.service");
 const create_basic_student_dto_1 = require("./dto/create-basic-student.dto");
-const create_basic_student_bulk_dto_1 = require("./dto/create-basic-student-bulk.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
 const path_1 = require("path");
@@ -25,10 +24,7 @@ let StudentController = class StudentController {
     constructor(studentService) {
         this.studentService = studentService;
     }
-    create(createStudentDto, query) {
-        if (query.bulk === 'true') {
-            throw new common_1.BadRequestException('Bulk upload requires CSV file. Use POST /student?bulk=true with file.');
-        }
+    create(createStudentDto) {
         return this.studentService.createStudent(createStudentDto);
     }
     async createOrBulkUpload(file) {
@@ -45,10 +41,8 @@ exports.StudentController = StudentController;
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_basic_student_dto_1.CreateStudentDto,
-        create_basic_student_bulk_dto_1.BulkStudentUploadQueryDto]),
+    __metadata("design:paramtypes", [create_basic_student_dto_1.CreateStudentDto]),
     __metadata("design:returntype", void 0)
 ], StudentController.prototype, "create", null);
 __decorate([
@@ -61,12 +55,10 @@ __decorate([
             },
         }),
         fileFilter: (req, file, cb) => {
-            if (req.query.bulk === 'true') {
-                if (file && file.originalname.endsWith('.csv')) {
-                    return cb(null, true);
-                }
-                return cb(new common_1.BadRequestException('Only CSV files allowed in bulk mode'), false);
+            if (file && file.originalname.endsWith('.csv')) {
+                return cb(null, true);
             }
+            return cb(new common_1.BadRequestException('Only CSV files allowed in bulk mode'), false);
             cb(null, true);
         },
     })),

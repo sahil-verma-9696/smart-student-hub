@@ -55,13 +55,17 @@ const user_service_1 = require("../user/user.service");
 const enum_1 = require("../user/types/enum");
 const fs = __importStar(require("fs"));
 const csv = __importStar(require("fast-csv"));
+const academic_service_1 = require("../academic/academic.service");
+const constants_1 = require("./constants");
 let StudentService = StudentService_1 = class StudentService {
     studentModel;
     userService;
+    academicService;
     logger = new common_1.Logger(StudentService_1.name);
-    constructor(studentModel, userService) {
+    constructor(studentModel, userService, academicService) {
         this.studentModel = studentModel;
         this.userService = userService;
+        this.academicService = academicService;
     }
     async validateInstitute(instituteId) {
         if (!mongoose_2.Types.ObjectId.isValid(instituteId)) {
@@ -86,13 +90,21 @@ let StudentService = StudentService_1 = class StudentService {
             contactInfo: dto.contactInfo,
         };
         const user = await this.userService.createUser(userDto, session);
-        const created = await this.studentModel.create([
+        const academic = await this.academicService.create({
+            department: dto.department ?? null,
+            backlogs: dto.backlogs ?? 0,
+            studentId: null,
+        });
+        const createdStudent = await this.studentModel.create([
             {
                 basicUserDetails: user._id,
                 institute: new mongoose_2.Types.ObjectId(dto.instituteId),
+                academicDetails: academic._id,
             },
         ], { session });
-        return created[0].populate('basicUserDetails');
+        const student = createdStudent[0];
+        await this.academicService.updateStudentId(academic._id, student._id);
+        return student.populate(['basicUserDetails', 'academicDetails']);
     }
     async bulkUploadStudents(csvPath) {
         const rows = await this.parseCsv(csvPath);
@@ -111,17 +123,13 @@ let StudentService = StudentService_1 = class StudentService {
                     : typeof err === 'string'
                         ? err
                         : JSON.stringify(err);
-                this.logger.error(`Bulk student row ${i + 1} failed | Email: ${dto.email} | Reason: ${reason}`);
-                failed.push({
-                    rowNumber: i + 1,
-                    row: dto,
-                    reason,
-                });
+                this.logger.error(`CSV row ${i + 1} FAILED | Email: ${dto.email} | Reason: ${reason}`);
+                failed.push({ rowNumber: i + 1, row: dto, reason });
             }
         }
-        await fs.promises.unlink(csvPath).catch((err) => {
-            this.logger.warn(`Failed to delete CSV ${csvPath}: ${err}`);
-        });
+        await fs.promises
+            .unlink(csvPath)
+            .catch((err) => this.logger.warn(`Failed to delete CSV ${csvPath}: ${err}`));
         return {
             total: rows.length,
             successCount: success.length,
@@ -131,14 +139,9 @@ let StudentService = StudentService_1 = class StudentService {
         };
     }
     parseCsv(filePath) {
-        const REQUIRED_COLUMNS = [
-            'name',
-            'email',
-            'password',
-            'gender',
-            'phone',
-            'instituteId',
-        ];
+        const REQUIRED = Object.values(constants_1.CSV_FIELD_MAP)
+            .filter((f) => f.required)
+            .map((f) => f.csv);
         return new Promise((resolve, reject) => {
             const rows = [];
             let headersVerified = false;
@@ -148,9 +151,9 @@ let StudentService = StudentService_1 = class StudentService {
                 ignoreEmpty: true,
             }))
                 .on('headers', (headers) => {
-                const missing = REQUIRED_COLUMNS.filter((col) => !headers.includes(col));
+                const missing = REQUIRED.filter((col) => !headers.includes(col));
                 if (missing.length > 0) {
-                    reject(new Error(`CSV missing required columns: ${missing.join(', ')}`));
+                    return reject(new Error(`CSV missing required columns: ${missing.join(', ')}`));
                 }
                 headersVerified = true;
             })
@@ -167,32 +170,40 @@ let StudentService = StudentService_1 = class StudentService {
         });
     }
     mapCsvRowToStudentDto(row) {
+        const mapped = {};
+        for (const [key, conf] of Object.entries(constants_1.CSV_FIELD_MAP)) {
+            mapped[key] = row[conf.csv]?.trim() ?? null;
+        }
         return {
-            name: row.name.trim(),
-            email: row.email.trim(),
-            password: row.password.trim(),
-            gender: row.gender.trim(),
-            instituteId: row.instituteId.trim(),
+            name: mapped.name,
+            email: mapped.email,
+            password: mapped.password,
+            gender: mapped.gender,
+            instituteId: mapped.instituteId,
+            department: mapped.department,
+            backlogs: mapped.backlogs ? Number(mapped.backlogs) : 0,
             contactInfo: {
-                phone: row.phone.trim(),
-                alternatePhone: row.alternatePhone?.trim(),
-                address: row.address?.trim(),
+                phone: mapped.phone,
+                alternatePhone: mapped.alternatePhone,
+                address: mapped.address,
             },
         };
     }
     async getByUserId(userId) {
         const student = await this.studentModel
-            .findOne({ basicUserDetails: userId })
-            .populate('basicUserDetails')
-            .populate('institute')
+            .findOne({ basicUserDetails: new mongoose_2.Types.ObjectId(userId) })
+            .populate(['basicUserDetails', 'academicDetails', 'institute'])
             .exec();
         if (!student) {
-            throw new common_1.NotFoundException(`Student with userId ${userId} not found`);
+            throw new common_1.NotFoundException(`Student with basicUserDetails ${userId} not found`);
         }
         return student;
     }
     async getAllStudents() {
-        return this.studentModel.find().populate('basicUserDetails').exec();
+        return this.studentModel
+            .find()
+            .populate(['basicUserDetails', 'academicDetails'])
+            .exec();
     }
 };
 exports.StudentService = StudentService;
@@ -200,6 +211,7 @@ exports.StudentService = StudentService = StudentService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(student_schema_1.Student.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        user_service_1.UserService])
+        user_service_1.UserService,
+        academic_service_1.AcademicService])
 ], StudentService);
 //# sourceMappingURL=student.service.js.map

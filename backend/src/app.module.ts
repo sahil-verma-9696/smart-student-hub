@@ -11,6 +11,7 @@ import { ActivityModule } from './activity/activity.module';
 import { AdminModule } from './admin/admin.module';
 import { UpDocsModule } from './up-docs/up-docs.module';
 import { AttachmentModule } from './attachment/attachment.module';
+import { AcademicModule } from './academic/academic.module';
 
 @Module({
   imports: [
@@ -39,6 +40,8 @@ import { AttachmentModule } from './attachment/attachment.module';
     UpDocsModule,
 
     AttachmentModule,
+
+    AcademicModule,
   ],
   controllers: [AppController],
   providers: [AppService],

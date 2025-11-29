@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Faculty, FacultyDocument } from './schemas/faculty.schema';
 import { isValidObjectId } from 'mongoose';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
@@ -60,7 +60,7 @@ export class FacultyService {
 
   async getByUserId(userId: string): Promise<FacultyDocument> {
     const faculty = await this.facultyModel
-      .findOne({ basicUserDetails: userId })
+      .findOne({ basicUserDetails: new Types.ObjectId(userId) })
       .populate<{ basicUserDetails: any }>('basicUserDetails')
       .populate<{ institute: any }>('institute')
       .populate<{ department: any }>('department')
