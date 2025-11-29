@@ -1,31 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  createColumnHelper,
+} from "@tanstack/react-table";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Pencil, Trash } from "lucide-react";
 
+import useStudentPannel from "@/hooks/useStudentPannel.admin";
+
 export default function AdminAddStudentsPage() {
-  // Initial student data
-  const [students, setStudents] = useState([
-    { id: 1, name: "Sahil Verma", email: "sahil@example.com", roll: "202101", dept: "CSE" },
-    { id: 2, name: "Sonal Verma", email: "sonal@example.com", roll: "202102", dept: "IT" },
-    { id: 3, name: "Aarav Mehta", email: "aarav@example.com", roll: "202103", dept: "ECE" },
-  ]);
+  // ============================
+  // HOOKS — must be at the top
+  // ============================
+  const { students } = useStudentPannel();
 
-  // Toggle add form
+  // UI States
   const [showForm, setShowForm] = useState(false);
-
-  // Add form state
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -33,7 +36,6 @@ export default function AdminAddStudentsPage() {
     department: "",
   });
 
-  // **EDIT MODAL STATE**
   const [editOpen, setEditOpen] = useState(false);
   const [editData, setEditData] = useState({
     id: "",
@@ -43,107 +45,101 @@ export default function AdminAddStudentsPage() {
     dept: "",
   });
 
-  // **DELETE MODAL STATE**
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
 
   // ============================
-  // ADD STUDENT
+  // PREPARE TABLE DATA
+  // ============================
+  const columnHelper = createColumnHelper();
+
+  const data = useMemo(() => {
+    if (!students) return [];
+    return students.map((s, index) => ({
+      id: index + 1,
+      studentId: s._id,
+      name: s.basicUserDetails?.name,
+      email: s.basicUserDetails?.email,
+      gender: s.basicUserDetails?.gender,
+      phone: s.basicUserDetails?.contactInfo?.phone,
+      address: s.basicUserDetails?.contactInfo?.address,
+      role: s.basicUserDetails?.role,
+      createdAt: new Date(s.basicUserDetails?.createdAt).toLocaleDateString(),
+    }));
+  }, [students]);
+
+  const columns = [
+    columnHelper.accessor("id", { header: "ID" }),
+    columnHelper.accessor("name", { header: "Name" }),
+    columnHelper.accessor("email", { header: "Email" }),
+    columnHelper.accessor("gender", { header: "Gender" }),
+    columnHelper.accessor("phone", { header: "Phone" }),
+    columnHelper.accessor("address", { header: "Address" }),
+    columnHelper.accessor("role", { header: "Role" }),
+    columnHelper.accessor("createdAt", { header: "Created At" }),
+  ];
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  // ============================
+  // FORM HANDLERS
   // ============================
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const newStudent = {
-      id: students.length + 1,
-      name: form.name,
-      email: form.email,
-      roll: form.roll,
-      dept: form.department,
-    };
-
-    setStudents([...students, newStudent]);
-    alert("Student added successfully!");
-
-    setForm({ name: "", email: "", roll: "", department: "" });
-
-    setShowForm(false); // hide form
+    alert("Student added! (Backend integration needed)");
+    setShowForm(false);
   };
 
-  // ============================
-  // OPEN EDIT MODAL
-  // ============================
   const openEdit = (student) => {
     setEditData(student);
     setEditOpen(true);
   };
 
-  // ============================
-  // SAVE EDIT CHANGES  ⭐ FIXED
-  // ============================
   const saveEdit = () => {
-    setStudents(
-      students.map((s) =>
-        s.id === editData.id ? editData : s
-      )
-    );
-
+    alert("Edit saved! (Backend integration needed)");
     setEditOpen(false);
   };
 
+  // ============================
+  // LOADING CHECK (AFTER HOOKS)
+  // ============================
+  if (!students) return <div>Loading...</div>;
+
+  // ============================
+  // UI RETURN
+  // ============================
   return (
     <div className="p-6">
-
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-3xl font-bold">All Students</h2>
-
-        <Button
-          className="bg-blue-600 text-white"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? "Close Form" : "Add Student"}
-        </Button>
-      </div>
-
-      {/* Students Table */}
-      <div className="border rounded-lg overflow-hidden shadow bg-white mb-10">
-        <table className="w-full table-auto">
+      {/* TABLE */}
+      <div className="rounded-xl border bg-white shadow overflow-hidden mb-10">
+        <table className="w-full">
           <thead className="bg-gray-100">
-            <tr>
-              <th className="p-3 text-left">ID</th>
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">Roll Number</th>
-              <th className="p-3 text-left">Department</th>
-              <th className="p-3 text-left">Actions</th>
-            </tr>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} className="p-3 text-left">
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
           </thead>
 
           <tbody>
-            {students.map((student) => (
-              <tr key={student.id} className="border-t">
-                <td className="p-3">{student.id}</td>
-                <td className="p-3">{student.name}</td>
-                <td className="p-3">{student.email}</td>
-                <td className="p-3">{student.roll}</td>
-                <td className="p-3">{student.dept}</td>
-
-                <td className="p-3 flex gap-3">
-                  {/* Edit */}
-                  <Pencil
-                    className="h-5 w-5 text-blue-600 cursor-pointer"
-                    onClick={() => openEdit(student)}
-                  />
-
-                  {/* Delete */}
-                  <Trash
-                    className="h-5 w-5 text-red-600 cursor-pointer"
-                    onClick={() => {
-                      setStudentToDelete(student);
-                      setDeleteOpen(true);
-                    }}
-                  />
-                </td>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="border-t hover:bg-gray-50">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="p-3">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>
@@ -198,15 +194,13 @@ export default function AdminAddStudentsPage() {
             </div>
 
             <Button className="w-full bg-blue-600 text-white" type="submit">
-              +Add Student
+              + Add Student
             </Button>
           </form>
         </>
       )}
 
-      {/* ========================== */}
-      {/*        EDIT MODAL          */}
-      {/* ========================== */}
+      {/* EDIT MODAL */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <DialogHeader>
@@ -214,56 +208,33 @@ export default function AdminAddStudentsPage() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div>
-              <Label>Name</Label>
-              <Input
-                value={editData.name}
-                onChange={(e) =>
-                  setEditData({ ...editData, name: e.target.value })
-                }
-              />
-            </div>
+            <Label>Name</Label>
+            <Input
+              value={editData.name}
+              onChange={(e) =>
+                setEditData({ ...editData, name: e.target.value })
+              }
+            />
 
-            <div>
-              <Label>Email</Label>
-              <Input
-                value={editData.email}
-                onChange={(e) =>
-                  setEditData({ ...editData, email: e.target.value })
-                }
-              />
-            </div>
+            <Label>Email</Label>
+            <Input
+              value={editData.email}
+              onChange={(e) =>
+                setEditData({ ...editData, email: e.target.value })
+              }
+            />
 
-            <div>
-              <Label>Roll Number</Label>
-              <Input
-                value={editData.roll}
-                onChange={(e) =>
-                  setEditData({ ...editData, roll: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
-              <Label>Department</Label>
-              <Input
-                value={editData.dept}
-                onChange={(e) =>
-                  setEditData({ ...editData, dept: e.target.value })
-                }
-              />
-            </div>
-
-            <Button className="w-full bg-blue-600 text-white" onClick={saveEdit}>
+            <Button
+              className="w-full bg-blue-600 text-white"
+              onClick={saveEdit}
+            >
               Save Changes
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* ========================== */}
-      {/*     DELETE CONFIRM MODAL   */}
-      {/* ========================== */}
+      {/* DELETE MODAL */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>
@@ -280,19 +251,10 @@ export default function AdminAddStudentsPage() {
               Cancel
             </Button>
 
-            <Button
-              className="bg-red-600 text-white"
-              onClick={() => {
-                setStudents(students.filter((s) => s.id !== studentToDelete.id));
-                setDeleteOpen(false);
-              }}
-            >
-              Delete
-            </Button>
+            <Button className="bg-red-600 text-white">Delete</Button>
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

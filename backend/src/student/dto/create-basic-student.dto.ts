@@ -8,7 +8,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ContactInfoDto } from 'src/user/dto/contact-info.dto';
-import { USER_ROLE } from 'src/user/types/enum';
 
 export class CreateStudentDto {
   @IsString()
@@ -19,9 +18,6 @@ export class CreateStudentDto {
 
   @IsString()
   password: string;
-
-  @IsEnum(USER_ROLE)
-  role: USER_ROLE;
 
   @IsString()
   gender: string;

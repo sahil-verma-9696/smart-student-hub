@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import storageKeys from "@/common/storage-keys";
 import toast from "react-hot-toast";
 

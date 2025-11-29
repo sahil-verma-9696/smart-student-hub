@@ -6,28 +6,84 @@ import {
   Patch,
   Param,
   Delete,
+  BadRequestException,
+  UseInterceptors,
+  UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { UpdateStudentDto } from './dto/update-student.dto';
+// import { UpdateStudentDto } from './dto/update-student.dto';
+import { CreateStudentDto } from './dto/create-basic-student.dto';
+import { BulkStudentUploadQueryDto } from './dto/create-basic-student-bulk.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('student')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  // @Post()
-  // create(@Body() createStudentDto: CreateBasicStudentDto) {
-  //   return this.studentService.create(createStudentDto);
-  // }
+  // --------------------
+  // SINGLE STUDENT CREATE
+  // --------------------
+  @Post()
+  create(
+    @Body() createStudentDto: CreateStudentDto,
+    @Query() query: BulkStudentUploadQueryDto,
+  ) {
+    if (query.bulk === 'true') {
+      throw new BadRequestException(
+        'Bulk upload requires CSV file. Use POST /student?bulk=true with file.',
+      );
+    }
 
-  // @Post('bulk')
-  // createBulk(@Body() createStudentDto: CreateBasicStudentDto[]) {
-  //   return this.studentService.createBulk(createStudentDto);
-  // }
+    return this.studentService.createStudent(createStudentDto);
+  }
 
-  // @Get()
-  // findAll() {
-  //   return this.studentService.findAll();
-  // }
+  // --------------------
+  // BULK UPLOAD VIA CSV
+  // --------------------
+  @Post('/bulk')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/csv',
+        filename: (req, file, cb) => {
+          cb(null, Date.now() + extname(file.originalname));
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (req.query.bulk === 'true') {
+          // bulk mode → allow only CSV
+          if (file && file.originalname.endsWith('.csv')) {
+            return cb(null, true);
+          }
+          return cb(
+            new BadRequestException('Only CSV files allowed in bulk mode'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async createOrBulkUpload(
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ) {
+    if (file === undefined) {
+      throw new BadRequestException(
+        'Bulk upload requires CSV file. Use POST /student?bulk=true with file.',
+      );
+    }
+
+    // body ignored in bulk mode (form-data validation disabled)
+    return this.studentService.bulkUploadStudents(file.path);
+  }
+
+  @Get()
+  findAll() {
+    return this.studentService.getAllStudents();
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {

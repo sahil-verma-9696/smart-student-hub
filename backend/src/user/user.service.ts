@@ -20,6 +20,8 @@ export class UserService implements IUserService {
     dto: CreateUserDto,
     session?: ClientSession,
   ): Promise<UserDocument> {
+    // force update indexes to make sure indexes are up to date
+    await this.userModel.syncIndexes();
     // Use array syntax so session works properly
     const created = await this.userModel.create(
       [

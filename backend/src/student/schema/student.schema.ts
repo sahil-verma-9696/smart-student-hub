@@ -14,24 +14,13 @@ export class Student {
   })
   basicUserDetails: Types.ObjectId;
 
-  // Academic Info
-  // @Prop({ required: true })
-  branch: string;
-
-  // @Prop({ required: true })
-  course: string;
-
-  // @Prop({ required: true })
-  year: number;
-
-  // @Prop({ required: true })
-  semester: number;
-
-  // @Prop({ required: true })
-  section: string;
-
-  // @Prop({ required: true })
-  // studentId: string;
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Institute',
+    default: null,
+    required: false,
+  })
+  institute: Types.ObjectId;
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);
