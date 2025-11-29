@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { InstituteType } from 'src/auth/types/auth.enum';
 
 @Schema({ timestamps: true })
@@ -9,7 +9,7 @@ export default class Institute extends Document {
 
   @Prop({
     required: true,
-    enum: Object.values(InstituteType), // e.g., "private" | "government"
+    enum: Object.values(InstituteType),
   })
   institute_type: InstituteType;
 
@@ -39,6 +39,10 @@ export default class Institute extends Document {
 
   @Prop()
   affiliation_id?: string;
+
+  // 🔥 New field: All programs offered by this institute
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Program' }], default: [] })
+  programs: Types.ObjectId[];
 }
 
 export const InstituteSchema = SchemaFactory.createForClass(Institute);

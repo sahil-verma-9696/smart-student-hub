@@ -32,13 +32,19 @@ let InstituteController = class InstituteController {
         return this.instituteService.findAll();
     }
     findOne(id) {
-        return this.instituteService.findOne(+id);
+        return this.instituteService.findOne(id);
     }
     update(id, updateInstituteDto) {
-        return this.instituteService.update(+id, updateInstituteDto);
+        return this.instituteService.update(id, updateInstituteDto);
     }
     remove(id) {
-        return this.instituteService.remove(+id);
+        return this.instituteService.remove(id);
+    }
+    addProgram(id, programId) {
+        return this.instituteService.addProgram(id, programId);
+    }
+    removeProgram(id, programId) {
+        return this.instituteService.removeProgram(id, programId);
     }
 };
 exports.InstituteController = InstituteController;
@@ -77,6 +83,22 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], InstituteController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Patch)(':id/program/add'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('programId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], InstituteController.prototype, "addProgram", null);
+__decorate([
+    (0, common_1.Patch)(':id/program/remove'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('programId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], InstituteController.prototype, "removeProgram", null);
 exports.InstituteController = InstituteController = __decorate([
     (0, common_1.Controller)('institute'),
     __metadata("design:paramtypes", [institute_service_1.InstituteService])

@@ -106,5 +106,5 @@ export class CreateFacultyDto {
 
   @ValidateNested()
   @Type(() => DocumentsDto)
-  documents: DocumentsDto;
+  documents?: DocumentsDto;
 }

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import Institute from './schemas/institute.schema';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class InstituteService {
     });
 
     if (instituteExists) {
-      throw new Error('Institute already exists');
+      throw new BadRequestException('Institute already exists with this email');
     }
 
     const newInstitute = new this.instituteModel(createInstituteDto);
@@ -28,19 +28,89 @@ export class InstituteService {
     return newInstitute;
   }
 
-  findAll() {
-    return `This action returns all institute`;
+  async findAll() {
+    return await this.instituteModel.find().populate('programs');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} institute`;
+  async findOne(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid institute ID');
+    }
+
+    const institute = await this.instituteModel.findById(id).populate('programs');
+    if (!institute) {
+      throw new NotFoundException('Institute not found');
+    }
+
+    return institute;
   }
 
-  update(id: number, updateInstituteDto: UpdateInstituteDto) {
-    return `This action updates a #${id} institute`;
+  async update(id: string, updateInstituteDto: UpdateInstituteDto) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid institute ID');
+    }
+
+    const institute = await this.instituteModel.findByIdAndUpdate(
+      id,
+      updateInstituteDto,
+      { new: true },
+    ).populate('programs');
+
+    if (!institute) {
+      throw new NotFoundException('Institute not found');
+    }
+
+    return institute;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} institute`;
+  async remove(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid institute ID');
+    }
+
+    const institute = await this.instituteModel.findByIdAndDelete(id);
+    if (!institute) {
+      throw new NotFoundException('Institute not found');
+    }
+
+    return { message: 'Institute deleted successfully' };
+  }
+
+  // 🎓 Add program to institute
+  async addProgram(instituteId: string, programId: string) {
+    if (!isValidObjectId(instituteId) || !isValidObjectId(programId)) {
+      throw new BadRequestException('Invalid ID');
+    }
+
+    const institute = await this.instituteModel.findByIdAndUpdate(
+      instituteId,
+      { $addToSet: { programs: programId } },
+      { new: true },
+    ).populate('programs');
+
+    if (!institute) {
+      throw new NotFoundException('Institute not found');
+    }
+
+    return institute;
+  }
+
+  // ➖ Remove program from institute
+  async removeProgram(instituteId: string, programId: string) {
+    if (!isValidObjectId(instituteId) || !isValidObjectId(programId)) {
+      throw new BadRequestException('Invalid ID');
+    }
+
+    const institute = await this.instituteModel.findByIdAndUpdate(
+      instituteId,
+      { $pull: { programs: programId } },
+      { new: true },
+    ).populate('programs');
+
+    if (!institute) {
+      throw new NotFoundException('Institute not found');
+    }
+
+    return institute;
   }
 }

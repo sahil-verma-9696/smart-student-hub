@@ -1,286 +1,414 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Plus, Upload, Pencil, Trash } from "lucide-react";
 
-import { Pencil, Trash } from "lucide-react";
+import useAuthContext from "@/hooks/useAuthContext";
+import storageKeys from "@/common/storage-keys";
+
+const API_BASE =
+  (typeof import.meta !== "undefined" &&
+    import.meta.env &&
+    import.meta.env.VITE_API_BASE) ||
+  "http://localhost:3000";
 
 export default function AdminAddFacultyPage() {
-  // Initial faculty data
-  const [faculties, setFaculties] = useState([
-    { id: 1, name: "Dr. Ramesh Kumar", email: "ramesh.kumar@example.com", empId: "F1001", department: "CSE", position: "Professor" },
-    { id: 2, name: "Prof. Meera Jain", email: "meera.jain@example.com", empId: "F1002", department: "ECE", position: "Associate Professor" },
-    { id: 3, name: "Dr. Vikram Singh", email: "vikram.singh@example.com", empId: "F1003", department: "IT", position: "Assistant Professor" },
-  ]);
+  const { user } = useAuthContext();
+  const [faculties, setFaculties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [file, setFile] = useState(null);
+  const [search, setSearch] = useState("");
+  const [bulkResult, setBulkResult] = useState(null);
 
-  // Add form state
-  const [form, setForm] = useState({
+  // MODALS
+  const [addOpen, setAddOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  // ADD DTO
+  const [formData, setFormData] = useState({
+    facultyId: "",
     name: "",
     email: "",
-    empId: "",
+    gender: "male",
+    phone: "",
     department: "",
-    position: "",
+    designation: "",
   });
 
-  // EDIT modal state
-  const [editOpen, setEditOpen] = useState(false);
+  // EDIT DTO
   const [editData, setEditData] = useState({
     id: "",
-    name: "",
-    email: "",
-    empId: "",
     department: "",
-    position: "",
+    designation: "",
   });
 
-  // DELETE modal state
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  // DELETE target
   const [facultyToDelete, setFacultyToDelete] = useState(null);
 
-  // Add Faculty handler
-  const handleAdd = (e) => {
-    e.preventDefault();
-
-    const newFaculty = {
-      id: faculties.length + 1,
-      name: form.name,
-      email: form.email,
-      empId: form.empId,
-      department: form.department,
-      position: form.position,
-    };
-
-    setFaculties([...faculties, newFaculty]);
-
-    alert("Faculty added successfully!");
-
-    setForm({ name: "", email: "", empId: "", department: "", position: "" });
+  // 🔎 FETCH FACULTIES
+  const fetchFaculties = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/faculty`);
+      const data = await res.json();
+      // Backend returns array directly from findAllFaculty()
+      const facultiesArray = Array.isArray(data) ? data : [];
+      setFaculties(facultiesArray);
+    } catch (err) {
+      console.error("Fetch failed:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Open edit modal
-  const openEdit = (faculty) => {
-    setEditData(faculty);
+  useEffect(() => {
+    fetchFaculties();
+  }, []);
+
+  // ➕ CREATE FACULTY
+  const handleAddFaculty = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_BASE}/faculty/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, instituteId: user?.instituteId }),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        alert(`Failed to create faculty: ${txt}`);
+        return;
+      }
+
+      alert("Faculty created successfully!");
+      setAddOpen(false);
+      setFormData({
+        facultyId: "",
+        name: "",
+        email: "",
+        gender: "male",
+        phone: "",
+        department: "",
+        designation: "",
+      });
+      fetchFaculties();
+    } catch (err) {
+      alert(err.message || String(err));
+    }
+  };
+
+  // ✏ EDIT FACULTY
+  const handleEdit = (fac) => {
+    setEditData({
+      id: fac._id,
+      department: fac.department || "",
+      designation: fac.designation || "",
+    });
     setEditOpen(true);
   };
 
-  // Save edited faculty
-  const saveEdit = () => {
-    setFaculties(
-      faculties.map((f) => (f.id === editData.id ? editData : f))
-    );
-    setEditOpen(false);
+  const saveEdit = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/faculty/${editData.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          department: editData.department,
+          designation: editData.designation,
+        }),
+      });
+
+      if (!res.ok) {
+        alert("Update failed");
+        return;
+      }
+      alert("Faculty updated!");
+      setEditOpen(false);
+      fetchFaculties();
+    } catch (err) {
+      alert(err.message || String(err));
+    }
   };
 
-  // Open delete modal
-  const confirmDelete = (faculty) => {
-    setFacultyToDelete(faculty);
+  // 🗑 DELETE FACULTY
+  const confirmDelete = (fac) => {
+    setFacultyToDelete(fac);
     setDeleteOpen(true);
   };
 
-  // Perform delete
-  const performDelete = () => {
+  const performDelete = async () => {
     if (!facultyToDelete) return;
-    setFaculties(faculties.filter((f) => f.id !== facultyToDelete.id));
-    setDeleteOpen(false);
-    setFacultyToDelete(null);
+    try {
+      const res = await fetch(`${API_BASE}/faculty/${facultyToDelete._id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        alert(`Delete failed: ${txt}`);
+        return;
+      }
+      alert("Faculty deleted!");
+      setDeleteOpen(false);
+      setFacultyToDelete(null);
+      fetchFaculties();
+    } catch (err) {
+      alert(err.message || String(err));
+    }
   };
+
+  // 📥 BULK UPLOAD CSV/XLSX
+  const handleBulkUpload = async () => {
+    if (!file) return alert("Please select a file");
+
+    const formDataObj = new FormData();
+    formDataObj.append("file", file);
+
+    const accessToken = localStorage.getItem(storageKeys.accessToken);
+
+    try {
+      const res = await fetch(`${API_BASE}/faculty/bulk`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formDataObj,
+      });
+
+      const data = await res.json();
+      setBulkResult(data);
+      fetchFaculties();
+    } catch (err) {
+      alert(err.message || String(err));
+    }
+  };
+
+  if (loading) return <p className="p-6">Loading...</p>;
 
   return (
     <div className="p-6">
-      {/* Header */}
-      <h2 className="text-3xl font-bold mb-4">All Faculties</h2>
+      <div className="flex justify-between mb-4">
+        <h2 className="text-3xl font-bold">Faculty Records</h2>
+        <div className="flex gap-2">
+          <Button onClick={() => setAddOpen(true)}>
+            <Plus className="mr-1 h-4 w-4" /> Add
+          </Button>
+          <Button variant="secondary" onClick={() => setBulkOpen(true)}>
+            <Upload className="mr-1 h-4 w-4" /> Bulk
+          </Button>
+        </div>
+      </div>
 
-      {/* Faculties Table */}
-      <div className="border rounded-lg overflow-hidden shadow bg-white mb-10">
-        <table className="w-full table-auto">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-3 text-left">ID</th>
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">Employee ID</th>
-              <th className="p-3 text-left">Department</th>
-              <th className="p-3 text-left">Position</th>
-              <th className="p-3 text-left">Actions</th>
-            </tr>
-          </thead>
+      <Input
+        placeholder="Search by name..."
+        className="max-w-sm mb-4"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-          <tbody>
-            {faculties.map((f) => (
-              <tr key={f.id} className="border-t">
-                <td className="p-3">{f.id}</td>
-                <td className="p-3">{f.name}</td>
-                <td className="p-3">{f.email}</td>
-                <td className="p-3">{f.empId}</td>
-                <td className="p-3">{f.department}</td>
-                <td className="p-3">{f.position}</td>
-                <td className="p-3 flex gap-3">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faculty ID</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Designation</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {faculties
+            .filter((f) =>
+              f.basicUserDetails?.name?.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((fac, index) => (
+              <tr key={fac._id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {fac.basicUserDetails?.name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {fac.basicUserDetails?.email}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {fac.basicUserDetails?.userId}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {fac.department}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {fac.designation}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
                   <Pencil
-                    className="h-5 w-5 text-blue-600 cursor-pointer"
-                    onClick={() => openEdit(f)}
+                    className="cursor-pointer text-blue-600 hover:text-blue-900 h-5 w-5"
+                    onClick={() => handleEdit(fac)}
                   />
                   <Trash
-                    className="h-5 w-5 text-red-600 cursor-pointer"
-                    onClick={() => confirmDelete(f)}
+                    className="cursor-pointer text-red-600 hover:text-red-900 h-5 w-5"
+                    onClick={() => confirmDelete(fac)}
                   />
                 </td>
               </tr>
             ))}
-          </tbody>
-        </table>
-      </div>
+        </tbody>
+      </table>
 
-      {/* Add Faculty Form */}
-      <h2 className="text-3xl font-bold mb-6">Add New Faculty</h2>
+      {/* ------------------ ADD MODAL ---------------- */}
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent aria-describedby="add-faculty">
+          <DialogHeader>
+            <DialogTitle>Add Faculty</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddFaculty} className="space-y-2">
+            <Input
+              value={formData.facultyId}
+              placeholder="Faculty ID"
+              onChange={(e) => setFormData({ ...formData, facultyId: e.target.value })}
+              required
+            />
+            <Input
+              value={formData.name}
+              placeholder="Name"
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+            <Input
+              value={formData.email}
+              placeholder="Email"
+              type="email"
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
+            <Input
+              value={formData.phone}
+              placeholder="Phone"
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            />
+            <select
+              value={formData.gender}
+              onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+              className="w-full border rounded p-2"
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+            <Input
+              value={formData.department}
+              placeholder="Department"
+              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              required
+            />
+            <Input
+              value={formData.designation}
+              placeholder="Designation"
+              onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+              required
+            />
+            <Button type="submit" className="w-full bg-blue-600">
+              Submit
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-      <form
-        onSubmit={handleAdd}
-        className="space-y-6 p-6 bg-white shadow rounded-lg max-w-2xl"
-      >
-        <div>
-          <Label>Name</Label>
-          <Input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Full name"
-            required
-          />
-        </div>
-
-        <div>
-          <Label>Email</Label>
-          <Input
-            type="email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            placeholder="Email address"
-            required
-          />
-        </div>
-
-        <div>
-          <Label>Employee ID</Label>
-          <Input
-            value={form.empId}
-            onChange={(e) => setForm({ ...form, empId: e.target.value })}
-            placeholder="Employee ID (e.g., F1004)"
-            required
-          />
-        </div>
-
-        <div>
-          <Label>Department</Label>
-          <Input
-            value={form.department}
-            onChange={(e) => setForm({ ...form, department: e.target.value })}
-            placeholder="Department (e.g., CSE)"
-            required
-          />
-        </div>
-
-        <div>
-          <Label>Position</Label>
-          <Input
-            value={form.position}
-            onChange={(e) => setForm({ ...form, position: e.target.value })}
-            placeholder="Position (e.g., Professor)"
-            required
-          />
-        </div>
-
-        <Button className="w-full bg-blue-600 text-white" type="submit">
-          Add Faculty
-        </Button>
-      </form>
-
-      {/* EDIT MODAL */}
+      {/* ------------------ EDIT MODAL ---------------- */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby="edit-faculty">
           <DialogHeader>
             <DialogTitle>Edit Faculty</DialogTitle>
           </DialogHeader>
-
-          <div className="space-y-4">
-            <div>
-              <Label>Name</Label>
-              <Input
-                value={editData.name}
-                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label>Email</Label>
-              <Input
-                value={editData.email}
-                onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label>Employee ID</Label>
-              <Input
-                value={editData.empId}
-                onChange={(e) => setEditData({ ...editData, empId: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label>Department</Label>
-              <Input
-                value={editData.department}
-                onChange={(e) => setEditData({ ...editData, department: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label>Position</Label>
-              <Input
-                value={editData.position}
-                onChange={(e) => setEditData({ ...editData, position: e.target.value })}
-              />
-            </div>
-
-            <Button className="w-full bg-blue-600 text-white" onClick={saveEdit}>
-              Save Changes
+          <div className="space-y-2">
+            <Input
+              value={editData.department}
+              placeholder="Department"
+              onChange={(e) => setEditData({ ...editData, department: e.target.value })}
+            />
+            <Input
+              value={editData.designation}
+              placeholder="Designation"
+              onChange={(e) => setEditData({ ...editData, designation: e.target.value })}
+            />
+            <Button className="w-full bg-blue-600" onClick={saveEdit}>
+              Save
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* DELETE CONFIRM MODAL */}
+      {/* ------------------ DELETE CONFIRM MODAL ---------------- */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Faculty</DialogTitle>
           </DialogHeader>
-
           <p className="text-gray-600 mb-4">
             Are you sure you want to delete{" "}
-            <span className="font-semibold">{facultyToDelete?.name}</span>?
+            <span className="font-semibold">{facultyToDelete?.basicUserDetails?.name}</span>?
           </p>
-
           <div className="flex justify-end gap-4">
             <Button variant="outline" onClick={() => setDeleteOpen(false)}>
               Cancel
             </Button>
-
-            <Button
-              className="bg-red-600 text-white"
-              onClick={performDelete}
-            >
+            <Button className="bg-red-600 text-white" onClick={performDelete}>
               Delete
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ------------------ BULK MODAL ---------------- */}
+      <Dialog
+        open={bulkOpen}
+        onOpenChange={(isOpen) => {
+          setBulkOpen(isOpen);
+          if (!isOpen) {
+            setBulkResult(null);
+            setFile(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bulk Upload CSV/Excel</DialogTitle>
+          </DialogHeader>
+          <Input
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          />
+          <Button className="w-full bg-green-600 mt-3" onClick={handleBulkUpload}>
+            Upload
+          </Button>
+          {bulkResult && (
+            <div className="mt-4">
+              <p>{bulkResult.message}</p>
+              <p>Created: {bulkResult.createdCount}</p>
+              <p>Errors: {bulkResult.errorCount}</p>
+              {bulkResult.errors && bulkResult.errors.length > 0 && (
+                <div>
+                  <h4 className="font-bold mt-2">Error Details:</h4>
+                  <ul className="text-sm text-red-600">
+                    {bulkResult.errors.map((err, index) => (
+                      <li key={index}>
+                        - {err.faculty?.["Full Name"] || "Unknown"}: {err.error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

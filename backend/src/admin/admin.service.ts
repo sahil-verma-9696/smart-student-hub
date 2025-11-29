@@ -7,11 +7,17 @@ import { Model } from 'mongoose';
 export class AdminService {
   constructor(@InjectModel(Admin.name) private adminModel: Model<Admin>) {}
 
-  async create(userId: string) {
+  // Create admin profile only (used by auth service)
+  async createProfile(userId: string) {
     const admin = await this.adminModel.create({
       basicUserDetails: userId,
     });
     await admin.save();
     return admin;
+  }
+
+  // Legacy method name for compatibility
+  async create(userId: string) {
+    return this.createProfile(userId);
   }
 }

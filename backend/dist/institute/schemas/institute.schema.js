@@ -25,6 +25,7 @@ let Institute = class Institute extends mongoose_2.Document {
     is_affiliated;
     affiliation_university;
     affiliation_id;
+    programs;
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
@@ -73,6 +74,10 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Institute.prototype, "affiliation_id", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'Program' }], default: [] }),
+    __metadata("design:type", Array)
+], Institute.prototype, "programs", void 0);
 Institute = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Institute);

@@ -10,8 +10,32 @@ export declare class InstituteService {
     }> & {
         __v: number;
     }>;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: number, updateInstituteDto: UpdateInstituteDto): string;
-    remove(id: number): string;
+    findAll(): Promise<(import("mongoose").Document<unknown, {}, Institute, {}, {}> & Institute & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    })[]>;
+    findOne(id: string): Promise<import("mongoose").Document<unknown, {}, Institute, {}, {}> & Institute & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
+    update(id: string, updateInstituteDto: UpdateInstituteDto): Promise<import("mongoose").Document<unknown, {}, Institute, {}, {}> & Institute & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
+    remove(id: string): Promise<{
+        message: string;
+    }>;
+    addProgram(instituteId: string, programId: string): Promise<import("mongoose").Document<unknown, {}, Institute, {}, {}> & Institute & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
+    removeProgram(instituteId: string, programId: string): Promise<import("mongoose").Document<unknown, {}, Institute, {}, {}> & Institute & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
 }

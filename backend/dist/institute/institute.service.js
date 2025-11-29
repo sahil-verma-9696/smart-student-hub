@@ -30,23 +30,64 @@ let InstituteService = class InstituteService {
             official_email: createInstituteDto.official_email,
         });
         if (instituteExists) {
-            throw new Error('Institute already exists');
+            throw new common_1.BadRequestException('Institute already exists with this email');
         }
         const newInstitute = new this.instituteModel(createInstituteDto);
         await newInstitute.save();
         return newInstitute;
     }
-    findAll() {
-        return `This action returns all institute`;
+    async findAll() {
+        return await this.instituteModel.find().populate('programs');
     }
-    findOne(id) {
-        return `This action returns a #${id} institute`;
+    async findOne(id) {
+        if (!(0, mongoose_2.isValidObjectId)(id)) {
+            throw new common_1.BadRequestException('Invalid institute ID');
+        }
+        const institute = await this.instituteModel.findById(id).populate('programs');
+        if (!institute) {
+            throw new common_1.NotFoundException('Institute not found');
+        }
+        return institute;
     }
-    update(id, updateInstituteDto) {
-        return `This action updates a #${id} institute`;
+    async update(id, updateInstituteDto) {
+        if (!(0, mongoose_2.isValidObjectId)(id)) {
+            throw new common_1.BadRequestException('Invalid institute ID');
+        }
+        const institute = await this.instituteModel.findByIdAndUpdate(id, updateInstituteDto, { new: true }).populate('programs');
+        if (!institute) {
+            throw new common_1.NotFoundException('Institute not found');
+        }
+        return institute;
     }
-    remove(id) {
-        return `This action removes a #${id} institute`;
+    async remove(id) {
+        if (!(0, mongoose_2.isValidObjectId)(id)) {
+            throw new common_1.BadRequestException('Invalid institute ID');
+        }
+        const institute = await this.instituteModel.findByIdAndDelete(id);
+        if (!institute) {
+            throw new common_1.NotFoundException('Institute not found');
+        }
+        return { message: 'Institute deleted successfully' };
+    }
+    async addProgram(instituteId, programId) {
+        if (!(0, mongoose_2.isValidObjectId)(instituteId) || !(0, mongoose_2.isValidObjectId)(programId)) {
+            throw new common_1.BadRequestException('Invalid ID');
+        }
+        const institute = await this.instituteModel.findByIdAndUpdate(instituteId, { $addToSet: { programs: programId } }, { new: true }).populate('programs');
+        if (!institute) {
+            throw new common_1.NotFoundException('Institute not found');
+        }
+        return institute;
+    }
+    async removeProgram(instituteId, programId) {
+        if (!(0, mongoose_2.isValidObjectId)(instituteId) || !(0, mongoose_2.isValidObjectId)(programId)) {
+            throw new common_1.BadRequestException('Invalid ID');
+        }
+        const institute = await this.instituteModel.findByIdAndUpdate(instituteId, { $pull: { programs: programId } }, { new: true }).populate('programs');
+        if (!institute) {
+            throw new common_1.NotFoundException('Institute not found');
+        }
+        return institute;
     }
 };
 exports.InstituteService = InstituteService;

@@ -153,7 +153,7 @@ export class AuthService {
     });
 
     /** Create Faculty profile */
-    const faculty = await this.facultyService.create(user._id.toString());
+    const faculty = await this.facultyService.createProfile(user._id.toString());
 
     /********************************
      *  Sanitize User

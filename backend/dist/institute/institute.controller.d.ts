@@ -9,8 +9,32 @@ export declare class InstituteController {
     }> & {
         __v: number;
     }>;
-    findAll(): string;
-    findOne(id: string): string;
-    update(id: string, updateInstituteDto: UpdateInstituteDto): string;
-    remove(id: string): string;
+    findAll(): Promise<(import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    })[]>;
+    findOne(id: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
+    update(id: string, updateInstituteDto: UpdateInstituteDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
+    remove(id: string): Promise<{
+        message: string;
+    }>;
+    addProgram(id: string, programId: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
+    removeProgram(id: string, programId: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
 }

@@ -64,9 +64,9 @@ export declare class AuthService {
             comparePassword(plainPassword: string): Promise<boolean>;
             __v: number;
         };
-        studentData: import("mongoose").Document<unknown, {}, import("../student/schema/student.schema").Student, {}, {}> & import("../student/schema/student.schema").Student & Required<{
+        studentData: import("mongoose").Document<unknown, {}, import("../student/schema/student.schema").Student, {}, {}> & import("../student/schema/student.schema").Student & {
             _id: import("mongoose").Types.ObjectId;
-        }> & {
+        } & {
             __v: number;
         };
         token: string;

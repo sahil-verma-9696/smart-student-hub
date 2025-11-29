@@ -94,7 +94,7 @@ let AuthService = class AuthService {
             role: 'faculty',
             instituteId,
         });
-        const faculty = await this.facultyService.create(user._id.toString());
+        const faculty = await this.facultyService.createProfile(user._id.toString());
         const { passwordHash, ...sanitizedUser } = user.toObject();
         const payload = this.buildJwtPayload(user);
         const token = this.jwtService.sign(payload);
