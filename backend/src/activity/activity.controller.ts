@@ -6,10 +6,12 @@ import {
   Post,
   Patch,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
+import { SearchActivityDto } from './dto/search-activity.dto';
 
 @Controller('activities')
 export class ActivityController {
@@ -21,8 +23,13 @@ export class ActivityController {
   }
 
   @Get()
-  findAll() {
-    return this.activityService.findAll();
+  findAll(@Query() query: SearchActivityDto) {
+    return this.activityService.findAll(query);
+  }
+
+  @Get('stats')
+  getStudentActivityStats(@Query('studentId') studentId: string) {
+    return this.activityService.getStudentActivityStats(studentId);
   }
 
   @Get(':id')

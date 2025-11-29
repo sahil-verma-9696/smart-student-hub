@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { Activity, ActivityDocument } from './schema/activity.schema';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
+import { SearchActivityDto } from './dto/search-activity.dto';
 
 @Injectable()
 export class ActivityService {
@@ -17,15 +18,45 @@ export class ActivityService {
   // CREATE ACTIVITY
   // -----------------------------
   async create(dto: CreateActivityDto) {
-    return this.activityModel.create(dto);
+    const activity = await new this.activityModel(dto).save();
+
+    return this.activityModel
+      .findById(activity._id)
+      .populate('student')
+      .populate('attachments');
   }
 
   // -----------------------------
   // FIND ALL
   // -----------------------------
-  async findAll() {
+  async findAll(query: SearchActivityDto) {
+    const filter: Record<string, any> = {};
+
+    if (query.activityType) {
+      filter.activityType = query.activityType;
+    }
+
+    if (query.status) {
+      filter.status = query.status;
+    }
+
+    if (query.studentId) {
+      filter.student = query.studentId;
+    }
+
+    if (query.title) {
+      filter.title = { $regex: query.title, $options: 'i' }; // case-insensitive
+    }
+
+    if (query.from || query.to) {
+      filter.dateStart = {};
+      if (query.from) filter.dateStart.$gte = new Date(query.from);
+      if (query.to) filter.dateStart.$lte = new Date(query.to);
+    }
+
     return this.activityModel
-      .find()
+      .find(filter)
+      .sort({ createdAt: -1 }) // NEWEST first
       .populate('student')
       .populate('attachments')
       .exec();
@@ -68,5 +99,92 @@ export class ActivityService {
     if (!deleted) throw new NotFoundException('Activity not found');
 
     return { message: 'Activity deleted successfully' };
+  }
+
+  async getStudentActivityStats(studentId: string) {
+    const match: any = {};
+
+    if (studentId) {
+      match.student = new Types.ObjectId(studentId);
+    }
+
+    const aggregation = await this.activityModel.aggregate([
+      { $match: match },
+
+      {
+        $facet: {
+          // ------------------------------------------
+          // 1. STATUS COUNTS
+          // ------------------------------------------
+          statusStats: [
+            {
+              $group: {
+                _id: '$status',
+                count: { $sum: 1 },
+              },
+            },
+          ],
+
+          // ------------------------------------------
+          // 2. TYPE COUNTS
+          // ------------------------------------------
+          typeStats: [
+            {
+              $group: {
+                _id: '$activityType',
+                count: { $sum: 1 },
+              },
+            },
+          ],
+
+          // ------------------------------------------
+          // 3. TRENDING TYPE (most common)
+          // ------------------------------------------
+          trendingType: [
+            {
+              $group: {
+                _id: '$activityType',
+                count: { $sum: 1 },
+              },
+            },
+            { $sort: { count: -1 } },
+            { $limit: 1 },
+          ],
+        },
+      },
+    ]);
+
+    const result = aggregation[0];
+
+    // ----------------------------------------------
+    // Prepare final response
+    // ----------------------------------------------
+
+    const formatted = {
+      status: {
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+        total: 0,
+      },
+      types: {},
+      trendingActivityType: null,
+    };
+
+    // Fill status stats
+    for (const item of result.statusStats) {
+      formatted.status[item._id] = item.count;
+      formatted.status.total += item.count;
+    }
+
+    // Fill type counts
+    for (const item of result.typeStats) {
+      formatted.types[item._id] = item.count;
+    }
+
+    // Add trending type
+    formatted.trendingActivityType = result.trendingType[0]?._id || null;
+
+    return formatted;
   }
 }

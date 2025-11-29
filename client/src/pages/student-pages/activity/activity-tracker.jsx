@@ -27,8 +27,8 @@ import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
-import useActivitiesPage from "@/hooks/useActivitiesPage";
 import { ActivityConfig } from "./constants";
+import { useActivityPageContext } from "@/hooks/useActivityPageContext";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -49,7 +49,7 @@ export function ActivityTracker() {
   /***************************************
    * ******** Custom & Helpers hooks *****
    **************************************/
-  const { postActivity } = useActivitiesPage();
+  const { postActivity } = useActivityPageContext();
   const form = useForm({
     defaultValues: {},
   });

@@ -21,6 +21,7 @@ import Settings from "@/pages/student-pages/Settings";
 import { IntegrationOverview } from "@/pages/student-pages/integrations/integration-overview";
 import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-preview";
 import ActivitiesPage from "@/pages/student-pages/activity/page";
+import ActivityPageProvider from "@/providers/activity-page-provider";
 
 export default createBrowserRouter([
   {
@@ -38,7 +39,7 @@ export default createBrowserRouter([
       },
       {
         path: "activities",
-        Component: ActivitiesPage,
+        Component: ActivityPageProvider,
       },
       {
         path: "mind-piolet",

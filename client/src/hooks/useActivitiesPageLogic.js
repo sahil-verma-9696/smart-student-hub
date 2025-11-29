@@ -1,8 +1,9 @@
 import React from "react";
 import useAuthContext from "./useAuthContext";
 
-export default function useActivitiesPage() {
+export default function useActivitiesPageLogic() {
   const [activities, setActivities] = React.useState(null);
+  const [activityStats, setActivityStats] = React.useState(null);
 
   const { user } = useAuthContext();
 
@@ -105,7 +106,7 @@ export default function useActivitiesPage() {
       const dto = {
         ...activity,
         attachments: uploadedResources,
-        student: user.studentId
+        student: user?._id,
       };
 
       console.log(dto, token, uploadedResources);
@@ -122,7 +123,9 @@ export default function useActivitiesPage() {
       const response = await res.json();
 
       // // add to local state
-      setActivities((prev) => [response.data, ...(prev || [])]);
+      setActivities((prev) => {
+        return [response.data, ...(prev || [])];
+      });
 
       return response.data;
     } catch (err) {
@@ -135,15 +138,31 @@ export default function useActivitiesPage() {
     GET ACTIVITIES
   ---------------------------------------------------- */
   React.useEffect(() => {
-    (async function getAllActivities() {
-      const res = await fetch("http://localhost:3000/activities");
-      const responce = await res.json();
-      setActivities(responce.data);
-    })();
-  }, []);
+    if (activities === null) {
+      (async function getAllActivities() {
+        const res = await fetch(
+          `http://localhost:3000/activities?studentId=${user?._id}&status=approved`
+        );
+        const responce = await res.json();
+        setActivities(responce.data);
+      })();
+    }
+  }, [user, activities]);
+  React.useEffect(() => {
+    if (activities === null) {
+      (async function getAllActivities() {
+        const res = await fetch(
+          `http://localhost:3000/activities/stats?studentId=${user?._id}`
+        );
+        const responce = await res.json();
+        setActivityStats(responce.data);
+      })();
+    }
+  }, [user, activities]);
 
   return {
     activities,
+    activityStats,
     setActivities,
     postActivity,
   };
