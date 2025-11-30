@@ -1,12 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 
 import { Activity, ActivityDocument } from './schema/activity.schema';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { SearchActivityDto } from './dto/search-activity.dto';
-import { ActivityStatsResponse } from './types/types';
+import {
+  ActivityAggregationResult,
+  ActivityStatsResponse,
+} from './types/types';
 
 @Injectable()
 export class ActivityService {
@@ -31,7 +34,7 @@ export class ActivityService {
   // FIND ALL
   // -----------------------------
   async findAll(query: SearchActivityDto) {
-    const filter: Record<string, any> = {};
+    const filter: FilterQuery<ActivityDocument> = {};
 
     if (query.activityType) {
       filter.activityType = query.activityType;
@@ -46,18 +49,21 @@ export class ActivityService {
     }
 
     if (query.title) {
-      filter.title = { $regex: query.title, $options: 'i' }; // case-insensitive
+      filter.title = { $regex: query.title, $options: 'i' };
     }
 
     if (query.from || query.to) {
-      filter.dateStart = {};
-      if (query.from) filter.dateStart.$gte = new Date(query.from);
-      if (query.to) filter.dateStart.$lte = new Date(query.to);
+      const dateRange: { $gte?: Date; $lte?: Date } = {};
+
+      if (query.from) dateRange.$gte = new Date(query.from);
+      if (query.to) dateRange.$lte = new Date(query.to);
+
+      filter.dateStart = dateRange;
     }
 
     return this.activityModel
       .find(filter)
-      .sort({ createdAt: -1 }) // NEWEST first
+      .sort({ createdAt: -1 })
       .populate('student')
       .populate('attachments')
       .exec();
@@ -109,57 +115,58 @@ export class ActivityService {
   async getStudentActivityStats(
     studentId: string,
   ): Promise<ActivityStatsResponse> {
-    const match: any = {};
+    const match: Activity | Record<string, any> = {};
 
     if (studentId) {
       match.student = new Types.ObjectId(studentId);
     }
 
-    const aggregation = await this.activityModel.aggregate([
-      { $match: match },
+    const aggregation =
+      await this.activityModel.aggregate<ActivityAggregationResult>([
+        { $match: match },
 
-      {
-        $facet: {
-          // ------------------------------------------
-          // 1. STATUS COUNTS
-          // ------------------------------------------
-          statusStats: [
-            {
-              $group: {
-                _id: '$status',
-                count: { $sum: 1 },
+        {
+          $facet: {
+            // ------------------------------------------
+            // 1. STATUS COUNTS
+            // ------------------------------------------
+            statusStats: [
+              {
+                $group: {
+                  _id: '$status',
+                  count: { $sum: 1 },
+                },
               },
-            },
-          ],
+            ],
 
-          // ------------------------------------------
-          // 2. TYPE COUNTS
-          // ------------------------------------------
-          typeStats: [
-            {
-              $group: {
-                _id: '$activityType',
-                count: { $sum: 1 },
+            // ------------------------------------------
+            // 2. TYPE COUNTS
+            // ------------------------------------------
+            typeStats: [
+              {
+                $group: {
+                  _id: '$activityType',
+                  count: { $sum: 1 },
+                },
               },
-            },
-          ],
+            ],
 
-          // ------------------------------------------
-          // 3. TRENDING TYPE (most common)
-          // ------------------------------------------
-          trendingType: [
-            {
-              $group: {
-                _id: '$activityType',
-                count: { $sum: 1 },
+            // ------------------------------------------
+            // 3. TRENDING TYPE (most common)
+            // ------------------------------------------
+            trendingType: [
+              {
+                $group: {
+                  _id: '$activityType',
+                  count: { $sum: 1 },
+                },
               },
-            },
-            { $sort: { count: -1 } },
-            { $limit: 1 },
-          ],
+              { $sort: { count: -1 } },
+              { $limit: 1 },
+            ],
+          },
         },
-      },
-    ]);
+      ]);
 
     const result = aggregation[0];
 
@@ -167,7 +174,7 @@ export class ActivityService {
     // Prepare final response
     // ----------------------------------------------
 
-    const formatted = {
+    const formatted: ActivityStatsResponse = {
       status: {
         pending: 0,
         approved: 0,

@@ -22,6 +22,7 @@ import { IntegrationOverview } from "@/pages/student-pages/integrations/integrat
 import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-preview";
 import ActivitiesPage from "@/pages/student-pages/activity/page";
 import ActivityPageProvider from "@/providers/activity-page-provider";
+import ActivitiesManagment from "@/pages/admin-pages/activity-managment/activity-managment";
 
 export default createBrowserRouter([
   {
@@ -95,7 +96,7 @@ export default createBrowserRouter([
       },
       {
         path: "activities",
-        Component: ActivitiesPage,
+        Component: ActivitiesManagment,
       },
       {
         path: "students-panel",

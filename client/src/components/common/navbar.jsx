@@ -10,12 +10,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import useAuthantication from "@/hooks/useAuthantication";
+import useAuthContext from "@/hooks/useAuthContext";
+import { Badge } from "../ui/badge";
 
-function Navbar({ title }) {
+function Navbar() {
   /******************************************
    * Custom hooks
    ********************************************/
   const { logout } = useAuthantication();
+  const { user } = useAuthContext();
 
   /******************************************
    * Handler Functions
@@ -26,8 +29,9 @@ function Navbar({ title }) {
     <header className="border-b border-border bg-card px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h2 className="text-xl font-semibold text-card-foreground capitalize">
-            {title}
+          <h2 className="text-xl font-semibold text-card-foreground capitalize  flex items-center justify-center gap-1">
+            {user?.basicUserDetails?.name} 
+            <Badge variant={"outlined"}>{user?.basicUserDetails?.role}</Badge>
           </h2>
         </div>
 
