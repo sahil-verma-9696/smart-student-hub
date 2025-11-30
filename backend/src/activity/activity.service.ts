@@ -6,6 +6,7 @@ import { Activity, ActivityDocument } from './schema/activity.schema';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { SearchActivityDto } from './dto/search-activity.dto';
+import { ActivityStatsResponse } from './types/types';
 
 @Injectable()
 export class ActivityService {
@@ -101,7 +102,13 @@ export class ActivityService {
     return { message: 'Activity deleted successfully' };
   }
 
-  async getStudentActivityStats(studentId: string) {
+  /******************************************************
+   *
+   * @returns {Promise<ActivityStatsResponse>}
+   *******************************************************/
+  async getStudentActivityStats(
+    studentId: string,
+  ): Promise<ActivityStatsResponse> {
     const match: any = {};
 
     if (studentId) {
@@ -187,4 +194,30 @@ export class ActivityService {
 
     return formatted;
   }
+
+  /******************************************************
+   * @description Update activity status
+   * @param acitivityId
+   * @param facultyId
+   * @param ACTIVITY_STATUS
+   * @returns {Promise<ActivityDocument>}
+   *******************************************************/
+  // async updateActivityStatus(
+  //   activityId: string,
+  //   facultyId: string,
+  //   status: ACTIVITY_STATUS,
+  // ): Promise<ActivityDocument> {}
+
+  /******************************************************
+   * @description Update activity social links
+   * @param acitivityId
+   * @param studentId
+   * @param {{plateform: string, link: string}}
+   * @returns {Promise<ActivityDocument>}
+   *******************************************************/
+  // async updateActivitySocialLinks(
+  //   activityId: string,
+  //   facultyId: string,
+  //   status: ACTIVITY_STATUS,
+  // ): Promise<ActivityDocument> {}
 }

@@ -148,6 +148,8 @@ export default function useActivitiesPageLogic() {
       })();
     }
   }, [user, activities]);
+
+  /** Get Activity Stats */
   React.useEffect(() => {
     if (activities === null) {
       (async function getAllActivities() {
@@ -159,6 +161,8 @@ export default function useActivitiesPageLogic() {
       })();
     }
   }, [user, activities]);
+
+  
 
   return {
     activities,

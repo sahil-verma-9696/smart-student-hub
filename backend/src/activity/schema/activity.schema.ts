@@ -57,6 +57,21 @@ export class Activity {
     default: [],
   })
   attachments?: Types.ObjectId[];
+
+  socialLinks?: [
+    {
+      platform: string;
+      url: string;
+    },
+  ];
+
+  reviewedBy?: Types.ObjectId[];
+
+  reviewedAt?: Date;
+
+  verifiedBy?: Types.ObjectId;
+
+  verifiedAt?: Date;
 }
 
 export const ActivitySchema = SchemaFactory.createForClass(Activity);
