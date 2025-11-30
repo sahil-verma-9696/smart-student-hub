@@ -1,10 +1,8 @@
-import LandingPage from '@/components/publicComponents/landing-page/LandingPage'
-import React from 'react'
+import LandingPage from "@/pages/public-pages/landing-page/LandingPage";
+import React from "react";
 
 const PublicLayout = () => {
-  return (
-    <LandingPage/>
-  )
-}
+  return <LandingPage />;
+};
 
 export default PublicLayout;

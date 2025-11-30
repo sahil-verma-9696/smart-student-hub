@@ -2,7 +2,7 @@ import FacultyLayout from "@/layout/FacultyLayout";
 import AdminLayout from "@/layout/AdminLayout";
 import PublicLayout from "@/layout/PublicLayout";
 import StudentLayout from "@/layout/StudentLayout";
-import ScholarWindowPage from "@/pages/student-pages/student-scholarwindow";
+import ScholarWindowPage from "@/pages/student-pages/scholar-window/page";
 import FacultyDashboardPage from "@/pages/faculty-pages/faculty-dashboard";
 import AdminDashboardPage from "@/pages/admin-pages/admin-dashboard";
 import ApprovalPannel from "@/pages/faculty-pages/approval-pannel";

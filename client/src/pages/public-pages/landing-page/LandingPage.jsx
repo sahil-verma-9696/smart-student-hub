@@ -6,9 +6,9 @@ import Hero from "./Hero";
 import Features from "./Features";
 import ProblemSolution from "./ProblemSolution";
 import Team from "./Team";
-import AuthModal from "@/components/publicComponents/AuthModal";
 import useAuthContext from "@/hooks/useAuthContext";
 import { useNavigate } from "react-router";
+import AuthModal from "../AuthModal";
 
 const LandingPage = () => {
   const [authOpen, setAuthOpen] = useState(false);

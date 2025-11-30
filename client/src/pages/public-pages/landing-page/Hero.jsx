@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import AuthModal from '@/components/publicComponents/AuthModal';
+import AuthModal from "../AuthModal";
 
 export default function Hero({ onGetStarted }) {
   const [authOpen, setAuthOpen] = useState(false);
