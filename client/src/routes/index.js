@@ -12,27 +12,29 @@ import ActivitiesFilterPage from "@/pages/admin-pages/student-panel";
 import AdminAnalyticsPage from "@/pages/admin-pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-pages/admin-settings";
 import { createBrowserRouter } from "react-router";
-import UpDocs from "@/pages/student-pages/UpDocs";
-import PortfolioPage from "@/pages/student-pages/portfolio";
 import MindPilot from "@/pages/student-pages/MindPilot";
-import ShareAchivos from "@/pages/student-pages/ShareAchivos";
 import PrivateVault from "@/pages/student-pages/PrivateVault";
 import Settings from "@/pages/student-pages/Settings";
-import { IntegrationOverview } from "@/pages/student-pages/integrations/integration-overview";
 import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-preview";
-import ActivitiesPage from "@/pages/student-pages/activity/page";
 import ActivityPageProvider from "@/providers/activity-page-provider";
-import ActivitiesManagment from "@/pages/admin-pages/activity-managment/activity-managment";
+import ActivitiesManagment from "@/pages/admin-pages/components/activity-managment/activity-managment";
+import AdminInstPageProvider from "@/pages/admin-pages/provider/admin-inst.provider";
 
 export default createBrowserRouter([
   {
     path: "/",
     Component: PublicLayout,
+    /***********************************************************************
+     * *********************** Public Routes *****************************
+     * ***********************************************************************/
+    children: [],
   },
   {
     path: "/student",
-
     Component: StudentLayout,
+    /***********************************************************************
+     * *********************** Student Routes *****************************
+     * ***********************************************************************/
     children: [
       {
         index: true,
@@ -67,6 +69,9 @@ export default createBrowserRouter([
   {
     path: "/faculty",
     Component: FacultyLayout,
+    /***********************************************************************
+     * *********************** Faculty Routes *****************************
+     * ***********************************************************************/
     children: [
       {
         index: true,
@@ -81,6 +86,9 @@ export default createBrowserRouter([
   {
     path: "/admin",
     Component: AdminLayout,
+    /***********************************************************************
+     * *********************** Admin Routes *****************************
+     * ***********************************************************************/
     children: [
       {
         index: true,
@@ -105,6 +113,10 @@ export default createBrowserRouter([
       {
         path: "analytics",
         Component: AdminAnalyticsPage,
+      },
+      {
+        path: "institue",
+        Component: AdminInstPageProvider,
       },
       {
         path: "settings",

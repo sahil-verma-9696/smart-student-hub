@@ -10,6 +10,7 @@ import {
   Settings,
   GraduationCap,
   Users,
+  Building2,
 } from "lucide-react";
 
 const adminNavigation = [
@@ -18,6 +19,7 @@ const adminNavigation = [
   { name: "Faculty Panel", href: "/admin/add-faculty", icon: Users },
   { name: "Activities", href: "/admin/activities", icon: Trophy },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { name: "Institue", href: "/admin/institue", icon: Building2 },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 const AdminLayout = () => {
