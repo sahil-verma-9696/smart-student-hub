@@ -78,6 +78,7 @@ export class StudentService {
           basicUserDetails: user._id,
           institute: new Types.ObjectId(dto.instituteId),
           academicDetails: academic._id,
+          roll_number: dto.roll_number,
         },
       ],
       { session },

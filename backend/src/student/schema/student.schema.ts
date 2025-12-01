@@ -29,6 +29,9 @@ export class Student {
     required: false,
   })
   academicDetails: Types.ObjectId;
+
+  @Prop({ required: true, unique: true })
+  roll_number: string;
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);

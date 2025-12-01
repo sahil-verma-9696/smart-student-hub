@@ -32,6 +32,9 @@ export class CreateStudentDto {
   instituteId: string;
 
   @IsString()
+  roll_number?: string;
+
+  @IsString()
   @IsOptional()
   department?: string;
 

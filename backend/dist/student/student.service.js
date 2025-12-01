@@ -100,6 +100,7 @@ let StudentService = StudentService_1 = class StudentService {
                 basicUserDetails: user._id,
                 institute: new mongoose_2.Types.ObjectId(dto.instituteId),
                 academicDetails: academic._id,
+                roll_number: dto.roll_number,
             },
         ], { session });
         const student = createdStudent[0];
