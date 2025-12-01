@@ -42,3 +42,33 @@ export class CreateStudentDto {
   @IsOptional()
   backlogs?: number;
 }
+
+export class CreateStudentWithoutInstitueIdDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  password: string;
+
+  @IsString()
+  gender: string;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ContactInfoDto)
+  contactInfo: ContactInfoDto;
+
+  @IsString()
+  roll_number?: string;
+
+  @IsString()
+  @IsOptional()
+  department?: string;
+
+  @IsNumber()
+  @IsOptional()
+  backlogs?: number;
+}

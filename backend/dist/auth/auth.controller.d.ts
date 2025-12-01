@@ -13,7 +13,7 @@ export declare class AuthController {
         msg: string;
     }>;
     getMe(req: authType.AuthenticatedRequest): Promise<{
-        userData: import("../student/schema/student.schema").StudentDocument | import("../admin/schema/admin.schema").AdminDocument | import("../faculty/schemas/faculty.schema").FacultyDocument;
+        userData: import("../admin/schema/admin.schema").AdminDocument | import("../student/schema/student.schema").StudentDocument | import("../faculty/schemas/faculty.schema").FacultyDocument;
         msg: string;
     }>;
 }

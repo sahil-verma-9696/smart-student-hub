@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import * as csv from 'fast-csv';
 import { AcademicService } from 'src/academic/academic.service';
 import { CSV_FIELD_MAP } from './constants';
+import { BulkCreateStudentDto } from './dto/create-basic-student-bulk.dto';
 
 @Injectable()
 export class StudentService {
@@ -90,6 +91,68 @@ export class StudentService {
     await this.academicService.updateStudentId(academic._id, student._id);
 
     return student.populate(['basicUserDetails', 'academicDetails']);
+  }
+
+  async bulkCreateStudents(dto: BulkCreateStudentDto) {
+    const { instituteId, students } = dto;
+
+    if (!Array.isArray(students)) {
+      throw new Error('Invalid students array');
+    }
+
+    const successes: {
+      email: string;
+      roll_number?: string;
+      studentId?: string;
+    }[] = [];
+    const failures: {
+      email: string;
+      roll_number?: string;
+      reason?: string;
+    }[] = [];
+
+    for (const entry of students) {
+      try {
+        // prepare single student creation DTO
+        const singleDto: CreateStudentDto = {
+          ...entry,
+          roll_number: entry?.roll_number,
+          instituteId,
+        };
+
+        const created = await this.createStudent(singleDto);
+
+        successes.push({
+          email: entry.email,
+          roll_number: entry.roll_number,
+          studentId: created._id.toString(),
+        });
+      } catch (error) {
+        failures.push({
+          email: entry.email,
+          roll_number: entry.roll_number,
+          reason: (error.message as string | undefined) ?? 'Unknown error',
+        });
+
+        // continue loop, do NOT stop processing
+      }
+    }
+
+    return {
+      status:
+        failures.length === 0
+          ? 'success'
+          : successes.length > 0
+            ? 'partial'
+            : 'failed',
+
+      total: students.length,
+      created: successes.length,
+      failed: failures.length,
+
+      successes,
+      failures,
+    };
   }
 
   /***************************************

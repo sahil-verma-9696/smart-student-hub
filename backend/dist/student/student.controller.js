@@ -19,6 +19,7 @@ const create_basic_student_dto_1 = require("./dto/create-basic-student.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
 const path_1 = require("path");
+const create_basic_student_bulk_dto_1 = require("./dto/create-basic-student-bulk.dto");
 let StudentController = class StudentController {
     studentService;
     constructor(studentService) {
@@ -33,6 +34,13 @@ let StudentController = class StudentController {
         }
         return this.studentService.bulkUploadStudents(file.path);
     }
+    async createOrBulkUploadJson(body) {
+        const data = {
+            instituteId: body.instituteId,
+            students: body.students,
+        };
+        return this.studentService.bulkCreateStudents(data);
+    }
     findAll() {
         return this.studentService.getAllStudents();
     }
@@ -46,7 +54,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], StudentController.prototype, "create", null);
 __decorate([
-    (0, common_1.Post)('/bulk'),
+    (0, common_1.Post)('/bulk/csv'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
             destination: './uploads/csv',
@@ -67,6 +75,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], StudentController.prototype, "createOrBulkUpload", null);
+__decorate([
+    (0, common_1.Post)('/bulk/json'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_basic_student_bulk_dto_1.BulkCreateStudentDto]),
+    __metadata("design:returntype", Promise)
+], StudentController.prototype, "createOrBulkUploadJson", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),

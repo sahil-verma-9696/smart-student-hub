@@ -107,6 +107,48 @@ let StudentService = StudentService_1 = class StudentService {
         await this.academicService.updateStudentId(academic._id, student._id);
         return student.populate(['basicUserDetails', 'academicDetails']);
     }
+    async bulkCreateStudents(dto) {
+        const { instituteId, students } = dto;
+        if (!Array.isArray(students)) {
+            throw new Error('Invalid students array');
+        }
+        const successes = [];
+        const failures = [];
+        for (const entry of students) {
+            try {
+                const singleDto = {
+                    ...entry,
+                    roll_number: entry?.roll_number,
+                    instituteId,
+                };
+                const created = await this.createStudent(singleDto);
+                successes.push({
+                    email: entry.email,
+                    roll_number: entry.roll_number,
+                    studentId: created._id.toString(),
+                });
+            }
+            catch (error) {
+                failures.push({
+                    email: entry.email,
+                    roll_number: entry.roll_number,
+                    reason: error.message ?? 'Unknown error',
+                });
+            }
+        }
+        return {
+            status: failures.length === 0
+                ? 'success'
+                : successes.length > 0
+                    ? 'partial'
+                    : 'failed',
+            total: students.length,
+            created: successes.length,
+            failed: failures.length,
+            successes,
+            failures,
+        };
+    }
     async bulkUploadStudents(csvPath) {
         const rows = await this.parseCsv(csvPath);
         const success = [];
