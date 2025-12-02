@@ -19,6 +19,7 @@ import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-prev
 import ActivityPageProvider from "@/providers/activity-page-provider";
 import ActivitiesManagment from "@/pages/admin-pages/components/activity-managment/activity-managment";
 import AdminInstPageProvider from "@/pages/admin-pages/provider/admin-inst.provider";
+import StudentManagmentProvider from "@/pages/admin-pages/provider/student-managment.provider";
 
 export default createBrowserRouter([
   {
@@ -95,11 +96,11 @@ export default createBrowserRouter([
         Component: AdminDashboardPage,
       },
       {
-        path: "add-student",
-        Component: AdminAddStudentsPage,
+        path: "student-managment",
+        Component: StudentManagmentProvider,
       },
       {
-        path: "add-faculty",
+        path: "faculty-managment",
         Component: AdminAddFacultyPage,
       },
       {

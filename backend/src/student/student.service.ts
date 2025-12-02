@@ -1,15 +1,26 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Student, StudentDocument } from './schema/student.schema';
 import { ClientSession, Model, Types } from 'mongoose';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { USER_ROLE } from 'src/user/types/enum';
-import { CreateStudentDto } from './dto/create-basic-student.dto';
+import { CreateStudentDto } from './dto/create-student.dto';
 import * as fs from 'fs';
 import * as csv from 'fast-csv';
 import { AcademicService } from 'src/academic/academic.service';
 import { CSV_FIELD_MAP } from './constants';
+import { BulkCreateStudentDto } from './dto/create-student-bulk.dto';
+import { StudentQueryDto } from './dto/query.dto';
+import { UpdateStudentDto } from './dto/update-student.dto';
+import { UserDocument } from 'src/user/schema/user.schema';
+import { InstituteDocument } from 'src/institute/schemas/institute.schema';
+import { AcademicDocument } from 'src/academic/schema/academic.schema';
 
 @Injectable()
 export class StudentService {
@@ -19,6 +30,7 @@ export class StudentService {
     @InjectModel(Student.name)
     private readonly studentModel: Model<StudentDocument>,
 
+    // Services
     private readonly userService: UserService,
     private readonly academicService: AcademicService,
   ) {}
@@ -66,18 +78,17 @@ export class StudentService {
 
     /** STEP 2 — Create AcademicDetails using AcademicService */
     const academic = await this.academicService.create({
-      department: dto.department ?? null,
-      backlogs: dto.backlogs ?? 0, // 🔥 NEW
-      studentId: null, // will assign after student is created
+      studentId: null,
     });
 
     /** STEP 3 — Create Student with academicDetails ref */
     const createdStudent = await this.studentModel.create(
       [
         {
-          basicUserDetails: user._id,
+          basicUserDetails: new Types.ObjectId(user._id),
           institute: new Types.ObjectId(dto.instituteId),
-          academicDetails: academic._id,
+          academicDetails: new Types.ObjectId(academic._id),
+          roll_number: dto.roll_number,
         },
       ],
       { session },
@@ -89,6 +100,76 @@ export class StudentService {
     await this.academicService.updateStudentId(academic._id, student._id);
 
     return student.populate(['basicUserDetails', 'academicDetails']);
+  }
+
+  /***************************************
+   * BULK UPLOAD STUDENTS WITH ACADEMIC + JSON Input
+   ***************************************/
+  async bulkCreateStudents(dto: BulkCreateStudentDto) {
+    const { instituteId, students } = dto;
+
+    if (!Array.isArray(students)) {
+      throw new Error('Invalid students array');
+    }
+
+    const successes: {
+      email: string;
+      roll_number?: string;
+      studentId?: string;
+    }[] = [];
+    const failures: {
+      email: string;
+      roll_number?: string;
+      reason?: string;
+    }[] = [];
+
+    for (const entry of students) {
+      try {
+        // prepare single student creation DTO
+        const singleDto: CreateStudentDto = {
+          name: entry.name,
+          email: entry.email,
+          password: entry.password,
+          gender: entry.gender,
+          contactInfo: entry.contactInfo,
+          roll_number: entry.roll_number,
+          instituteId,
+        };
+
+        const created = await this.createStudent(singleDto);
+
+        successes.push({
+          email: entry.email,
+          roll_number: entry.roll_number,
+          studentId: created._id.toString(),
+        });
+      } catch (error: any) {
+        failures.push({
+          email: entry.email,
+          roll_number: entry.roll_number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          reason: (error.message as string | undefined) ?? 'Unknown error',
+        });
+
+        // continue loop, do NOT stop processing
+      }
+    }
+
+    return {
+      status:
+        failures.length === 0
+          ? 'success'
+          : successes.length > 0
+            ? 'partial'
+            : 'failed',
+
+      total: students.length,
+      created: successes.length,
+      failed: failures.length,
+
+      successes,
+      failures,
+    };
   }
 
   /***************************************
@@ -211,10 +292,7 @@ export class StudentService {
       password: mapped.password,
       gender: mapped.gender,
       instituteId: mapped.instituteId,
-
-      department: mapped.department,
-      backlogs: mapped.backlogs ? Number(mapped.backlogs) : 0, // 🔥 NEW
-
+      roll_number: mapped.roll_number,
       contactInfo: {
         phone: mapped.phone,
         alternatePhone: mapped.alternatePhone,
@@ -226,10 +304,12 @@ export class StudentService {
   /***************************************
    * GETTERS
    ***************************************/
-  async getByUserId(userId: string): Promise<StudentDocument> {
+  async getByUserId(userId: string) {
     const student = await this.studentModel
       .findOne({ basicUserDetails: new Types.ObjectId(userId) })
-      .populate(['basicUserDetails', 'academicDetails', 'institute'])
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
+      .populate<{ adademicDetails: AcademicDocument }>('academicDetails')
       .exec();
 
     if (!student) {
@@ -241,10 +321,63 @@ export class StudentService {
     return student;
   }
 
-  async getAllStudents(): Promise<StudentDocument[]> {
+  /************************************************************
+   * *********** GET ALL STUDENTS ACCORDING TO QUERY ***********
+   *************************************************************/
+  async findStudents(query: StudentQueryDto): Promise<StudentDocument[]> {
+    const filter: StudentFilter = {};
+
+    if (query.instituteId) {
+      filter.institute = new Types.ObjectId(query.instituteId);
+    }
+
+    if (query.gender) {
+      filter['basicUserDetails.gender'] = query.gender;
+    }
+
+    if (query.department) {
+      filter['academicDetails.department'] = query.department;
+    }
+
+    if (query.roll_number) {
+      filter.roll_number = query.roll_number;
+    }
+
     return this.studentModel
-      .find()
-      .populate(['basicUserDetails', 'academicDetails'])
+      .find(filter)
+      .populate(['basicUserDetails', 'academicDetails', 'institute'])
       .exec();
   }
+
+  // TODO : to make for basicUserDetails
+  async updateStudentAcademicDetails(studentId: string, dto: UpdateStudentDto) {
+    const instituteId = dto.instituteId;
+
+    if (!instituteId) {
+      throw new BadRequestException('instituteId is required');
+    }
+    // Find student by ID & institute
+    const student = await this.studentModel.findOne({
+      _id: new Types.ObjectId(studentId),
+      institute: new Types.ObjectId(instituteId),
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    // Update AcademicDetails of student
+    if (dto.academicDetails) {
+      await this.academicService.updateById(
+        student.academicDetails.toString(),
+        dto.academicDetails,
+      );
+    }
+
+    // Apply allowed fields from DTO
+    Object.assign(student, dto);
+
+    return student;
+  }
 }
+type StudentFilter = Record<string, unknown>;

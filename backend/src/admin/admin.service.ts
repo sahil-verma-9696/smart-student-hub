@@ -9,6 +9,8 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { USER_ROLE } from 'src/user/types/enum';
 import { InstituteService } from 'src/institute/institute.service';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { UserDocument } from 'src/user/schema/user.schema';
+import { InstituteDocument } from 'src/institute/schemas/institute.schema';
 
 @Injectable()
 export class AdminService implements IAdminService {
@@ -80,9 +82,9 @@ export class AdminService implements IAdminService {
 
   async getByUserId(userId: string): Promise<AdminDocument> {
     const admin = await this.adminModel
-      .findOne({ basicUserDetails: new Types.ObjectId(userId)  })
-      .populate<{ basicUserDetails: any }>('basicUserDetails')
-      .populate<{ institute: any }>('institute')
+      .findOne({ basicUserDetails: new Types.ObjectId(userId) })
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
       .exec();
 
     if (!admin) {

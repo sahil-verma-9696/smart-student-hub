@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Academic, AcademicDocument } from './schema/academic.schema';
+import { UpdateAcademicDto } from './dto/update-academic.dto';
 
 @Injectable()
 export class AcademicService {
@@ -16,7 +17,6 @@ export class AcademicService {
     year?: number;
     section?: string;
     backlogs?: number; // 🔥 NEW
-
     studentId?: string | null;
   }): Promise<AcademicDocument> {
     const created = await this.academicModel.create({
@@ -75,5 +75,24 @@ export class AcademicService {
     const res = await this.academicModel.deleteOne({ student: studentId });
 
     return res.deletedCount > 0;
+  }
+
+  async updateById(
+    id: string,
+    dto: UpdateAcademicDto,
+  ): Promise<AcademicDocument> {
+    const updated = await this.academicModel.findOneAndUpdate(
+      { _id: new Types.ObjectId(id) },
+      { $set: dto },
+      { new: true },
+    );
+
+    if (!updated) {
+      throw new NotFoundException(
+        `AcademicDetails not found for student: ${id}`,
+      );
+    }
+
+    return updated;
   }
 }

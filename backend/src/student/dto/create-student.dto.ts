@@ -9,7 +9,7 @@ import {
 import { ContactInfoDto } from 'src/user/dto/contact-info.dto';
 import { OmitType } from '@nestjs/mapped-types';
 
-export class CreateFacultyDto {
+export class CreateStudentDto {
   @IsString()
   name: string;
 
@@ -31,16 +31,10 @@ export class CreateFacultyDto {
   instituteId: string;
 
   @IsString()
-  employee_code: string;
-
-  @IsString()
-  department?: string;
-
-  @IsString()
-  designation?: string;
+  roll_number: string;
 }
 
-export class CreateFacultyWithoutInstituteDto extends OmitType(
-  CreateFacultyDto,
+export class CreateStudentWithoutInstituteDto extends OmitType(
+  CreateStudentDto,
   ['instituteId'] as const,
 ) {}

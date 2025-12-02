@@ -12,6 +12,8 @@ import { AdminModule } from './admin/admin.module';
 import { UpDocsModule } from './up-docs/up-docs.module';
 import { AttachmentModule } from './attachment/attachment.module';
 import { AcademicModule } from './academic/academic.module';
+import { AcadmicProgramModule } from './acadmic-program/acadmic-program.module';
+import { MindPioletModule } from './mind-piolet/mind-piolet.module';
 
 @Module({
   imports: [
@@ -42,6 +44,10 @@ import { AcademicModule } from './academic/academic.module';
     AttachmentModule,
 
     AcademicModule,
+
+    AcadmicProgramModule,
+
+    MindPioletModule,
   ],
   controllers: [AppController],
   providers: [AppService],

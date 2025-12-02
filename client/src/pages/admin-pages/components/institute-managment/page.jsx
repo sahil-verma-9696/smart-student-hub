@@ -71,6 +71,7 @@ export default function InstituteAdminPage() {
   };
 
   const handleSave = async () => {
+    console.log(data, "data");
     setIsSaving(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsSaving(false);
