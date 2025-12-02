@@ -22,6 +22,7 @@ import { StudentDocument } from 'src/student/schema/student.schema';
 import { AdminDocument } from 'src/admin/schema/admin.schema';
 import { FacultyDocument } from 'src/faculty/schemas/faculty.schema';
 import { USER_ROLE } from 'src/user/types/enum';
+import { InstituteDocument } from 'src/institute/schemas/institute.schema';
 
 @Injectable()
 export class AuthService {
@@ -103,8 +104,25 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    const basicDetails = userData.basicUserDetails as UserDocument;
+    const institute = userData.institute as InstituteDocument;
+
+    const payload: JwtPayload = {
+      email: basicDetails.email,
+      sub: userData._id.toString(),
+      role: user.role,
+      name: user.name,
+      userId: userData._id.toString(),
+      instituteId: institute._id.toString(),
+    };
+
+    /****** Generate Token **************/
+    const token = this.jwtService.sign(payload);
+
     return {
       userData,
+      token,
+      expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
       msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
     };
   }
@@ -172,6 +190,7 @@ export class AuthService {
         role: user.role,
         sub: joinedAdmin._id.toString(),
         userId: joinedAdmin._id.toString(),
+        instituteId: institute._id.toString(),
       };
 
       const token = this.jwtService.sign(payload);

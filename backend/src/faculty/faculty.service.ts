@@ -14,6 +14,8 @@ import { USER_ROLE } from 'src/user/types/enum';
 import { BulkCreateFacultyDto } from './dto/create-faculty-bulk.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { FacultyQueryDto } from './dto/query.dto';
+import { UserDocument } from 'src/user/schema/user.schema';
+import { InstituteDocument } from 'src/institute/schemas/institute.schema';
 
 @Injectable()
 export class FacultyService {
@@ -192,11 +194,11 @@ export class FacultyService {
     return 'Faculty deleted successfully';
   }
 
-  async getByUserId(userId: string): Promise<FacultyDocument> {
+  async getByUserId(userId: string) {
     const faculty = await this.facultyModel
       .findOne({ basicUserDetails: new Types.ObjectId(userId) })
-      .populate<{ basicUserDetails: any }>('basicUserDetails')
-      .populate<{ institute: any }>('institute')
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
       .populate<{ department: any }>('department')
       .exec();
 

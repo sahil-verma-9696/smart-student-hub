@@ -18,6 +18,9 @@ import { CSV_FIELD_MAP } from './constants';
 import { BulkCreateStudentDto } from './dto/create-student-bulk.dto';
 import { StudentQueryDto } from './dto/query.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { UserDocument } from 'src/user/schema/user.schema';
+import { InstituteDocument } from 'src/institute/schemas/institute.schema';
+import { AcademicDocument } from 'src/academic/schema/academic.schema';
 
 @Injectable()
 export class StudentService {
@@ -301,10 +304,12 @@ export class StudentService {
   /***************************************
    * GETTERS
    ***************************************/
-  async getByUserId(userId: string): Promise<StudentDocument> {
+  async getByUserId(userId: string) {
     const student = await this.studentModel
       .findOne({ basicUserDetails: new Types.ObjectId(userId) })
-      .populate(['basicUserDetails', 'academicDetails', 'institute'])
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
+      .populate<{ adademicDetails: AcademicDocument }>('academicDetails')
       .exec();
 
     if (!student) {

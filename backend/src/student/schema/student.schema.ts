@@ -1,6 +1,9 @@
 // schemas/student.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { AcademicDocument } from 'src/academic/schema/academic.schema';
+import { InstituteDocument } from 'src/institute/schemas/institute.schema';
+import { UserDocument } from 'src/user/schema/user.schema';
 
 export type StudentDocument = Student & Document;
 
@@ -12,7 +15,7 @@ export class Student {
     default: null,
     required: true,
   })
-  basicUserDetails: Types.ObjectId;
+  basicUserDetails: Types.ObjectId | UserDocument;
 
   @Prop({
     type: Types.ObjectId,
@@ -20,7 +23,7 @@ export class Student {
     default: null,
     required: false,
   })
-  institute: Types.ObjectId;
+  institute: Types.ObjectId | InstituteDocument;
 
   @Prop({
     type: Types.ObjectId,
@@ -28,7 +31,7 @@ export class Student {
     default: null,
     required: false,
   })
-  academicDetails: Types.ObjectId;
+  academicDetails: Types.ObjectId | AcademicDocument;
 
   @Prop({ required: true, unique: true })
   roll_number: string;
