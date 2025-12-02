@@ -1,110 +1,46 @@
-// dto/create-faculty.dto.ts
-import { IsNotEmpty, IsString, IsEmail, IsOptional, IsEnum, IsDateString, ValidateNested, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
+import {
+  IsEmail,
+  IsObject,
+  // IsEnum,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { ContactInfoDto } from 'src/user/dto/contact-info.dto';
+import { OmitType } from '@nestjs/mapped-types';
 
-class ContactInfoDto {
+export class CreateFacultyDto {
+  @IsString()
+  name: string;
+
   @IsEmail()
   email: string;
 
   @IsString()
-  mobile: string;
-}
-
-class AcademicQualificationDto {
-  @IsString()
-  degree: string;
-
-  @IsOptional()
-  @IsString()
-  institution?: string;
-
-  @IsOptional()
-  year?: number;
-
-  @IsOptional()
-  @IsString()
-  proofUrl?: string;
-}
-
-class ExperienceDetailsDto {
-  @IsString()
-  position: string;
+  password: string;
 
   @IsString()
-  institution: string;
-
-  @IsOptional()
-  fromYear?: number;
-
-  @IsOptional()
-  toYear?: number;
-
-  @IsOptional()
-  yearsOfService?: number;
-}
-
-class DocumentsDto {
-  @IsString()
-  @IsNotEmpty()
-  idProofUrl: string;
-
-  @IsOptional()
-  @IsString()
-  appointmentLetterUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  cvUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  photoUrl?: string;
-}
-
-export class CreateFacultyDto {
-  @IsString()
-  @IsNotEmpty()
-  fullName: string;
-
-  @IsDateString()
-  dateOfBirth: string;
-
-  @IsEnum(['Male', 'Female', 'Other'])
   gender: string;
 
+  @IsObject()
   @ValidateNested()
   @Type(() => ContactInfoDto)
   contactInfo: ContactInfoDto;
 
   @IsString()
-  @IsNotEmpty()
-  facultyId: string;
+  instituteId: string;
 
   @IsString()
-  @IsNotEmpty()
-  designation: string;
+  employee_code: string;
 
   @IsString()
-  @IsNotEmpty()
-  department: string;
+  department?: string;
 
-  @IsOptional()
   @IsString()
-  subjectArea?: string;
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => AcademicQualificationDto)
-  academicQualifications?: AcademicQualificationDto[];
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ExperienceDetailsDto)
-  experienceDetails?: ExperienceDetailsDto[];
-
-  @ValidateNested()
-  @Type(() => DocumentsDto)
-  documents: DocumentsDto;
+  designation?: string;
 }
+
+export class CreateFacultyWithoutInstituteDto extends OmitType(
+  CreateFacultyDto,
+  ['instituteId'] as const,
+) {}
