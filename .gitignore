@@ -70,3 +70,8 @@
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 /backend/report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+
+/mind-pilot/__pycache__
+/mind-pilot/node_modules
+/mind-pilot/.env

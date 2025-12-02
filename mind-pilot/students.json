@@ -1,0 +1,376 @@
+[
+  {
+    "profile": {
+      "name": "Amit Sharma",
+      "age": 21,
+      "education": "B.Tech CSE 3rd Year",
+      "skills": ["Java", "DSA", "SQL"],
+      "interests": ["Web Development", "AI", "Hackathons"]
+    },
+    "achievements": [
+      {
+        "title": "CodeChef 4⭐",
+        "description": "Achieved 4-star rating on CodeChef",
+        "date": "2024-02-10"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Library Management System",
+        "description": "A CRUD-based library system",
+        "techStack": ["Java", "Spring Boot"],
+        "date": "2024-03-18"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Neha Verma",
+      "age": 22,
+      "education": "B.Tech IT Final Year",
+      "skills": ["Python", "ML", "PowerBI"],
+      "interests": ["Data Science", "Statistics", "Research"]
+    },
+    "achievements": [
+      {
+        "title": "Research Paper Published",
+        "description": "Published paper on Machine Learning",
+        "date": "2024-05-12"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Sales Prediction Model",
+        "description": "ML-based sales forecasting",
+        "techStack": ["Python", "Pandas", "Scikit-Learn"],
+        "date": "2024-06-25"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Rahul Singh",
+      "age": 20,
+      "education": "B.Tech CSE 2nd Year",
+      "skills": ["JavaScript", "Node.js", "MongoDB"],
+      "interests": ["Backend", "Cloud", "Open Source"]
+    },
+    "achievements": [
+      {
+        "title": "Open Source Contributor",
+        "description": "Contributed to 5+ GitHub projects",
+        "date": "2024-04-05"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Chat Application",
+        "description": "Real-time chat app",
+        "techStack": ["Node.js", "Socket.io"],
+        "date": "2024-01-10"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Priya Gupta",
+      "age": 23,
+      "education": "B.Tech AI & ML 4th Year",
+      "skills": ["Python", "TensorFlow", "Deep Learning"],
+      "interests": ["Neural Networks", "AI", "Healthcare Tech"]
+    },
+    "achievements": [
+      {
+        "title": "Intern at Microsoft",
+        "description": "Worked on AI model optimization",
+        "date": "2024-07-15"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Brain Tumor Detection",
+        "description": "MRI scan classification using CNN",
+        "techStack": ["Python", "TensorFlow"],
+        "date": "2024-08-10"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Sahil Jain",
+      "age": 21,
+      "education": "B.Tech CSE 3rd Year",
+      "skills": ["Flutter", "Firebase", "UI/UX"],
+      "interests": ["Mobile Apps", "Design", "Startups"]
+    },
+    "achievements": [
+      {
+        "title": "Hackathon Finalist",
+        "description": "Reached finals in national hackathon",
+        "date": "2024-03-02"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Fitness Tracker App",
+        "description": "Health monitoring application",
+        "techStack": ["Flutter", "Firebase"],
+        "date": "2024-04-22"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Kunal Mehta",
+      "age": 22,
+      "education": "B.Tech CSE Final Year",
+      "skills": ["C++", "DSA", "Competitive Programming"],
+      "interests": ["CP", "Problem Solving", "Teaching"]
+    },
+    "achievements": [
+      {
+        "title": "LeetCode 400 Problems",
+        "description": "Solved 400+ problems on LeetCode",
+        "date": "2024-06-07"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Algorithm Visualizer",
+        "description": "Web app to visualize DSA algorithms",
+        "techStack": ["React", "D3.js"],
+        "date": "2024-09-01"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Ananya Patel",
+      "age": 20,
+      "education": "B.Tech IT 2nd Year",
+      "skills": ["HTML", "CSS", "JavaScript"],
+      "interests": ["UI/UX", "Web Dev", "Design"]
+    },
+    "achievements": [
+      {
+        "title": "Freelance Web Designer",
+        "description": "Built 4 websites for clients",
+        "date": "2024-04-15"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Portfolio Website",
+        "description": "Personal portfolio",
+        "techStack": ["HTML", "CSS", "JavaScript"],
+        "date": "2024-02-28"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Vikas Yadav",
+      "age": 21,
+      "education": "B.Tech CSE 3rd Year",
+      "skills": ["AWS", "Docker", "Linux"],
+      "interests": ["Cloud", "DevOps", "Security"]
+    },
+    "achievements": [
+      {
+        "title": "AWS Cloud Certified",
+        "description": "Certified AWS Cloud Practitioner",
+        "date": "2024-05-12"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Cloud Deployment Pipeline",
+        "description": "CI/CD pipeline using AWS + Docker",
+        "techStack": ["AWS", "Docker", "GitHub Actions"],
+        "date": "2024-08-20"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Sneha Kapoor",
+      "age": 19,
+      "education": "B.Tech AI 1st Year",
+      "skills": ["Python", "Maths", "Statistics"],
+      "interests": ["Machine Learning", "Research"]
+    },
+    "achievements": [
+      {
+        "title": "Math Olympiad Rank 2",
+        "description": "Secured 2nd rank in state-level Olympiad",
+        "date": "2024-02-01"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Linear Regression Model",
+        "description": "Simple prediction model",
+        "techStack": ["Python", "NumPy", "Matplotlib"],
+        "date": "2024-04-10"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Aarav Joshi",
+      "age": 24,
+      "education": "B.Tech CSE Final Year",
+      "skills": ["Blockchain", "Solidity", "Web3"],
+      "interests": ["Crypto", "Finance", "DeFi"]
+    },
+    "achievements": [
+      {
+        "title": "Blockchain Workshop Winner",
+        "description": "Led a blockchain-based project",
+        "date": "2024-06-10"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Smart Contract Marketplace",
+        "description": "Decentralized marketplace",
+        "techStack": ["Solidity", "React", "Hardhat"],
+        "date": "2024-07-30"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Pooja Nair",
+      "age": 22,
+      "education": "B.Tech CSE 3rd Year",
+      "skills": ["Java", "Spring Boot", "REST APIs"],
+      "interests": ["Backend Dev", "Microservices"]
+    },
+    "achievements": [
+      {
+        "title": "Intern at TCS",
+        "description": "Worked on backend API testing",
+        "date": "2024-05-14"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Hospital Management API",
+        "description": "RESTful API for hospitals",
+        "techStack": ["Java", "Spring Boot", "PostgreSQL"],
+        "date": "2024-09-18"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Rohan Kumar",
+      "age": 20,
+      "education": "B.Tech CSE 2nd Year",
+      "skills": ["C++", "DSA", "OOP"],
+      "interests": ["CP", "Mathematics"]
+    },
+    "achievements": [
+      {
+        "title": "Codeforces Specialist",
+        "description": "Achieved Specialist rank on Codeforces",
+        "date": "2024-07-10"
+      }
+    ],
+    "projects": [
+      {
+        "name": "DSA Visualizer",
+        "description": "Algorithm visualization tool",
+        "techStack": ["JavaScript", "Canvas API"],
+        "date": "2024-10-01"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Simran Kaur",
+      "age": 21,
+      "education": "B.Tech CSE 3rd Year",
+      "skills": ["React", "Node.js", "MongoDB"],
+      "interests": ["Full Stack", "EdTech"]
+    },
+    "achievements": [
+      {
+        "title": "EdTech Startup Internship",
+        "description": "Worked as MERN stack intern",
+        "date": "2024-08-02"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Student Portal",
+        "description": "All-in-one student dashboard",
+        "techStack": ["React", "Node.js", "MongoDB"],
+        "date": "2024-09-10"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Dev Patel",
+      "age": 22,
+      "education": "B.Tech IT Final Year",
+      "skills": ["SQL", "ETL", "Data Warehousing"],
+      "interests": ["Data Engineering", "Big Data"]
+    },
+    "achievements": [
+      {
+        "title": "Data Engineering Intern",
+        "description": "Worked with ETL pipelines",
+        "date": "2024-07-05"
+      }
+    ],
+    "projects": [
+      {
+        "name": "ETL Pipeline Project",
+        "description": "Data migration using Python",
+        "techStack": ["Python", "SQL", "Airflow"],
+        "date": "2024-10-20"
+      }
+    ]
+  },
+
+  {
+    "profile": {
+      "name": "Harsh Vardhan",
+      "age": 21,
+      "education": "B.Tech CSE 3rd Year",
+      "skills": ["Cybersecurity", "Kali Linux", "Networking"],
+      "interests": ["Ethical Hacking", "Security"]
+    },
+    "achievements": [
+      {
+        "title": "CEH Certified",
+        "description": "Certified Ethical Hacker",
+        "date": "2024-11-02"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Vulnerability Scanner",
+        "description": "Network vulnerability detection tool",
+        "techStack": ["Python", "Nmap"],
+        "date": "2024-11-18"
+      }
+    ]
+  }
+]

@@ -1,8 +1,9 @@
 import React from 'react'
+import Chatbot from '../../components/bot/Bot'
 
 function MindPilot() {
   return (
-    <div>MindPilot</div>
+    <div><Chatbot/></div>
   )
 }
 
