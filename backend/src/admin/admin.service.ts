@@ -133,7 +133,7 @@ export class AdminService implements IAdminService {
     // 5. Return updated, populated admin
     const updatedAdmin = await this.adminModel
       .findById(adminId)
-      .populate('basicUserDetails') // correct field
+      .populate('basicUserDetails','-passwordHash') // correct field
       .populate('institute')
       .session(session ?? null);
 
@@ -156,7 +156,7 @@ export class AdminService implements IAdminService {
     }
     return this.adminModel
       .findById(adminId)
-      .populate('basicUserDetails')
+      .populate('basicUserDetails','-passwordHash')
       .exec()
       .then((admin) => {
         if (!admin) {

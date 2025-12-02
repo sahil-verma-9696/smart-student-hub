@@ -66,8 +66,8 @@ export class FacultyService {
 
     const user = await this.userService.createUser(userDto, session);
 
-    /** STEP 3 — Create Student with academicDetails ref */
-    const createdStudent = await this.facultyModel.create(
+    /** STEP 2 — Create Faculty */
+    const createdFaculty = await this.facultyModel.create(
       [
         {
           basicUserDetails: new Types.ObjectId(user._id),
@@ -80,10 +80,10 @@ export class FacultyService {
       { session },
     );
 
-    const student = createdStudent[0];
+    const faculty = createdFaculty[0];
 
     /** STEP 4 — Update academic.student reference */
-    return student.populate(['basicUserDetails', 'institute']);
+    return faculty.populate(['basicUserDetails', 'institute']);
   }
 
   /***************************************
@@ -177,11 +177,37 @@ export class FacultyService {
       throw new BadRequestException('Invalid faculty id');
     }
 
-    const faculty = await this.facultyModel.findByIdAndUpdate(id, dto, {
-      new: true,
-    });
+    const faculty = await this.facultyModel.findById(id);
     if (!faculty) throw new NotFoundException('Faculty not found');
-    return faculty;
+
+    // Separate faculty-specific fields from user fields
+    const facultyFields: Partial<Faculty> = {};
+    const userFields: any = {};
+
+    // Faculty-specific fields
+    if (dto.department !== undefined) facultyFields.department = dto.department;
+    if (dto.designation !== undefined) facultyFields.designation = dto.designation;
+    if (dto.employee_code !== undefined) facultyFields.employee_code = dto.employee_code;
+
+    // User-specific fields
+    if (dto.name !== undefined) userFields.name = dto.name;
+    if (dto.email !== undefined) userFields.email = dto.email;
+    if (dto.gender !== undefined) userFields.gender = dto.gender;
+    if (dto.contactInfo !== undefined) userFields.contactInfo = dto.contactInfo;
+
+    // Update faculty document if there are faculty fields
+    if (Object.keys(facultyFields).length > 0) {
+      Object.assign(faculty, facultyFields);
+      await faculty.save();
+    }
+
+    // Update user document if there are user fields
+    if (Object.keys(userFields).length > 0) {
+      await this.userService.updateUser(faculty.basicUserDetails.toString(), userFields);
+    }
+
+    // Return updated faculty with populated user details
+    return await this.facultyModel.findById(id).populate('basicUserDetails', '-passwordHash');
   }
 
   async remove(id: string) {

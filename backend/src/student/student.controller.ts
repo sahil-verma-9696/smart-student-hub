@@ -90,7 +90,6 @@ export class StudentController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
   updateStudent(@Param('id') id: string, @Body() body: UpdateStudentDto) {
     return this.studentService.updateStudentAcademicDetails(id, body);
   }
