@@ -2,14 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { UpdateUpDocDto } from './dto/update-up-doc.dto';
 import { v2 as cloudinary } from 'cloudinary';
 import { AttachmentService } from 'src/attachment/attachment.service';
-import { CreateAttachmentDto } from 'src/attachment/dto/create-attachment.dto';
 import { CreateUpDocDto } from './dto/create-up-doc.dto';
 
 @Injectable()
 export class UpDocsService {
   constructor(private readonly attachmentService: AttachmentService) {}
   async create(att: CreateUpDocDto) {
-
     const attachment = await this.attachmentService.upload({
       access_mode: att.access_mode!,
       asset_id: att.asset_id!,

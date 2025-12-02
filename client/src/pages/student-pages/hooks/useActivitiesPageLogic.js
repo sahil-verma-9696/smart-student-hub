@@ -1,5 +1,5 @@
 import React from "react";
-import useAuthContext from "./useAuthContext";
+import useAuthContext from "../../../hooks/useAuthContext";
 
 export default function useActivitiesPageLogic() {
   const [activities, setActivities] = React.useState(null);
@@ -11,7 +11,9 @@ export default function useActivitiesPageLogic() {
     STEP 1: GET ACCESS TOKEN
   ---------------------------------------------------- */
   async function getAccessToken() {
-    const res = await fetch("http://localhost:3000/up-docs/access-token");
+    const res = await fetch(
+      "http://localhost:3000/up-docs/access-token?folderName=activities-attachments"
+    );
     if (!res.ok) throw new Error("Failed to get upload token");
 
     const data = await res.json();
@@ -135,13 +137,13 @@ export default function useActivitiesPageLogic() {
   }
 
   /* ----------------------------------------------------
-    GET ACTIVITIES
+    GET ALL ACTIVITIES OF STUDENT
   ---------------------------------------------------- */
   React.useEffect(() => {
     if (activities === null) {
       (async function getAllActivities() {
         const res = await fetch(
-          `http://localhost:3000/activities?studentId=${user?._id}&status=approved`
+          `http://localhost:3000/activities?studentId=${user?._id}`
         );
         const responce = await res.json();
         setActivities(responce.data);
@@ -149,7 +151,9 @@ export default function useActivitiesPageLogic() {
     }
   }, [user, activities]);
 
-  /** Get Activity Stats */
+  /* ----------------------------------------------------
+    GET ACTIVITIE STATS
+  ---------------------------------------------------- */
   React.useEffect(() => {
     if (activities === null) {
       (async function getAllActivities() {
@@ -162,12 +166,35 @@ export default function useActivitiesPageLogic() {
     }
   }, [user, activities]);
 
-  
+  /* ----------------------------------------------------
+    FILTER ACTIVITIES
+  ---------------------------------------------------- */
+  async function fetchFilteredActivities(filters = {}) {
+    const { title = "*", status = "all", activityType = "all" } = filters;
+
+    const params = new URLSearchParams();
+
+    // always required
+    params.set("studentId", user?._id);
+
+    // add ONLY meaningful fields
+    if (title && title !== "*") params.set("title", title);
+    if (status && status !== "all") params.set("status", status);
+    if (activityType && activityType !== "all")
+      params.set("activityType", activityType);
+
+    const url = `http://localhost:3000/activities?${params.toString()}`;
+
+    const res = await fetch(url);
+    const response = await res.json();
+    setActivities(response.data);
+  }
 
   return {
     activities,
     activityStats,
     setActivities,
     postActivity,
+    fetchFilteredActivities,
   };
 }

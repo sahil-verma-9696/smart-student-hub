@@ -3,7 +3,7 @@ import { ActivityList } from "./activity-list";
 import { ActivityStats } from "./activity-stats";
 import useAuthContext from "@/hooks/useAuthContext";
 import { USER_ROLE } from "@/common/enum";
-import { useActivityPageContext } from "@/hooks/useActivityPageContext";
+import { useActivityPageContext } from "@/pages/student-pages/hooks/useActivityPageContext";
 
 export default function ActivitiesPage() {
   const { activities, activityStats } = useActivityPageContext();

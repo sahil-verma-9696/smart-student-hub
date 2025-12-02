@@ -7,6 +7,7 @@ import {
   IsNumber,
   ValidateIf,
   IsArray,
+  IsDate,
 } from 'class-validator';
 import { ACTIVITY_TYPES, ACTIVITY_STATUS } from '../types/enum';
 
@@ -45,11 +46,6 @@ export class CreateActivityDto {
   // -------------------------------------------
   // HACKATHON
   // -------------------------------------------
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
-  )
-  @IsString()
-  name?: string;
 
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
@@ -72,6 +68,33 @@ export class CreateActivityDto {
   @IsString()
   hackDescription?: string;
 
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsString()
+  level?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsString()
+  participantType?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsDate()
+  deadline?: Date;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsString()
+  organizer?: string;
   // -------------------------------------------
   // WORKSHOP
   // -------------------------------------------
@@ -87,13 +110,6 @@ export class CreateActivityDto {
   @IsOptional()
   @IsString()
   speaker?: string;
-
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
-  )
-  @IsOptional()
-  @IsString()
-  organizer?: string;
 
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,

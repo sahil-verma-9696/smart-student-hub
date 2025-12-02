@@ -1,9 +1,6 @@
 import { IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class HackathonDto {
-  @IsString()
-  name: string;
-
   @IsOptional()
   @IsNumber()
   teamSize?: number;
@@ -14,5 +11,17 @@ export class HackathonDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
+  level?: string;
+
+  @IsOptional()
+  @IsString()
+  participantType?: string;
+
+  @IsOptional()
+  @IsString()
+  deadline?: Date;
+
+  @IsOptional()
+  @IsString()
+  organizer?: string;
 }
