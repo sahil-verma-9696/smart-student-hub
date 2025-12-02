@@ -14,7 +14,6 @@ import { AttachmentModule } from './attachment/attachment.module';
 import { AcademicModule } from './academic/academic.module';
 import { AcadmicProgramModule } from './acadmic-program/acadmic-program.module';
 import { MindPioletModule } from './mind-piolet/mind-piolet.module';
-import { MindPioletModule } from './mind-piolet/mind-piolet.module';
 
 @Module({
   imports: [
