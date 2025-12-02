@@ -2,10 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  CardContent,
-  Card,
-} from "@/components/ui/card";
+import { CardContent, Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,7 +13,14 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Calendar, Download, CheckCircle, AlertCircle, Hourglass } from "lucide-react";
+import {
+  Search,
+  Calendar,
+  Download,
+  CheckCircle,
+  AlertCircle,
+  Hourglass,
+} from "lucide-react";
 import { useActivityPageContext } from "@/hooks/useActivityPageContext";
 
 export function ActivityList() {
@@ -56,8 +60,8 @@ export function ActivityList() {
     if (status) filters.status = status;
     if (type) filters.activityType = type;
 
-    fetchFilteredActivities(filters);
-  }, [searchParams]);
+    // fetchFilteredActivities(filters);
+  }, []);
 
   // backend already filtered the data
   const filteredActivities = activities;
@@ -131,7 +135,9 @@ function ActivityCard({ activity }) {
         <h3 className="font-semibold">{activity.title}</h3>
       </div>
 
-      <p className="text-sm text-muted-foreground mt-2">{activity.description}</p>
+      <p className="text-sm text-muted-foreground mt-2">
+        {activity.description}
+      </p>
 
       <div className="flex items-center gap-4 text-xs text-muted-foreground mt-3">
         <div className="flex items-center gap-1">

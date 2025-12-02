@@ -23,12 +23,8 @@ export class Activity {
   @Prop()
   description?: string;
 
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student',
-    required: true,
-  })
-  student: Types.ObjectId;
+  @Prop({ enum: ACTIVITY_STATUS, default: ACTIVITY_STATUS.PENDING })
+  status: ACTIVITY_STATUS;
 
   @Prop({
     enum: ACTIVITY_TYPES,
@@ -36,9 +32,6 @@ export class Activity {
     default: ACTIVITY_TYPES.DEFAULT,
   })
   activityType: ACTIVITY_TYPES;
-
-  @Prop({ enum: ACTIVITY_STATUS, default: ACTIVITY_STATUS.PENDING })
-  status: ACTIVITY_STATUS;
 
   @Prop({ type: [String], default: [] })
   externalLinks?: string[];
@@ -58,6 +51,15 @@ export class Activity {
   })
   attachments?: Types.ObjectId[];
 
+  @Prop({
+    type: [
+      {
+        platform: String,
+        url: String,
+      },
+    ],
+    default: [],
+  })
   socialLinks?: [
     {
       platform: string;
@@ -65,19 +67,17 @@ export class Activity {
     },
   ];
 
-  // @Prop({
-  //   type: { type: Types.ObjectId, ref: 'Facutly' },
-  //   default: null,
-  // })
-  // assignFaculty?: Types.ObjectId;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student',
+    required: true,
+  })
+  student: Types.ObjectId;
 
-  reviewedBy?: Types.ObjectId[];
-
-  reviewedAt?: Date;
-
-  verifiedBy?: Types.ObjectId;
-
-  verifiedAt?: Date;
+  @Prop({
+    type: { type: Types.ObjectId, ref: 'Facutly' },
+  })
+  approvedBy?: Types.ObjectId;
 }
 
 export const ActivitySchema = SchemaFactory.createForClass(Activity);

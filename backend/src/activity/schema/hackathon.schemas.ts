@@ -4,9 +4,6 @@ import { HydratedDocument } from 'mongoose';
 export type HackathonDocument = HydratedDocument<HackathonActivity>;
 @Schema()
 export class HackathonActivity {
-  @Prop({ required: true })
-  name: string;
-
   @Prop()
   teamSize?: number;
 
