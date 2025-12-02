@@ -1,4 +1,4 @@
-import { StudentManagement } from "./student-managment";
+import { StudentManagement } from "./student-management";
 
 export default function StudentManagementPage() {
   return (

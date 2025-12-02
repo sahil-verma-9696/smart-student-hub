@@ -96,11 +96,12 @@ export class UserService implements IUserService {
       throw new Error('User not found');
     }
 
-    if (dto.name && dto.email && dto.gender && dto.contactInfo) {
-      user.name = dto.name;
-      user.email = dto.email;
-      user.gender = dto.gender;
-      user.contactInfo = dto.contactInfo;
+    // Apply partial updates
+    if (dto.name !== undefined) user.name = dto.name;
+    if (dto.email !== undefined) user.email = dto.email;
+    if (dto.gender !== undefined) user.gender = dto.gender;
+    if (dto.contactInfo !== undefined) {
+      user.contactInfo = { ...user.contactInfo, ...dto.contactInfo };
     }
 
     await user.save();
