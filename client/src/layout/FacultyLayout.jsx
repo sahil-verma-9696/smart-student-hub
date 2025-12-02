@@ -17,11 +17,11 @@ import {
 } from "lucide-react";
 
 const navigationConfig = [
-  { name: "Crono Compose", href: "/dashboard", icon: Home },
-  { name: "Approval pannel", href: "/approval-pannel", icon: Calendar },
+  { name: "Crono Compose", href: "/faculty/dashboard", icon: Home },
+  { name: "Approval pannel", href: "/faculty/approval-pannel", icon: Calendar },
   { name: "Activities", href: "/faculty/activities", icon: Trophy },
-  { name: "Profile", href: "/profile", icon: BarChart3 },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Profile", href: "/faculty/profile", icon: BarChart3 },
+  { name: "Settings", href: "/faculty/settings", icon: Settings },
 ];
 const FacultyLayout = () => {
   return (

@@ -28,7 +28,7 @@ import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { ActivityConfig } from "./constants";
-import { useActivityPageContext } from "@/hooks/useActivityPageContext";
+import { useActivityPageContext } from "../../../hooks/useActivityPageContext";
 
 registerPlugin(
   FilePondPluginImagePreview,

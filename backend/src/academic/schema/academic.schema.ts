@@ -5,11 +5,17 @@ export type AcademicDocument = HydratedDocument<Academic>;
 
 @Schema({ timestamps: true })
 export class Academic {
-  @Prop({ required: false })
-  department?: string;
+  @Prop({ required: false, default: '' })
+  degree?: string;
 
-  @Prop()
-  course?: string;
+  @Prop({ required: false, default: '' })
+  program?: string;
+
+  @Prop({ required: false, default: '' })
+  branch?: string;
+
+  @Prop({ required: false, default: '' })
+  specialization?: string;
 
   @Prop()
   year?: number;

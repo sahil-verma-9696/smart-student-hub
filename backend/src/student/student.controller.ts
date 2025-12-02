@@ -6,14 +6,21 @@ import {
   BadRequestException,
   UseInterceptors,
   UploadedFile,
+  Query,
+  Patch,
+  Param,
+  UseGuards,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 // import { UpdateStudentDto } from './dto/update-student.dto';
-import { CreateStudentDto } from './dto/create-basic-student.dto';
+import { CreateStudentDto } from './dto/create-student.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { BulkCreateStudentDto } from './dto/create-basic-student-bulk.dto';
+import { BulkCreateStudentDto } from './dto/create-student-bulk.dto';
+import { StudentQueryDto } from './dto/query.dto';
+import { UpdateStudentDto } from './dto/update-student.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('student')
 export class StudentController {
@@ -64,6 +71,9 @@ export class StudentController {
     return this.studentService.bulkUploadStudents(file.path);
   }
 
+  // --------------------
+  // BULK UPLOAD VIA JSON
+  // --------------------
   @Post('/bulk/json')
   async createOrBulkUploadJson(@Body() body: BulkCreateStudentDto) {
     const data: BulkCreateStudentDto = {
@@ -74,22 +84,13 @@ export class StudentController {
   }
 
   @Get()
-  findAll() {
-    return this.studentService.getAllStudents();
+  findStudents(@Query() query: StudentQueryDto) {
+    return this.studentService.findStudents(query);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.studentService.findOne(id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
-  //   return this.studentService.update(+id, updateStudentDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.studentService.remove(+id);
-  // }
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  updateStudent(@Param('id') id: string, @Body() body: UpdateStudentDto) {
+    return this.studentService.updateStudentAcademicDetails(id, body);
+  }
 }

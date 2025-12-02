@@ -65,6 +65,12 @@ export class Activity {
     },
   ];
 
+  // @Prop({
+  //   type: { type: Types.ObjectId, ref: 'Facutly' },
+  //   default: null,
+  // })
+  // assignFaculty?: Types.ObjectId;
+
   reviewedBy?: Types.ObjectId[];
 
   reviewedAt?: Date;
