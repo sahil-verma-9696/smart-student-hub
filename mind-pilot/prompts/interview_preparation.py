@@ -11,11 +11,14 @@ model = ChatGroq(
     model="llama-3.1-8b-instant"
 )
 
-def interview_prep(student, role, conversation):
+def interview_prep(student, role, conversation, message=""):
     prompt = f"""
 You are an **Industry-Level Role-Specific Interview Preparation AI**.
 Generate **ONLY relevant interview preparation content** for the role:
 🎯 **Target Job Role: {role}**
+
+**User Request/Context:**
+"{message}"
 
 ---
 
@@ -129,4 +132,26 @@ Common fresher mistakes:
 - Final output MUST look like a professional interview mentor  
 
 """
-    return model.invoke(prompt).content
+    try:
+        return model.invoke(prompt).content
+    except Exception as e:
+        return f"""
+# ⚠️ AI Service Unavailable (Fallback Mode)
+
+**Error:** {str(e)}
+
+## 🧠 CORE SKILLS REQUIRED for {role}
+• Skill 1
+• Skill 2
+• Skill 3
+
+## 🧩 REAL INTERVIEW EXPECTATIONS
+• Expect technical questions
+• Expect behavioral questions
+
+## 🧠 LAST 2 WEEKS PREPARATION
+• Week 1: Revision
+• Week 2: Mocks
+
+**Note:** Please check your API key configuration.
+"""

@@ -1,0 +1,79 @@
+# MindPilot API Documentation
+
+## 🌐 Base URL
+**https://doyle-unhumourous-mark.ngrok-free.dev**
+
+---
+
+## 1️⃣ Get Student Data (Initialization)
+**Endpoint:** `GET /py/student/{id}/get-mindpiolet`
+**Description:** Fetches **ONLY** the MindPilot generated content (Gap Analysis Report).
+
+**Request:**
+- **Method:** GET
+- **URL:** `{{base_url}}/py/student/692d6decc0fd661ac1aa8d02/get-mindpiolet`
+
+**Response (JSON):**
+```json
+{
+  "result": "\n===== AI OUTPUT =====\n\n🎯 SKILL GAP ANALYSIS REPORT\n..."
+}
+```
+
+---
+
+## 2️⃣ MindPilot Interaction (AI Features)
+**Endpoint:** `POST /py/student/{id}/mind-piolet`
+**Description:** Interact with the AI using specific options. Supports **continuous conversation** by passing the `conversation` history.
+
+### 🔹 Option 1: Skill Analysis
+**Request:**
+```json
+{
+  "option": "Skill Analysis",
+  "message": "Focus on my backend skills"
+}
+```
+
+### 🔹 Option 2: Roadmap Provider
+**Request:**
+```json
+{
+  "option": "Roadmap Provider",
+  "role": "Backend Developer",
+  "message": "I want to learn AWS specifically"
+}
+```
+
+### 🔹 Option 3: Interview Preparation
+**Request:**
+```json
+{
+  "option": "Interview Preparation",
+  "role": "Backend Developer",
+  "conversation": [
+    {"role": "user", "content": "I want to practice SQL."},
+    {"role": "assistant", "content": "Okay, what is a JOIN?"}
+  ],
+  "message": "Explain INNER JOIN"
+}
+```
+
+### 🔹 Option 4: General Chat / Advice
+**Request:**
+```json
+{
+  "message": "How do I start learning Python?",
+  "conversation": [
+    {"role": "user", "content": "I am a beginner."},
+    {"role": "assistant", "content": "Great! Start with Python basics."}
+  ]
+}
+```
+**Response:** Personalized advice based on student profile AND conversation history.
+
+---
+
+## 3️⃣ Flexible Route (GET or POST)
+**Endpoint:** `POST /py/student/{id}/get-mindpiolet`
+**Description:** Can also be used for interaction if a body is sent.

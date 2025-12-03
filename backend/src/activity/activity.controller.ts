@@ -41,6 +41,15 @@ export class ActivityController {
   update(@Param('id') id: string, @Body() dto: UpdateActivityDto) {
     return this.activityService.update(id, dto);
   }
+  @Patch(':id/approved')
+  appupdate(@Param('id') id: string, @Body() dto: UpdateActivityDto) {
+    return this.activityService.updateapp(id, dto);
+  }
+  @Patch(':id/rejected')
+  rejupdate(@Param('id') id: string, @Body() dto: UpdateActivityDto) {
+    return this.activityService.updaterej(id, dto);
+  }
+  
 
   @Delete(':id')
   remove(@Param('id') id: string) {

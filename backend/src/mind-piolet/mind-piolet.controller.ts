@@ -14,7 +14,7 @@ import { mindPioletData } from './constants';
 
 @Controller('mind-piolet')
 export class MindPioletController {
-  constructor(private readonly mindPioletService: MindPioletService) {}
+  constructor(private readonly mindPioletService: MindPioletService) { }
 
   @Post()
   create(@Body() createMindPioletDto: CreateMindPioletDto) {
@@ -26,9 +26,18 @@ export class MindPioletController {
     return mindPioletData;
   }
 
+  @Post('chat')
+  chat(@Body() body: { message: string; role: string; studentId: string }) {
+    return this.mindPioletService.chat(
+      body.message,
+      body.role,
+      body.studentId,
+    );
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.mindPioletService.findOne(+id);
+    return this.mindPioletService.getMindPioletData(id);
   }
 
   @Patch(':id')

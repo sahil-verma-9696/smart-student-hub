@@ -11,7 +11,10 @@ model = ChatGroq(
     model="llama-3.1-8b-instant"
 )
 
-def generate_roadmap(student, gap, role):
+def generate_roadmap(student, gap, role, message="", conversation=None):
+    conversation_text = ""
+    if conversation:
+        conversation_text = "\n".join([f"{msg.get('role', 'User')}: {msg.get('content', '')}" for msg in conversation])
     prompt = f"""
 You are **MindPilot**, an industry-level career mentor who generates **100% role-specific** and **fully personalized** guidance.
 
@@ -27,6 +30,12 @@ Below is the student's profile:
 - Job Description (target): {student.get("job_description", "Not Provided")}
 
 Target Role: **{role}**
+
+**Conversation History:**
+{conversation_text}
+
+**User Request/Context:**
+"{message}"
 
 ---
 
@@ -155,4 +164,27 @@ End with **one motivational sentence** addressed directly to {student.get("name"
 If ANY technology/tool/framework/skill is NOT required for `{role}`,  
 **DO NOT generate it.**
 """
-    return model.invoke(prompt).content
+    try:
+        return model.invoke(prompt).content
+    except Exception as e:
+        return f"""
+# ⚠️ AI Service Unavailable (Fallback Mode)
+
+**Error:** {str(e)}
+
+# ⏳ TIME-BASED LEARNING ROADMAP for {role}
+
+### ⭐ PHASE 1 (2–4 weeks) — Role Fundamentals
+• Learn Core Concepts
+• Understand Basic Tools
+
+### ⭐ PHASE 2 (1–2 months) — Hands-on Skills
+• Build 2-3 Projects
+• Practice Coding
+
+### ⭐ PHASE 3 (1–2 months) — Industry Ready
+• Portfolio Building
+• Mock Interviews
+
+**Note:** Please check your API key configuration.
+"""

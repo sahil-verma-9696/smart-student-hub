@@ -97,6 +97,26 @@ export class ActivityService {
     return updated;
   }
 
+  async updateapp(id: string, dto: UpdateActivityDto) {
+    const updated = await this.activityModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+
+    if (!updated) throw new NotFoundException('Activity not found');
+
+    return updated;
+  }
+
+  async updaterej(id: string, dto: UpdateActivityDto) {
+    const updated = await this.activityModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+
+    if (!updated) throw new NotFoundException('Activity not found');
+
+    return updated;
+  }
+
   // -----------------------------
   // DELETE
   // -----------------------------

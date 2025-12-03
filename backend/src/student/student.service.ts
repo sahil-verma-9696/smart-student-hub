@@ -51,6 +51,104 @@ export class StudentService {
       throw new Error(`Institute not found for ID: ${instituteId}`);
     }
   }
+    //count students 
+            async getInstituteStudentStats(
+          instituteId: string,
+        ): Promise<any> {
+          const match: any = {};
+        
+          // Match by institute
+          if (instituteId) {
+            match.institute = new Types.ObjectId(instituteId);
+          }
+        
+          const aggregation =
+            await this.studentModel.aggregate([
+              { $match: match },
+            
+              // ------------------------------------------
+              // JOIN ACTIVITY COLLECTION
+              // ------------------------------------------
+              {
+                $lookup: {
+                  from: 'activities',
+                  localField: '_id',
+                  foreignField: 'student',
+                  as: 'activities',
+                },
+              },
+            
+              { $unwind: '$activities' },
+            
+              {
+                $facet: {
+                  // ------------------------------------------
+                  // 1. STATUS COUNTS
+                  // ------------------------------------------
+                  statusStats: [
+                    {
+                      $group: {
+                        _id: '$activities.status',
+                        count: { $sum: 1 },
+                      },
+                    },
+                  ],
+                
+                  // ------------------------------------------
+                  // 2. TYPE COUNTS
+                  // ------------------------------------------
+                  typeStats: [
+                    {
+                      $group: {
+                        _id: '$activities.activityType',
+                        count: { $sum: 1 },
+                      },
+                    },
+                  ],
+                
+                  // ------------------------------------------
+                  // 3. TRENDING TYPE (MOST COMMON)
+                  // ------------------------------------------
+                  trendingType: [
+                    {
+                      $group: {
+                        _id: '$activities.activityType',
+                        count: { $sum: 1 },
+                      },
+                    },
+                    { $sort: { count: -1 } },
+                    { $limit: 1 },
+                  ],
+                
+                  // ------------------------------------------
+                  // 4. TOTAL STUDENTS IN INSTITUTE
+                  // ------------------------------------------
+                  totalStudents: [
+                    {
+                      $group: {
+                        _id: null,
+                        total: { $addToSet: '$_id' },
+                      },
+                    },
+                    {
+                      $project: {
+                        count: { $size: '$total' },
+                      },
+                    },
+                  ],
+                },
+              },
+            ]);
+          
+          return aggregation[0];
+        }
+
+
+
+
+
+
+
 
   /***************************************
    * CREATE SINGLE STUDENT WITH ACADEMIC
@@ -60,6 +158,13 @@ export class StudentService {
     session?: ClientSession,
   ): Promise<StudentDocument> {
     await this.studentModel.syncIndexes();
+
+   
+    
+
+
+
+
 
     // Validate institute
     await this.validateInstitute(dto.instituteId);

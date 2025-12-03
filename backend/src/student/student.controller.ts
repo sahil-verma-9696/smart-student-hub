@@ -71,6 +71,16 @@ export class StudentController {
     return this.studentService.bulkUploadStudents(file.path);
   }
 
+
+
+  
+  // route for count student 
+      @Get('stats/institute')
+    getInstituteActivityStats(@Query('instituteId') instituteId: string) {
+      return this.studentService.getInstituteStudentStats(instituteId);
+    }
+
+
   // --------------------
   // BULK UPLOAD VIA JSON
   // --------------------
