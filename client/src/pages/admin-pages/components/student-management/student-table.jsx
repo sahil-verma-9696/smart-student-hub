@@ -61,12 +61,19 @@ import {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {students.map((student) => {
+                  const userDetails = student.basicUserDetails || student;
+                  return (
+                  <TableRow key={student._id || student.id}>
+                    <TableCell className="font-medium">{userDetails.name || student.name}</TableCell>
+                    <TableCell>{userDetails.email || student.email}</TableCell>
                 {students.map((student) => (
                   <TableRow key={student._id}>
                     <TableCell className="font-medium">{student.basicUserDetails.name}</TableCell>
                     <TableCell>{student.basicUserDetails.email}</TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="capitalize">
+                        {userDetails.gender || student.gender}
                         {student.basicUserDetails.gender}
                       </Badge>
                     </TableCell>
@@ -76,16 +83,19 @@ import {
                       )}
                     </TableCell>
                     <TableCell>
+                      {userDetails.contactInfo?.phone || student.contactInfo?.phone || (
                       {student.basicUserDetails.contactInfo?.phone || (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
+                      {userDetails.contactInfo?.alternatePhone || student.contactInfo?.alternatePhone || (
                       {student.basicUserDetails.contactInfo?.alternatePhone || (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
+                      {userDetails.contactInfo?.address || student.contactInfo?.address || (
                       {student.basicUserDetails.contactInfo?.address || (
                         <span className="text-muted-foreground">—</span>
                       )}
@@ -95,14 +105,15 @@ import {
                         variant="ghost"
                         size="icon"
                         className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => onDelete(student.id)}
+                        onClick={() => onDelete(student._id || student.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Delete student</span>
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

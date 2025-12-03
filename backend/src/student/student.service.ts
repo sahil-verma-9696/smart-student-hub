@@ -365,11 +365,12 @@ export class StudentService {
 
     return this.studentModel
       .find(filter)
-      .populate(['basicUserDetails', 'academicDetails', 'institute'])
+      .populate('basicUserDetails','-passwordHash')
+      .populate('academicDetails')
+      .populate('institute')
       .exec();
   }
 
-  // TODO : to make for basicUserDetails
   async updateStudentAcademicDetails(studentId: string, dto: UpdateStudentDto) {
     const instituteId = dto.instituteId;
 
@@ -394,10 +395,38 @@ export class StudentService {
       );
     }
 
-    // Apply allowed fields from DTO
-    Object.assign(student, dto);
+    // Separate student-specific fields from user fields
+    const studentFields: Partial<Student> = {};
+    const userFields: any = {};
 
-    return student;
+    // Student-specific fields
+    if (dto.roll_number !== undefined) studentFields.roll_number = dto.roll_number;
+
+    // User-specific fields (stored in basicUserDetails)
+    if (dto.name !== undefined) userFields.name = dto.name;
+    if (dto.email !== undefined) userFields.email = dto.email;
+    if (dto.gender !== undefined) userFields.gender = dto.gender;
+    if (dto.contactInfo !== undefined) userFields.contactInfo = dto.contactInfo;
+
+    // Update student document if there are student fields
+    if (Object.keys(studentFields).length > 0) {
+      Object.assign(student, studentFields);
+      await student.save();
+    }
+
+    // Update user document if there are user fields
+    if (Object.keys(userFields).length > 0) {
+      await this.userService.updateUser(
+        student.basicUserDetails.toString(),
+        userFields,
+      );
+    }
+
+    // Return updated student with populated user details
+    return await this.studentModel
+      .findById(studentId)
+      .populate('basicUserDetails','-passwordHash')
+      .populate('academicDetails');
   }
 
   /**
