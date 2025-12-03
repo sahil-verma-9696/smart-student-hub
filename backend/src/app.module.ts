@@ -13,6 +13,7 @@ import { UpDocsModule } from './up-docs/up-docs.module';
 import { AttachmentModule } from './attachment/attachment.module';
 import { AcademicModule } from './academic/academic.module';
 import { AcadmicProgramModule } from './acadmic-program/acadmic-program.module';
+import { AssignmentModule } from './assignment/assignment.module';
 
 @Module({
   imports: [
@@ -45,6 +46,8 @@ import { AcadmicProgramModule } from './acadmic-program/acadmic-program.module';
     AcademicModule,
 
     AcadmicProgramModule,
+
+    AssignmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

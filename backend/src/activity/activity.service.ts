@@ -6,10 +6,13 @@ import { Activity, ActivityDocument } from './schema/activity.schema';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { SearchActivityDto } from './dto/search-activity.dto';
+import { ApproveActivityDto } from './dto/approve-activity.dto';
+import { RejectActivityDto } from './dto/reject-activity.dto';
 import {
   ActivityAggregationResult,
   ActivityStatsResponse,
 } from './types/types';
+import { ACTIVITY_STATUS } from './types/enum';
 
 @Injectable()
 export class ActivityService {
@@ -26,7 +29,13 @@ export class ActivityService {
 
     return this.activityModel
       .findById(activity._id)
-      .populate('student')
+      .populate({
+        path: 'student',
+        populate: [
+          { path: 'basicUserDetails', select: '-passwordHash' },
+          { path: 'institute' }
+        ]
+      })
       .populate('attachments');
   }
 
@@ -64,7 +73,13 @@ export class ActivityService {
     return this.activityModel
       .find(filter)
       .sort({ createdAt: -1 })
-      .populate('student')
+      .populate({
+        path: 'student',
+        populate: [
+          { path: 'basicUserDetails', select: '-passwordHash' },
+          { path: 'institute' }
+        ]
+      })
       .populate('attachments')
       .exec();
   }
@@ -75,7 +90,13 @@ export class ActivityService {
   async findOne(id: string) {
     const activity = await this.activityModel
       .findById(id)
-      .populate('student')
+      .populate({
+        path: 'student',
+        populate: [
+          { path: 'basicUserDetails', select: '-passwordHash' },
+          { path: 'institute' }
+        ]
+      })
       .populate('attachments')
       .exec();
 
@@ -200,6 +221,84 @@ export class ActivityService {
     formatted.trendingActivityType = result.trendingType[0]?._id || null;
 
     return formatted;
+  }
+
+  /******************************************************
+   * @description Approve an activity
+   * @param activityId - The ID of the activity to approve
+   * @param dto - ApproveActivityDto with optional remarks
+   * @returns {Promise<ActivityDocument>}
+   *******************************************************/
+  async approveActivity(
+    activityId: string,
+    dto: ApproveActivityDto,
+  ): Promise<ActivityDocument> {
+    const activity = await this.activityModel.findById(activityId);
+
+    if (!activity) {
+      throw new NotFoundException('Activity not found');
+    }
+
+    activity.status = ACTIVITY_STATUS.APPROVED;
+    if (dto.remarks) {
+      activity.remarks = dto.remarks;
+    }
+
+    await activity.save();
+
+    const populated = await this.activityModel
+      .findById(activityId)
+      .populate({
+        path: 'student',
+        populate: [
+          { path: 'basicUserDetails', select: '-passwordHash' },
+          { path: 'institute' },
+        ],
+      })
+      .populate('attachments')
+      .exec();
+
+    if (!populated) throw new NotFoundException('Activity not found after update');
+
+    return populated;
+  }
+
+  /******************************************************
+   * @description Reject an activity with mandatory remarks
+   * @param activityId - The ID of the activity to reject
+   * @param dto - RejectActivityDto with mandatory remarks
+   * @returns {Promise<ActivityDocument>}
+   *******************************************************/
+  async rejectActivity(
+    activityId: string,
+    dto: RejectActivityDto,
+  ): Promise<ActivityDocument> {
+    const activity = await this.activityModel.findById(activityId);
+
+    if (!activity) {
+      throw new NotFoundException('Activity not found');
+    }
+
+    activity.status = ACTIVITY_STATUS.REJECTED;
+    activity.remarks = dto.remarks;
+
+    await activity.save();
+
+    const populated = await this.activityModel
+      .findById(activityId)
+      .populate({
+        path: 'student',
+        populate: [
+          { path: 'basicUserDetails', select: '-passwordHash' },
+          { path: 'institute' },
+        ],
+      })
+      .populate('attachments')
+      .exec();
+
+    if (!populated) throw new NotFoundException('Activity not found after update');
+
+    return populated;
   }
 
   /******************************************************
