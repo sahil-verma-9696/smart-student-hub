@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Types } from 'mongoose';
+import { FilterQuery, Model, PipelineStage, Types } from 'mongoose';
 
 import { Activity, ActivityDocument } from './schema/activity.schema';
 import { CreateActivityDto } from './dto/create-activity.dto';
@@ -33,8 +33,8 @@ export class ActivityService {
         path: 'student',
         populate: [
           { path: 'basicUserDetails', select: '-passwordHash' },
-          { path: 'institute' }
-        ]
+          { path: 'institute' },
+        ],
       })
       .populate('attachments');
   }
@@ -45,6 +45,7 @@ export class ActivityService {
   async findAll(query: SearchActivityDto) {
     const filter: FilterQuery<ActivityDocument> = {};
 
+    // --- normal filters on Activity fields ---
     if (query.activityType) {
       filter.activityType = query.activityType;
     }
@@ -54,7 +55,7 @@ export class ActivityService {
     }
 
     if (query.studentId) {
-      filter.student = query.studentId;
+      filter.student = new Types.ObjectId(query.studentId);
     }
 
     if (query.title) {
@@ -63,25 +64,64 @@ export class ActivityService {
 
     if (query.from || query.to) {
       const dateRange: { $gte?: Date; $lte?: Date } = {};
-
       if (query.from) dateRange.$gte = new Date(query.from);
       if (query.to) dateRange.$lte = new Date(query.to);
-
       filter.dateStart = dateRange;
     }
 
-    return this.activityModel
-      .find(filter)
-      .sort({ createdAt: -1 })
-      .populate({
+    const pipeline: PipelineStage[] = [];
+
+    // base match on Activity collection
+    if (Object.keys(filter).length > 0) {
+      pipeline.push({ $match: filter });
+    }
+
+    // --- filter by student's instituteId using $lookup ---
+    if (query.instituteId) {
+      const instituteObjectId = new Types.ObjectId(query.instituteId);
+
+      pipeline.push(
+        {
+          $lookup: {
+            from: 'students', // collection name for Student
+            localField: 'student', // Activity.student (ObjectId)
+            foreignField: '_id', // Student._id
+            as: 'studentDoc',
+          },
+        },
+        { $unwind: '$studentDoc' },
+        {
+          $match: {
+            'studentDoc.institute': instituteObjectId, // Student.institute == instituteId
+          },
+        },
+        // put back only the ObjectId in `student` so Mongoose populate still works
+        {
+          $set: {
+            student: '$studentDoc._id',
+          },
+        },
+        { $unset: 'studentDoc' },
+      );
+    }
+
+    // sort like before
+    pipeline.push({ $sort: { createdAt: -1 } });
+
+    // run aggregation
+    const activities = await this.activityModel.aggregate(pipeline).exec();
+
+    // now use normal populate for student + attachments
+    return this.activityModel.populate(activities, [
+      {
         path: 'student',
         populate: [
           { path: 'basicUserDetails', select: '-passwordHash' },
-          { path: 'institute' }
-        ]
-      })
-      .populate('attachments')
-      .exec();
+          { path: 'institute' },
+        ],
+      },
+      { path: 'attachments' },
+    ]);
   }
 
   // -----------------------------
@@ -94,8 +134,8 @@ export class ActivityService {
         path: 'student',
         populate: [
           { path: 'basicUserDetails', select: '-passwordHash' },
-          { path: 'institute' }
-        ]
+          { path: 'institute' },
+        ],
       })
       .populate('attachments')
       .exec();
@@ -258,7 +298,8 @@ export class ActivityService {
       .populate('attachments')
       .exec();
 
-    if (!populated) throw new NotFoundException('Activity not found after update');
+    if (!populated)
+      throw new NotFoundException('Activity not found after update');
 
     return populated;
   }
@@ -296,7 +337,8 @@ export class ActivityService {
       .populate('attachments')
       .exec();
 
-    if (!populated) throw new NotFoundException('Activity not found after update');
+    if (!populated)
+      throw new NotFoundException('Activity not found after update');
 
     return populated;
   }

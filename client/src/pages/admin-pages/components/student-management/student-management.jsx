@@ -7,24 +7,24 @@ import { UpdateStudentsCsv } from "./update-students-csv";
 import { Users, UserPlus, Upload, FileEdit } from "lucide-react";
 import { studentAPI } from "@/services/api";
 import toast from "react-hot-toast";
-
-const INSTITUTE_ID = "69290e999fe3149cdc284749";
+import useAuthContext from "@/hooks/useAuthContext";
 
 export function StudentManagement() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuthContext();
 
-  /*********************************************************
-   * **************** Fetch Students ********************
-   *********************************************************/
-  useEffect(() => {
-    fetchStudents();
-  }, []);
+  const INSTITUTE_ID = user?.institute._id;
 
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await studentAPI.getStudents({ instituteId: INSTITUTE_ID });
+      if (!INSTITUTE_ID) {
+        throw new Error("Institute ID not found");
+      }
+      const response = await studentAPI.getStudents({
+        instituteId: INSTITUTE_ID,
+      });
       setStudents(response.data || response || []);
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -33,6 +33,13 @@ export function StudentManagement() {
       setLoading(false);
     }
   };
+
+  /*********************************************************
+   * **************** Fetch Students ********************
+   *********************************************************/
+  useEffect(() => {
+    fetchStudents();
+  }, [user]);
 
   /*********************************************************
    * **************** Handle Add Student ********************
@@ -76,24 +83,32 @@ export function StudentManagement() {
     try {
       setLoading(true);
       const response = await studentAPI.bulkCreateStudents(payload);
-      
+
       // Handle the response from backend
       const result = response.data || response;
-      
-      if (result.status === 'success') {
+
+      if (result.status === "success") {
         toast.success(`Successfully added ${result.created} students!`);
-      } else if (result.status === 'partial') {
-        const duplicates = result.failures.filter(f => f.reason?.includes('duplicate key')).length;
+      } else if (result.status === "partial") {
+        const duplicates = result.failures.filter((f) =>
+          f.reason?.includes("duplicate key")
+        ).length;
         if (duplicates > 0) {
-          toast.success(`Added ${result.created} students. ${duplicates} already exist (duplicates skipped).`);
+          toast.success(
+            `Added ${result.created} students. ${duplicates} already exist (duplicates skipped).`
+          );
         } else {
-          toast.success(`Added ${result.created} students. ${result.failed} failed.`);
+          toast.success(
+            `Added ${result.created} students. ${result.failed} failed.`
+          );
         }
         if (result.failures && result.failures.length > 0) {
           console.warn("Failed students:", result.failures);
         }
-      } else if (result.status === 'failed') {
-        const allDuplicates = result.failures.every(f => f.reason?.includes('duplicate key'));
+      } else if (result.status === "failed") {
+        const allDuplicates = result.failures.every((f) =>
+          f.reason?.includes("duplicate key")
+        );
         if (allDuplicates) {
           toast.error(`All students already exist in the database.`);
         } else {
@@ -101,12 +116,14 @@ export function StudentManagement() {
         }
         console.error("Failed students:", result.failures);
       }
-      
+
       await fetchStudents(); // Refresh the list
       return response;
     } catch (error) {
       console.error("Error bulk adding students:", error);
-      toast.error(error.response?.data?.message || "Failed to bulk add students");
+      toast.error(
+        error.response?.data?.message || "Failed to bulk add students"
+      );
       throw error;
     } finally {
       setLoading(false);
@@ -118,7 +135,7 @@ export function StudentManagement() {
     try {
       setLoading(true);
       let updatedCount = 0;
-      
+
       for (const update of updates) {
         const student = students.find(
           (s) =>
@@ -137,7 +154,10 @@ export function StudentManagement() {
             ...(update.contactInfo && { contactInfo: update.contactInfo }),
           };
 
-          await studentAPI.updateStudent(student._id || student.id, updatePayload);
+          await studentAPI.updateStudent(
+            student._id || student.id,
+            updatePayload
+          );
           updatedCount++;
         }
       }

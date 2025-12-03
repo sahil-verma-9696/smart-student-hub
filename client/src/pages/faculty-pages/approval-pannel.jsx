@@ -44,7 +44,7 @@ export default function ApprovalPannel() {
       
       // Get faculty ID from user context
       const facultyId = user?._id
-      const instituteId = user?.institute
+      const instituteId = user?.institute?._id
       
       if (!facultyId) {
         console.error('No faculty ID found in user context')
