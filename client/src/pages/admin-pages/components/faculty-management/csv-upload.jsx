@@ -22,13 +22,14 @@ const CSV_CONFIG = {
     "name",
     "email",
     "gender",
-    "roll_number",
+    "employee_code",
     "phone",
     "alternatePhone",
     "address",
   ],
+  optionalHeaders: ["department", "designation"],
   headerAliases: {
-    roll_number: ["rollnumber", "roll number", "roll", "roll_no"],
+    employee_code: ["employeecode", "employee code", "emp_code", "emp-code"],
     alternatePhone: ["alternate_phone", "altphone", "alt_phone", "alt-contact"],
   },
 };
@@ -50,6 +51,7 @@ export function CsvUpload({ onUpload }) {
   const [fileName, setFileName] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleFile = (file) => {
     setError(null);
@@ -60,7 +62,7 @@ export function CsvUpload({ onUpload }) {
       header: true,
       skipEmptyLines: true,
       dynamicTyping: false,
-      complete: ({ data, errors, meta }) => {
+      complete: async ({ data, errors, meta }) => {
         try {
           if (errors.length > 0) {
             console.error(errors);
@@ -83,59 +85,68 @@ export function CsvUpload({ onUpload }) {
           }
 
           // Transform rows
-          const students = [];
+          const faculties = [];
 
           for (const row of data) {
-            const student = {};
+            const faculty = {};
 
             for (const key of CSV_CONFIG.requiredHeaders) {
               const headerKey = findHeaderKey(Object.keys(row), key);
               const value = row[headerKey];
 
               if (!value) {
-                student.valid = false;
+                faculty.valid = false;
                 break;
               }
 
               if (key === "gender") {
                 const g = value.toLowerCase();
                 if (!["male", "female", "other"].includes(g)) {
-                  student.valid = false;
+                  faculty.valid = false;
                 }
-                student.gender = g;
+                faculty.gender = g;
               } else if (
                 ["phone", "alternatePhone"].includes(key)
               ) {
-                student[key] = value.toString();
+                faculty[key] = value.toString();
               } else {
-                student[key] = value;
+                faculty[key] = value;
               }
             }
 
-            if (student.valid === false) continue;
+            if (faculty.valid === false) continue;
 
-            students.push({
-              name: student.name,
-              email: student.email,
-              gender: student.gender,
-              roll_number: student.roll_number,
+            // Handle optional fields
+            const departmentKey = findHeaderKey(Object.keys(row), "department");
+            const designationKey = findHeaderKey(Object.keys(row), "designation");
+
+            faculties.push({
+              name: faculty.name,
+              email: faculty.email,
+              gender: faculty.gender,
+              employee_code: faculty.employee_code,
+              department: departmentKey ? row[departmentKey] : undefined,
+              designation: designationKey ? row[designationKey] : undefined,
               contactInfo: {
-                phone: student.phone,
-                alternatePhone: student.alternatePhone,
-                address: student.address,
+                phone: faculty.phone,
+                alternatePhone: faculty.alternatePhone,
+                address: faculty.address,
               },
             });
           }
 
-          if (students.length === 0) {
+          if (faculties.length === 0) {
             throw new Error("No valid rows found in CSV");
           }
 
-          onUpload(students);
-          setSuccess({ count: students.length });
+          setUploading(true);
+          await onUpload(faculties);
+          setSuccess({ count: faculties.length });
+          setUploading(false);
         } catch (err) {
           console.error(err);
           setError(err.message);
+          setUploading(false);
         }
       },
     });
@@ -143,21 +154,21 @@ export function CsvUpload({ onUpload }) {
 
   const downloadTemplate = () => {
     const template =
-      "name,email,gender,roll_number,phone,alternatePhone,address\n" +
-      `Student One,student1@gmail.com,male,S1,9876501234,9988776655,"JP Nagar, Bengaluru"\n` +
-      `Student Two,student2@gmail.com,female,S2,9876505678,8877665544,"BTM Layout, Bengaluru"\n`;
+      "name,email,gender,employee_code,department,designation,phone,alternatePhone,address\n" +
+      `Faculty One,faculty1@gmail.com,male,FAC001,Computer Science,Assistant Professor,9876501234,9988776655,"JP Nagar, Bengaluru"\n` +
+      `Faculty Two,faculty2@gmail.com,female,FAC002,Mathematics,Associate Professor,9876505678,8877665544,"BTM Layout, Bengaluru"\n`;
 
     const blob = new Blob([template], { type: "text/csv" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "students_template.csv";
+    a.download = "faculty_template.csv";
     a.click();
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Upload Students via CSV</CardTitle>
+        <CardTitle>Upload Faculty via CSV</CardTitle>
         <CardDescription>
           Uses PapaParse (comma-safe). Addresses with commas will not break
           columns.
@@ -185,13 +196,23 @@ export function CsvUpload({ onUpload }) {
             accept=".csv"
             className="hidden"
             onChange={(e) => handleFile(e.target.files[0])}
+            disabled={uploading}
           />
 
-          <label htmlFor="csv-upload" className="cursor-pointer">
-            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <p className="font-medium">
-              {fileName || "Drop your CSV here or click to browse"}
-            </p>
+          <label htmlFor="csv-upload" className={uploading ? "cursor-not-allowed opacity-50" : "cursor-pointer"}>
+            {uploading ? (
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                <p className="font-medium">Uploading faculty...</p>
+              </div>
+            ) : (
+              <>
+                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                <p className="font-medium">
+                  {fileName || "Drop your CSV here or click to browse"}
+                </p>
+              </>
+            )}
           </label>
         </div>
 
@@ -206,7 +227,7 @@ export function CsvUpload({ onUpload }) {
           <Alert className="border-green-200 bg-green-50 text-green-800">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
             <AlertDescription>
-              Successfully added {success.count} students!
+              Successfully added {success.count} faculty member{success.count !== 1 ? "s" : ""}!
             </AlertDescription>
           </Alert>
         )}

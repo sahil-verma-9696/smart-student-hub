@@ -12,6 +12,8 @@ import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { SearchActivityDto } from './dto/search-activity.dto';
+import { ApproveActivityDto } from './dto/approve-activity.dto';
+import { RejectActivityDto } from './dto/reject-activity.dto';
 
 @Controller('activities')
 export class ActivityController {
@@ -40,6 +42,16 @@ export class ActivityController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateActivityDto) {
     return this.activityService.update(id, dto);
+  }
+
+  @Patch(':id/approval')
+  approveActivity(@Param('id') id: string, @Body() dto: ApproveActivityDto) {
+    return this.activityService.approveActivity(id, dto);
+  }
+
+  @Patch(':id/rejected')
+  rejectActivity(@Param('id') id: string, @Body() dto: RejectActivityDto) {
+    return this.activityService.rejectActivity(id, dto);
   }
 
   @Delete(':id')

@@ -17,9 +17,10 @@ import PrivateVault from "@/pages/student-pages/PrivateVault";
 import Settings from "@/pages/student-pages/Settings";
 import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-preview";
 import ActivityPageProvider from "@/providers/activity-page-provider";
-import ActivitiesManagment from "@/pages/admin-pages/components/activity-managment/activity-managment";
+import ActivitiesManagement from "@/pages/admin-pages/components/activity-management/activity-management";
 import AdminInstPageProvider from "@/pages/admin-pages/provider/admin-inst.provider";
-import StudentManagmentProvider from "@/pages/admin-pages/provider/student-managment.provider";
+import StudentManagementProvider from "@/pages/admin-pages/provider/student-management.provider";
+import FacultyManagementProvider from "@/pages/admin-pages/provider/faculty-management.provider";
 
 export default createBrowserRouter([
   {
@@ -96,16 +97,16 @@ export default createBrowserRouter([
         Component: AdminDashboardPage,
       },
       {
-        path: "student-managment",
-        Component: StudentManagmentProvider,
+        path: "student-management",
+        Component: StudentManagementProvider,
       },
       {
-        path: "faculty-managment",
-        Component: AdminAddFacultyPage,
+        path: "faculty-management",
+        Component: FacultyManagementProvider,
       },
       {
         path: "activities",
-        Component: ActivitiesManagment,
+        Component: ActivitiesManagement,
       },
       {
         path: "students-panel",
