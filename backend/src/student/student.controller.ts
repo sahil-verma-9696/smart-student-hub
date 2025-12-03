@@ -9,6 +9,8 @@ import {
   Query,
   Patch,
   Param,
+  Delete,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
@@ -88,9 +90,26 @@ export class StudentController {
     return this.studentService.findStudents(query);
   }
 
+  @Get(':id')
+  getStudentById(@Param('id') id: string) {
+    return this.studentService.getById(id);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   updateStudent(@Param('id') id: string, @Body() body: UpdateStudentDto) {
     return this.studentService.updateStudentAcademicDetails(id, body);
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  updateStudentFull(@Param('id') id: string, @Body() body: UpdateStudentDto) {
+    return this.studentService.updateStudent(id, body);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  deleteStudent(@Param('id') id: string) {
+    return this.studentService.deleteStudent(id);
   }
 }

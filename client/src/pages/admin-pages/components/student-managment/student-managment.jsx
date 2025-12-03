@@ -1,50 +1,103 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentTable } from "./student-table";
 import { AddStudentForm } from "./add-student-form";
 import { CsvUpload } from "./csv-upload";
 import { UpdateStudentsCsv } from "./update-students-csv";
 import { Users, UserPlus, Upload, FileEdit } from "lucide-react";
-
-const INSTITUTE_ID = "69290e999fe3149cdc284749";
+import useAuthContext from "@/hooks/useAuthContext";
+import axios from "axios";
 
 export function StudentManagement() {
+  const { user } = useAuthContext();
+  const INSTITUTE_ID = user?.institute?._id;
   const [students, setStudents] = useState([]);
+
+  // Load students for the institute on mount / when institute changes
+  useEffect(() => {
+    const fetchStudents = async () => {
+      if (!INSTITUTE_ID) return;
+
+      try {
+        const res = await axios.get("http://localhost:3000/student", {
+          params: { instituteId: INSTITUTE_ID },
+        });
+
+        // Normalize response: backend may return array or wrapped object
+        const payload = res.data;
+        let list = [];
+
+        if (Array.isArray(payload)) {
+          list = payload;
+        } else if (Array.isArray(payload?.data)) {
+          list = payload.data;
+        } else if (Array.isArray(payload?.successes)) {
+          list = payload.successes;
+        } else if (Array.isArray(payload?.students)) {
+          list = payload.students;
+        }
+
+        setStudents(list);
+      } catch (err) {
+        console.error("Failed to fetch students:", err);
+      }
+    };
+
+    fetchStudents();
+  }, [INSTITUTE_ID]);
 
   /*********************************************************
    * **************** Handle Add Student ********************
    *********************************************************/
-  const addStudent = (studentData) => {
+  const addStudent = async (studentData) => {
     const payload = {
       ...studentData,
       instituteId: INSTITUTE_ID,
-      password: studentData.email, // email === password
+      password: studentData.email, 
     };
 
-    console.log("Adding student:", payload);
+    try {
+      const res = await axios.post("http://localhost:3000/student", payload);
 
-    setStudents((prev) => [...prev, payload]);
+      // Normalize created student
+      const created = Array.isArray(res.data)
+        ? res.data[0]
+        : res.data?.data ?? res.data;
 
-    // Here you can also call your backend:
-    // await axios.post("/students", payload)
+      setStudents((prev) => [...prev, created]);
+
+      console.log("Student added successfully!");
+    } catch (err) {
+      console.error("Failed to add student:", err);
+    }
   };
 
   /*********************************************************
    * **************** Handle Bulk Add Student ********************
    *********************************************************/
   const addStudents = (newStudents) => {
-    const payloads = newStudents.map((student) => ({
-      ...student,
-      instituteId: INSTITUTE_ID,
-      password: student.email, // email === password
-    }));
+    (async () => {
+      const payloads = newStudents.map((student) => ({
+        ...student,
+        instituteId: INSTITUTE_ID,
+        password: student.email, // email === password
+      }));
 
-    console.log(payloads);
+      try {
+        const res = await axios.post("http://localhost:3000/student/bulk/json", {
+          instituteId: INSTITUTE_ID,
+          students: payloads,
+        });
 
-    setStudents((prev) => [...prev, ...payloads]);
+        // backend returns object with `successes` array of created students
+        const created = res.data?.successes ?? [];
 
-    // Backend example:
-    // await axios.post("/students/bulk", payloads)
+        setStudents((prev) => [...prev, ...created]);
+      } catch (err) {
+        console.error("Bulk add failed, falling back to local add:", err);
+        setStudents((prev) => [...prev, ...payloads]);
+      }
+    })();
   };
 
   // Update via CSV (by roll_number)
@@ -79,7 +132,15 @@ export function StudentManagement() {
   };
 
   const deleteStudent = (id) => {
-    setStudents((prev) => prev.filter((s) => s.id !== id));
+    // call backend delete and update UI
+    (async () => {
+      try {
+        await axios.delete(`http://localhost:3000/student/${id}`);
+        setStudents((prev) => prev.filter((s) => s._id !== id));
+      } catch (err) {
+        console.error("Failed to delete student:", err);
+      }
+    })();
   };
 
   return (

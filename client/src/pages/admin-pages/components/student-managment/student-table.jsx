@@ -62,12 +62,12 @@ import {
               </TableHeader>
               <TableBody>
                 {students.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-medium">{student.name}</TableCell>
-                    <TableCell>{student.email}</TableCell>
+                  <TableRow key={student._id}>
+                    <TableCell className="font-medium">{student.basicUserDetails.name}</TableCell>
+                    <TableCell>{student.basicUserDetails.email}</TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="capitalize">
-                        {student.gender}
+                        {student.basicUserDetails.gender}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -76,17 +76,17 @@ import {
                       )}
                     </TableCell>
                     <TableCell>
-                      {student.contactInfo?.phone || (
+                      {student.basicUserDetails.contactInfo?.phone || (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {student.contactInfo?.alternatePhone || (
+                      {student.basicUserDetails.contactInfo?.alternatePhone || (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {student.contactInfo?.address || (
+                      {student.basicUserDetails.contactInfo?.address || (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>

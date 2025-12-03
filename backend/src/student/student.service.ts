@@ -321,6 +321,26 @@ export class StudentService {
     return student;
   }
 
+  /**
+   * Get student by student document id
+   */
+  async getById(studentId: string) {
+    if (!Types.ObjectId.isValid(studentId)) {
+      throw new NotFoundException('Invalid student id');
+    }
+
+    const student = await this.studentModel
+      .findById(new Types.ObjectId(studentId))
+      .populate(['basicUserDetails', 'academicDetails', 'institute'])
+      .exec();
+
+    if (!student) {
+      throw new NotFoundException(`Student ${studentId} not found`);
+    }
+
+    return student;
+  }
+
   /************************************************************
    * *********** GET ALL STUDENTS ACCORDING TO QUERY ***********
    *************************************************************/
@@ -378,6 +398,82 @@ export class StudentService {
     Object.assign(student, dto);
 
     return student;
+  }
+
+  /**
+   * Update student and optionally its user and academic subdocuments.
+   * - Updates basic user fields via UserService
+   * - Updates academic via AcademicService
+   * - Updates student document fields (e.g., roll_number)
+   */
+  async updateStudent(studentId: string, dto: UpdateStudentDto) {
+    // find student
+    const student = await this.studentModel
+      .findById(new Types.ObjectId(studentId))
+      .exec();
+
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    // If user-related fields present, update user
+    const userUpdateFields: any = {};
+    if (dto.name !== undefined) userUpdateFields.name = dto.name;
+    if (dto.email !== undefined) userUpdateFields.email = dto.email;
+    if (dto.gender !== undefined) userUpdateFields.gender = dto.gender;
+    if (dto.contactInfo !== undefined) userUpdateFields.contactInfo = dto.contactInfo;
+
+    if (Object.keys(userUpdateFields).length > 0) {
+      await this.userService.updateUser(student.basicUserDetails.toString(), userUpdateFields as any);
+    }
+
+    // Academic update by id if provided
+    if (dto.academicDetails) {
+      await this.academicService.updateById(
+        student.academicDetails.toString(),
+        dto.academicDetails as any,
+      );
+    }
+
+    // Apply allowed student fields
+    if (dto.roll_number !== undefined) {
+      student.roll_number = dto.roll_number;
+    }
+
+    await student.save();
+
+    return student.populate(['basicUserDetails', 'academicDetails', 'institute']);
+  }
+
+  /**
+   * Delete student and cascade to academic and user
+   */
+  async deleteStudent(studentId: string): Promise<{ deleted: boolean }>
+  {
+    const student = await this.studentModel.findById(studentId).exec();
+
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    // Delete academic
+    try {
+      await this.academicService.delete(student._id.toString());
+    } catch (err) {
+      this.logger.warn(`Failed to delete academic for student ${studentId}: ${err}`);
+    }
+
+    // Delete user
+    try {
+      await this.userService.deleteUser(student.basicUserDetails.toString());
+    } catch (err) {
+      this.logger.warn(`Failed to delete user for student ${studentId}: ${err}`);
+    }
+
+    // Delete student
+    const res = await this.studentModel.deleteOne({ _id: student._id }).exec();
+
+    return { deleted: res.deletedCount > 0 };
   }
 }
 type StudentFilter = Record<string, unknown>;

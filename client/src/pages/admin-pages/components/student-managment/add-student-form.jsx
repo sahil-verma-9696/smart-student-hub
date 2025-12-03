@@ -43,14 +43,14 @@ export function AddStudentForm({ onAdd }) {
     if (!allRequiredFilled) return;
 
     onAdd({
-      name,
-      email,
-      gender,
+      name:name,
+      email:email,
+      gender:gender,
       roll_number: rollNumber,
       contactInfo: {
-        phone,
-        alternatePhone,
-        address,
+        phone:phone,
+        alternatePhone:alternatePhone,
+        address:address,
       },
     });
 
