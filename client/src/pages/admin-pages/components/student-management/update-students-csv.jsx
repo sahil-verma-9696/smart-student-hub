@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import Papa from "papaparse";
 import {
   Card,
   CardContent,
@@ -34,126 +35,97 @@ export function UpdateStudentsCsv({ students, onUpdate }) {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  const parseCsv = (content) => {
-    const lines = content.trim().split("\n");
-    if (lines.length < 2)
-      throw new Error("CSV must have a header row and at least one data row");
-
-    const headerRaw = lines[0].split(",").map((h) => h.trim());
-
-    const missingRequired = UPDATE_CSV_CONFIG.requiredHeaders.filter((key) => {
-      const idx = headerIndex(headerRaw, key);
-      return idx === -1;
-    });
-
-    if (missingRequired.length > 0) {
-      throw new Error(
-        `CSV must have at least the following column(s): ${missingRequired.join(
-          ", "
-        )}`
-      );
-    }
-
-    const idx = {
-      roll_number: headerIndex(headerRaw, "roll_number"),
-      name: headerIndex(headerRaw, "name"),
-      email: headerIndex(headerRaw, "email"),
-      gender: headerIndex(headerRaw, "gender"),
-      phone: headerIndex(headerRaw, "phone"),
-      alternatePhone: headerIndex(headerRaw, "alternatePhone"),
-      address: headerIndex(headerRaw, "address"),
-    };
-
-    const updates = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      const row = lines[i].trim();
-      if (!row) continue;
-
-      const values = row.split(",").map((v) => v.trim());
-      const getVal = (index) =>
-        index >= 0 && index < values.length ? values[index] : "";
-
-      const roll_number = getVal(idx.roll_number);
-      if (!roll_number) continue;
-
-      const update = {
-        roll_number,
-      };
-
-      const name = getVal(idx.name);
-      if (name) update.name = name;
-
-      const email = getVal(idx.email);
-      if (email) update.email = email;
-
-      const gender = getVal(idx.gender)?.toLowerCase();
-      if (gender && ["male", "female", "other"].includes(gender)) {
-        update.gender = gender;
-      }
-
-      const phone = getVal(idx.phone);
-      const alternatePhone = getVal(idx.alternatePhone);
-      const address = getVal(idx.address);
-
-      if (phone || alternatePhone || address) {
-        update.contactInfo = {};
-        if (phone) update.contactInfo.phone = phone;
-        if (alternatePhone) update.contactInfo.alternatePhone = alternatePhone;
-        if (address) update.contactInfo.address = address;
-      }
-
-      updates.push(update);
-    }
-
-    return updates;
-  };
-
   const handleFile = useCallback(
     (file) => {
       setError(null);
       setSuccess(null);
       setFileName(file.name);
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const content = e.target?.result;
-          const updates = parseCsv(content);
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: async ({ data, errors, meta }) => {
+          try {
+            if (errors.length > 0) {
+              console.error(errors);
+              throw new Error("CSV contains formatting issues");
+            }
 
-          if (updates.length === 0) {
-            throw new Error("No valid update records found in CSV");
+            const headers = meta.fields || [];
+            const missingRequired = UPDATE_CSV_CONFIG.requiredHeaders.filter(
+              (key) => !headers.some((h) => normalizeHeader(h) === key.toLowerCase())
+            );
+
+            if (missingRequired.length > 0) {
+              throw new Error(
+                `CSV must have at least the following column(s): ${missingRequired.join(", ")}`
+              );
+            }
+
+            const updates = [];
+
+            for (const row of data) {
+              const roll_number = row.roll_number || row.roll_Number || row.ROLL_NUMBER;
+              if (!roll_number) continue;
+
+              const update = { roll_number };
+
+              if (row.name) update.name = row.name;
+              if (row.email) update.email = row.email;
+
+              const gender = row.gender?.toLowerCase();
+              if (gender && ["male", "female", "other"].includes(gender)) {
+                update.gender = gender;
+              }
+
+              const phone = row.phone;
+              const alternatePhone = row.alternatePhone || row.alternatephone;
+              const address = row.address;
+
+              if (phone || alternatePhone || address) {
+                update.contactInfo = {};
+                if (phone) update.contactInfo.phone = phone;
+                if (alternatePhone) update.contactInfo.alternatePhone = alternatePhone;
+                if (address) update.contactInfo.address = address;
+              }
+
+              updates.push(update);
+            }
+
+            if (updates.length === 0) {
+              throw new Error("No valid update records found in CSV");
+            }
+
+            const matched = updates.filter((u) =>
+              students.some(
+                (s) =>
+                  s.roll_number &&
+                  u.roll_number &&
+                  s.roll_number.toLowerCase().trim() ===
+                    u.roll_number.toLowerCase().trim()
+              )
+            );
+            const notFound = updates
+              .filter(
+                (u) =>
+                  !students.some(
+                    (s) =>
+                      s.roll_number &&
+                      u.roll_number &&
+                      s.roll_number.toLowerCase().trim() ===
+                        u.roll_number.toLowerCase().trim()
+                  )
+              )
+              .map((u) => u.roll_number);
+
+            await onUpdate(updates);
+            setSuccess({ count: matched.length, notFound });
+          } catch (err) {
+            console.error(err);
+            setError(err instanceof Error ? err.message : "Failed to parse CSV");
           }
-
-          const matched = updates.filter((u) =>
-            students.some(
-              (s) =>
-                s.roll_number &&
-                u.roll_number &&
-                s.roll_number.toLowerCase().trim() ===
-                  u.roll_number.toLowerCase().trim()
-            )
-          );
-          const notFound = updates
-            .filter(
-              (u) =>
-                !students.some(
-                  (s) =>
-                    s.roll_number &&
-                    u.roll_number &&
-                    s.roll_number.toLowerCase().trim() ===
-                      u.roll_number.toLowerCase().trim()
-                )
-            )
-            .map((u) => u.roll_number);
-
-          onUpdate(updates);
-          setSuccess({ count: matched.length, notFound });
-        } catch (err) {
-          setError(err instanceof Error ? err.message : "Failed to parse CSV");
-        }
-      };
-      reader.readAsText(file);
+        },
+      });
     },
     [onUpdate, students]
   );
@@ -186,6 +158,15 @@ export function UpdateStudentsCsv({ students, onUpdate }) {
       return;
     }
 
+    const escapeCSV = (value) => {
+      if (value == null) return "";
+      const str = String(value);
+      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
     const header = [
       "roll_number",
       "name",
@@ -195,17 +176,24 @@ export function UpdateStudentsCsv({ students, onUpdate }) {
       "alternatePhone",
       "address",
     ].join(",");
-    const rows = students.map((s) =>
-      [
-        s.roll_number || "",
-        s.name || "",
-        s.email || "",
-        s.gender || "",
-        s.contactInfo?.phone || "",
-        s.contactInfo?.alternatePhone || "",
-        s.contactInfo?.address || "",
-      ].join(",")
-    );
+    
+    const rows = students.map((s) => {
+      // Handle both populated and unpopulated basicUserDetails
+      const userDetails = typeof s.basicUserDetails === 'object' && s.basicUserDetails !== null 
+        ? s.basicUserDetails 
+        : {};
+      
+      return [
+        escapeCSV(s.roll_number),
+        escapeCSV(userDetails.name || s.name || ""),
+        escapeCSV(userDetails.email || s.email || ""),
+        escapeCSV(userDetails.gender || s.gender || ""),
+        escapeCSV(userDetails.contactInfo?.phone || s.contactInfo?.phone || ""),
+        escapeCSV(userDetails.contactInfo?.alternatePhone || s.contactInfo?.alternatePhone || ""),
+        escapeCSV(userDetails.contactInfo?.address || s.contactInfo?.address || ""),
+      ].join(",");
+    });
+    
     const csv = [header, ...rows].join("\n");
 
     const blob = new Blob([csv], { type: "text/csv" });

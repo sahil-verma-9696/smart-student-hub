@@ -5,6 +5,7 @@ import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { UserModule } from 'src/user/user.module';
 import { InstituteModule } from 'src/institute/institute.module';
+import { AssignmentModule } from 'src/assignment/assignment.module';
 import { StudentModule } from 'src/student/student.module';
 import { FacultyModule } from 'src/faculty/faculty.module';
 
@@ -13,6 +14,7 @@ import { FacultyModule } from 'src/faculty/faculty.module';
     MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }]),
     UserModule,
     InstituteModule,
+    AssignmentModule,
     StudentModule,
     FacultyModule,
   ],
