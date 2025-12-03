@@ -20,45 +20,88 @@ import {
 import { useEffect, useState } from "react";
 import useGlobalContext from "@/hooks/useGlobalContext";
 import useAuthContext from "@/hooks/useAuthContext";
+import { studentAPI, facultyAPI, activityAPI } from "@/services/api";
+import { formatDistanceToNow } from "date-fns";
 
 export default function AdminDashboardPage() {
   const [recentItems, setRecentItems] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
-
-  // Simulated data
-  useEffect(() => {
-    setRecentItems([
-      {
-        id: 1,
-        name: "Amit Verma",
-        role: "Student",
-        email: "amit@gmail.com",
-        date: "2025-11-23",
-      },
-      {
-        id: 2,
-        name: "Priya Sharma",
-        role: "Faculty",
-        email: "priya@college.com",
-        date: "2025-11-22",
-      },
-      {
-        id: 3,
-        name: "Rohit Singh",
-        role: "Student",
-        email: "rohit@gmail.com",
-        date: "2025-11-22",
-      },
-    ]);
-
-    setRecentActivities([
-      { id: 1, action: "New student registered", time: "2 hours ago" },
-      { id: 2, action: "Faculty uploaded attendance", time: "5 hours ago" },
-      { id: 3, action: "Admin updated institute settings", time: "Yesterday" },
-    ]);
-  }, []);
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalFaculty: 0,
+    departments: 0,
+    pendingRequests: 0,
+  });
 
   const { user } = useAuthContext();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const instituteId = user?.institute?._id || user?.institute;
+        
+        // Fetch data in parallel
+        const [students, faculty, activities] = await Promise.all([
+          studentAPI.getStudents({ instituteId }),
+          facultyAPI.getFaculties({ instituteId, limit: 1000 }), // High limit to get count
+          activityAPI.getActivities({ instituteId }), // Assuming this endpoint supports filtering
+        ]);
+
+        // 1. Calculate Stats
+        const uniqueDepartments = new Set(faculty.map(f => f.department).filter(Boolean));
+        const pending = activities.filter(a => a.status === 'pending');
+
+        setStats({
+          totalStudents: students.length,
+          totalFaculty: faculty.length,
+          departments: uniqueDepartments.size,
+          pendingRequests: pending.length,
+        });
+
+        // 2. Process Recent Registrations (Students + Faculty)
+        const allUsers = [
+          ...students.map(s => ({
+            id: s._id,
+            name: s.basicUserDetails?.name || "Unknown",
+            role: "Student",
+            email: s.basicUserDetails?.email,
+            date: s.createdAt,
+          })),
+          ...faculty.map(f => ({
+            id: f._id,
+            name: f.basicUserDetails?.name || "Unknown",
+            role: "Faculty",
+            email: f.basicUserDetails?.email,
+            date: f.createdAt,
+          }))
+        ];
+
+        // Sort by date descending and take top 5
+        const sortedUsers = allUsers.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+        setRecentItems(sortedUsers);
+
+        // 3. Process Recent Activities
+        const sortedActivities = activities
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 5)
+          .map(act => ({
+            id: act._id,
+            action: act.title || "Untitled Activity",
+            time: act.createdAt,
+            status: act.status
+          }));
+        
+        setRecentActivities(sortedActivities);
+
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      }
+    };
+
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen max-h-screen overflow-y-auto bg-[#f8f9fa]">
@@ -83,7 +126,7 @@ export default function AdminDashboardPage() {
               <CardContent className="flex items-center justify-between p-5">
                 <div>
                   <p className="text-sm text-[#6b7280]">Total Students</p>
-                  <h2 className="text-2xl font-bold">1,243</h2>
+                  <h2 className="text-2xl font-bold">{stats.totalStudents}</h2>
                 </div>
                 <GraduationCap className="w-10 h-10 text-black" />
               </CardContent>
@@ -93,7 +136,7 @@ export default function AdminDashboardPage() {
               <CardContent className="flex items-center justify-between p-5">
                 <div>
                   <p className="text-sm text-[#6b7280]">Total Faculty</p>
-                  <h2 className="text-2xl font-bold">123</h2>
+                  <h2 className="text-2xl font-bold">{stats.totalFaculty}</h2>
                 </div>
                 <Users className="w-10 h-10 text-black" />
               </CardContent>
@@ -103,7 +146,7 @@ export default function AdminDashboardPage() {
               <CardContent className="flex items-center justify-between p-5">
                 <div>
                   <p className="text-sm text-[#6b7280]">Departments</p>
-                  <h2 className="text-2xl font-bold">18</h2>
+                  <h2 className="text-2xl font-bold">{stats.departments}</h2>
                 </div>
                 <Building2 className="w-10 h-10 text-black" />
               </CardContent>
@@ -113,7 +156,7 @@ export default function AdminDashboardPage() {
               <CardContent className="flex items-center justify-between p-5">
                 <div>
                   <p className="text-sm text-[#6b7280]">Pending Requests</p>
-                  <h2 className="text-2xl font-bold">7</h2>
+                  <h2 className="text-2xl font-bold">{stats.pendingRequests}</h2>
                 </div>
                 <AlertCircle className="w-10 h-10 text-black" />
               </CardContent>
@@ -175,9 +218,14 @@ export default function AdminDashboardPage() {
                         {item.role} • {item.email}
                       </p>
                     </div>
-                    <span className="text-xs text-[#6b7280]">{item.date}</span>
+                    <span className="text-xs text-[#6b7280]">
+                      {item.date ? formatDistanceToNow(new Date(item.date), { addSuffix: true }) : 'N/A'}
+                    </span>
                   </div>
                 ))}
+                {recentItems.length === 0 && (
+                  <p className="text-sm text-gray-500 text-center py-4">No recent registrations found.</p>
+                )}
               </CardContent>
             </Card>
 
@@ -198,11 +246,19 @@ export default function AdminDashboardPage() {
                   >
                     <div className="flex items-center gap-3">
                       <Activity className="w-4 h-4 text-black" />
-                      <p className="text-sm">{act.action}</p>
+                      <div>
+                        <p className="text-sm font-medium">{act.action}</p>
+                        <p className="text-xs text-gray-500 capitalize">{act.status}</p>
+                      </div>
                     </div>
-                    <p className="text-xs text-[#6b7280]">{act.time}</p>
+                    <p className="text-xs text-[#6b7280]">
+                      {act.time ? formatDistanceToNow(new Date(act.time), { addSuffix: true }) : 'N/A'}
+                    </p>
                   </div>
                 ))}
+                {recentActivities.length === 0 && (
+                  <p className="text-sm text-gray-500 text-center py-4">No recent activities found.</p>
+                )}
               </CardContent>
             </Card>
           </div>
