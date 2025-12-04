@@ -34,14 +34,16 @@ export class Faculty {
     default: '',
     required: false,
   })
-  department: string;
-
-  @Prop({
-    type: String,
-    default: '',
-    required: false,
-  })
   designation: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Department', required: true })
+  department: Types.ObjectId;
+
+  @Prop([{ type: Types.ObjectId, ref: 'Branch' }])
+  teachesBranches: Types.ObjectId[];
+
+  @Prop([{ type: Types.ObjectId, ref: 'Specialization' }])
+  teachesSpecializations: Types.ObjectId[];
 }
 
 export const FacultySchema = SchemaFactory.createForClass(Faculty);

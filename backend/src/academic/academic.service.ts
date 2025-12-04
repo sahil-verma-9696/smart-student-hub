@@ -3,12 +3,47 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Academic, AcademicDocument } from './schema/academic.schema';
 import { UpdateAcademicDto } from './dto/update-academic.dto';
+import { Program, ProgramDocument } from './schema/program.schema';
+import { Branch, BranchDocument } from './schema/branch.schema';
+import { Department, DepartmentDocument } from './schema/department.schema';
+import {
+  Specialization,
+  SpecializationDocument,
+} from './schema/specialization.schema';
+import { YearLevel, YearLevelDocument } from './schema/year-level.schema';
+import { Degree, DegreeDocument } from './schema/degree.schema';
+import { Section, SectionDocument } from './schema/section.schema';
+import { Semester, SemesterDocument } from './schema/semester.schema';
 
 @Injectable()
 export class AcademicService {
   constructor(
     @InjectModel(Academic.name)
     private readonly academicModel: Model<AcademicDocument>,
+
+    @InjectModel(Program.name)
+    private readonly programModel: Model<ProgramDocument>,
+
+    @InjectModel(Branch.name)
+    private readonly branchModel: Model<BranchDocument>,
+
+    @InjectModel(Department.name)
+    private readonly departmentModel: Model<DepartmentDocument>,
+
+    @InjectModel(Specialization.name)
+    private readonly specializationModel: Model<SpecializationDocument>,
+
+    @InjectModel(YearLevel.name)
+    private readonly yearLevelModel: Model<YearLevelDocument>,
+
+    @InjectModel(Degree.name)
+    private readonly degreeModel: Model<DegreeDocument>,
+
+    @InjectModel(Section.name)
+    private readonly sectionModel: Model<SectionDocument>,
+
+    @InjectModel(Semester.name)
+    private readonly semesterModel: Model<SemesterDocument>,
   ) {}
 
   async create(details: {
@@ -94,5 +129,247 @@ export class AcademicService {
     }
 
     return updated;
+  }
+
+  /* ============================================================
+                        PROGRAM CRUD
+  ============================================================ */
+  async createProgram(instituteId: string, dto: { name: string }) {
+    return this.programModel.create({
+      name: dto.name,
+      institute: instituteId,
+    });
+  }
+
+  async getPrograms(instituteId: string) {
+    return this.programModel.find({ institute: instituteId });
+  }
+
+  async updateProgram(id: string, dto: any) {
+    const program = await this.programModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!program) throw new NotFoundException('Program not found');
+    return program;
+  }
+
+  async deleteProgram(id: string) {
+    const deleted = await this.programModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Program not found');
+    return { message: 'Program deleted' };
+  }
+
+  /* ============================================================
+                        DEGREE CRUD
+  ============================================================ */
+  async createDegree(
+    programId: string,
+    instituteId: string,
+    dto: { name: string },
+  ) {
+    return this.degreeModel.create({
+      name: dto.name,
+      program: programId,
+      institute: instituteId,
+    });
+  }
+
+  async getDegrees(programId: string) {
+    return this.degreeModel.find({ program: programId });
+  }
+
+  async updateDegree(id: string, dto: any) {
+    const degree = await this.degreeModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!degree) throw new NotFoundException('Degree not found');
+    return degree;
+  }
+
+  async deleteDegree(id: string) {
+    const deleted = await this.degreeModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Degree not found');
+    return { message: 'Degree deleted' };
+  }
+
+  /* ============================================================
+                        DEPARTMENT CRUD
+  ============================================================ */
+  async createDepartment(instituteId: string, dto: { name: string }) {
+    return this.departmentModel.create({
+      name: dto.name,
+      institute: instituteId,
+    });
+  }
+
+  async getDepartments(instituteId: string) {
+    return this.departmentModel.find({ institute: instituteId });
+  }
+
+  async updateDepartment(id: string, dto: any) {
+    const dept = await this.departmentModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!dept) throw new NotFoundException('Department not found');
+    return dept;
+  }
+
+  async deleteDepartment(id: string) {
+    const deleted = await this.departmentModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Department not found');
+    return { message: 'Department deleted' };
+  }
+
+  /* ============================================================
+                        BRANCH CRUD
+  ============================================================ */
+  async createBranch(
+    degreeId: string,
+    departmentId: string,
+    dto: { name: string },
+  ) {
+    return this.branchModel.create({
+      name: dto.name,
+      degree: degreeId,
+      department: departmentId,
+    });
+  }
+
+  async getBranches(degreeId: string) {
+    return this.branchModel.find({ degree: degreeId }).populate('department');
+  }
+
+  async updateBranch(id: string, dto: any) {
+    const branch = await this.branchModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!branch) throw new NotFoundException('Branch not found');
+    return branch;
+  }
+
+  async deleteBranch(id: string) {
+    const deleted = await this.branchModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Branch not found');
+    return { message: 'Branch deleted' };
+  }
+
+  /* ============================================================
+                        SPECIALIZATION CRUD
+  ============================================================ */
+  async createSpecialization(branchId: string, dto: { name: string }) {
+    return this.specializationModel.create({
+      name: dto.name,
+      branch: branchId,
+    });
+  }
+
+  async getSpecializations(branchId: string) {
+    return this.specializationModel.find({ branch: branchId });
+  }
+
+  async updateSpecialization(id: string, dto: any) {
+    const spec = await this.specializationModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!spec) throw new NotFoundException('Specialization not found');
+    return spec;
+  }
+
+  async deleteSpecialization(id: string) {
+    const deleted = await this.specializationModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Specialization not found');
+    return { message: 'Specialization deleted' };
+  }
+
+  /* ============================================================
+                        YEAR LEVEL CRUD
+  ============================================================ */
+  async createYearLevel(degreeId: string, dto: { year: number }) {
+    return this.yearLevelModel.create({
+      year: dto.year,
+      degree: degreeId,
+    });
+  }
+
+  async getYearLevels(degreeId: string) {
+    return this.yearLevelModel.find({ degree: degreeId });
+  }
+
+  async updateYearLevel(id: string, dto: any) {
+    const year = await this.yearLevelModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!year) throw new NotFoundException('Year level not found');
+    return year;
+  }
+
+  async deleteYearLevel(id: string) {
+    const deleted = await this.yearLevelModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Year level not found');
+    return { message: 'Year level deleted' };
+  }
+
+  /* ============================================================
+                        SEMESTER CRUD
+  ============================================================ */
+  async createSemester(yearId: string, dto: { semNumber: number }) {
+    return this.semesterModel.create({
+      semNumber: dto.semNumber,
+      year: yearId,
+    });
+  }
+
+  async getSemesters(yearId: string) {
+    return this.semesterModel.find({ year: yearId });
+  }
+
+  async updateSemester(id: string, dto: any) {
+    const sem = await this.semesterModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!sem) throw new NotFoundException('Semester not found');
+    return sem;
+  }
+
+  async deleteSemester(id: string) {
+    const deleted = await this.semesterModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Semester not found');
+    return { message: 'Semester deleted' };
+  }
+
+  /* ============================================================
+                        SECTION CRUD
+  ============================================================ */
+  async createSection(
+    specId: string,
+    semesterId: string,
+    dto: { name: string; seatCapacity: number },
+  ) {
+    return this.sectionModel.create({
+      name: dto.name,
+      seatCapacity: dto.seatCapacity,
+      specialization: specId,
+      semester: semesterId,
+    });
+  }
+
+  async getSections(specId: string) {
+    return this.sectionModel
+      .find({ specialization: specId })
+      .populate('semester');
+  }
+
+  async updateSection(id: string, dto: any) {
+    const section = await this.sectionModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
+    if (!section) throw new NotFoundException('Section not found');
+    return section;
+  }
+
+  async deleteSection(id: string) {
+    const deleted = await this.sectionModel.findByIdAndDelete(id);
+    if (!deleted) throw new NotFoundException('Section not found');
+    return { message: 'Section deleted' };
   }
 }

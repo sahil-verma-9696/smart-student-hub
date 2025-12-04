@@ -42,7 +42,7 @@ export class NotificationGateway
     }
     this.userSockets.get(userId)!.add(socketId);
 
-    client.join(userId); // private room (optional)
+    await client.join(userId); // private room (optional)
 
     console.log(`User connected: ${userId}, socket: ${socketId}`);
   }
@@ -68,8 +68,8 @@ export class NotificationGateway
 
   // testing
   @SubscribeMessage('ping')
-  handleTest(client: Socket, payload: any) {
-    client.emit('pong', { message: 'Working fine!', payload });
+  handleTest(client: Socket) {
+    client.emit('pong', { message: 'Working fine!' });
   }
 
   // 🔥 send notification to ALL active devices of a user

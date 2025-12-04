@@ -185,9 +185,12 @@ export class FacultyService {
     const userFields: any = {};
 
     // Faculty-specific fields
-    if (dto.department !== undefined) facultyFields.department = dto.department;
-    if (dto.designation !== undefined) facultyFields.designation = dto.designation;
-    if (dto.employee_code !== undefined) facultyFields.employee_code = dto.employee_code;
+    if (dto.department !== undefined)
+      facultyFields.department = new Types.ObjectId(dto.department);
+    if (dto.designation !== undefined)
+      facultyFields.designation = dto.designation;
+    if (dto.employee_code !== undefined)
+      facultyFields.employee_code = dto.employee_code;
 
     // User-specific fields
     if (dto.name !== undefined) userFields.name = dto.name;
@@ -203,11 +206,16 @@ export class FacultyService {
 
     // Update user document if there are user fields
     if (Object.keys(userFields).length > 0) {
-      await this.userService.updateUser(faculty.basicUserDetails.toString(), userFields);
+      await this.userService.updateUser(
+        faculty.basicUserDetails.toString(),
+        userFields,
+      );
     }
 
     // Return updated faculty with populated user details
-    return await this.facultyModel.findById(id).populate('basicUserDetails', '-passwordHash');
+    return await this.facultyModel
+      .findById(id)
+      .populate('basicUserDetails', '-passwordHash');
   }
 
   async remove(id: string) {

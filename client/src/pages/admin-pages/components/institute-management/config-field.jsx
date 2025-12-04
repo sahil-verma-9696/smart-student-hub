@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Lock, CheckCircle2, AlertCircle, Send, Loader2 } from "lucide-react";
 
-export default function ConfigField({
+export function ConfigField({
   config,
   value,
   onChange,

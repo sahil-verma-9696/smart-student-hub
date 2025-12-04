@@ -1,27 +1,4 @@
 export const instituteFormConfig = [
-  /*******************************************
-   * *********** Branding Information ***********
-   *******************************************/
-  {
-    id: "branding",
-    title: "Branding",
-    description: "Institute logo and visual identity",
-    icon: "image",
-    fields: [
-      {
-        id: "logo",
-        label: "Institute Logo",
-        type: "image",
-        editable: true,
-        required: true,
-        description: "Upload logo (PNG, JPG, max 2MB, min 200x200px)",
-      },
-    ],
-  },
-
-  /*******************************************
-   * *********** Basic Information ***********
-   *******************************************/
   {
     id: "basic-info",
     title: "Basic Information",
@@ -53,21 +30,21 @@ export const instituteFormConfig = [
         required: true,
         description: "Official code assigned by regulatory body",
       },
-      // {
-      //   id: "establishedYear",
-      //   label: "Established Year",
-      //   type: "number",
-      //   editable: false,
-      //   required: true,
-      // },
-      // {
-      //   id: "accreditationStatus",
-      //   label: "Accreditation Status",
-      //   type: "text",
-      //   editable: false,
-      //   required: true,
-      //   description: "Updated by accreditation authority",
-      // },
+      {
+        id: "establishedYear",
+        label: "Established Year",
+        type: "number",
+        editable: false,
+        required: true,
+      },
+      {
+        id: "accreditationStatus",
+        label: "Accreditation Status",
+        type: "text",
+        editable: false,
+        required: true,
+        description: "Updated by accreditation authority",
+      },
       {
         id: "instituteType",
         label: "Institute Type",
@@ -78,14 +55,11 @@ export const instituteFormConfig = [
           { value: "government", label: "Government" },
           { value: "private", label: "Private" },
           { value: "autonomous", label: "Autonomous" },
+          { value: "deemed", label: "Deemed University" },
         ],
-        description: "Institute Type cannot be changed after registration",
       },
     ],
   },
-  /*******************************************
-   * *********** Contact Information ***********
-   *******************************************/
   {
     id: "contact-info",
     title: "Contact Information",
@@ -99,10 +73,10 @@ export const instituteFormConfig = [
         placeholder: "admin@institute.edu",
         editable: true,
         required: true,
-        // verification: {
-        //   required: true,
-        //   type: "email",
-        // },
+        verification: {
+          required: true,
+          type: "email",
+        },
         validation: {
           pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
         },
@@ -114,10 +88,10 @@ export const instituteFormConfig = [
         placeholder: "+91 XXXXX XXXXX",
         editable: true,
         required: true,
-        // verification: {
-        //   required: true,
-        //   type: "phone",
-        // },
+        verification: {
+          required: true,
+          type: "phone",
+        },
         validation: {
           pattern: "^\\+?[1-9]\\d{1,14}$",
         },
@@ -140,10 +114,6 @@ export const instituteFormConfig = [
       },
     ],
   },
-
-  /*******************************************
-   * *********** Address Information ***********
-   *******************************************/
   {
     id: "address",
     title: "Address Details",
@@ -201,12 +171,30 @@ export const instituteFormConfig = [
       },
     ],
   },
+  {
+    id: "branding",
+    title: "Branding",
+    description: "Institute logo and visual identity",
+    icon: "image",
+    fields: [
+      {
+        id: "logo",
+        label: "Institute Logo",
+        type: "image",
+        editable: true,
+        required: true,
+        description: "Upload logo (PNG, JPG, max 2MB, min 200x200px)",
+      },
+    ],
+  },
 ];
 
-/*******************************************
- * *********** Academic Hierarchy ***********
- *******************************************/
 export const academicHierarchyConfig = {
+  departments: {
+    editable: true,
+    allowAdd: true,
+    allowDelete: true,
+  },
   programs: {
     editable: true,
     allowAdd: true,
@@ -227,11 +215,23 @@ export const academicHierarchyConfig = {
     allowAdd: true,
     allowDelete: true,
   },
+  yearLevels: {
+    editable: true,
+    allowAdd: true,
+    allowDelete: true,
+  },
+  semesters: {
+    editable: true,
+    allowAdd: true,
+    allowDelete: true,
+  },
+  sections: {
+    editable: true,
+    allowAdd: true,
+    allowDelete: true,
+  },
 };
 
-/*******************************************
- * *********** Primary Admin Credentials ***********
- *******************************************/
 export const adminCredentialsConfig = {
   id: "admin-credentials",
   title: "Primary Admin Details",
@@ -253,10 +253,10 @@ export const adminCredentialsConfig = {
       placeholder: "admin@institute.edu",
       editable: true,
       required: true,
-      // verification: {
-      //   required: true,
-      //   type: "email",
-      // },
+      verification: {
+        required: true,
+        type: "email",
+      },
     },
     {
       id: "adminPhone",
@@ -265,10 +265,10 @@ export const adminCredentialsConfig = {
       placeholder: "+91 XXXXX XXXXX",
       editable: true,
       required: true,
-      // verification: {
-      //   required: true,
-      //   type: "phone",
-      // },
+      verification: {
+        required: true,
+        type: "phone",
+      },
     },
     {
       id: "adminDesignation",

@@ -22,11 +22,14 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-import AcademicHierarchy from "./academic-hirarchy";
-import AdminCredentialsSection from "./admin-credentials-section";
-import ConfigField from "./config-field";
-import { instituteFormConfig, academicHierarchyConfig } from "./ui-config";
-import LogoUpload from "./logo-upload";
+import { AcademicHierarchy } from "./academic-hierarchy";
+import { AdminCredentialsSection } from "./admin-credentials-section";
+import { ConfigField } from "./config-field";
+import {
+  instituteFormConfig,
+  academicHierarchyConfig,
+} from "./ui-config";
+import { LogoUpload } from "./logo-upload";
 import { initialData } from "./constants";
 
 const iconMap = {
@@ -36,7 +39,7 @@ const iconMap = {
   image: <ImageIcon className="h-5 w-5" />,
 };
 
-export default function InstituteAdminPage() {
+export function InstituteAdminPage() {
   const [data, setData] = useState(initialData);
   const [verifyingField, setVerifyingField] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,6 +58,10 @@ export default function InstituteAdminPage() {
       setData((prev) => ({ ...prev, logo: reader.result }));
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleDepartmentsChange = (departments) => {
+    setData((prev) => ({ ...prev, departments }));
   };
 
   const handleVerify = async (field) => {
@@ -87,7 +94,9 @@ export default function InstituteAdminPage() {
         {/* 🔥 Sticky Top Header */}
         <div className="sticky top-0 z-20 bg-background border-b py-4 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Institute Settings</h2>
+            <h2 className="text-2xl font-bold text-foreground">
+              Institute Settings
+            </h2>
             <p className="text-muted-foreground mt-1">
               View and manage your institute information.
             </p>
@@ -117,7 +126,7 @@ export default function InstituteAdminPage() {
         <Tabs defaultValue="basic" className="w-full">
           <TabsList className="w-full justify-start">
             <TabsTrigger value="basic">Basic Details</TabsTrigger>
-            <TabsTrigger value="academic">Academic Programs</TabsTrigger>
+            <TabsTrigger value="academic">Academic Details</TabsTrigger>
             <TabsTrigger value="admin">Admin Details</TabsTrigger>
           </TabsList>
 
@@ -184,19 +193,23 @@ export default function InstituteAdminPage() {
                     <GraduationCap className="h-5 w-5" />
                   </div>
                   <div>
-                    <CardTitle>Academic Programs</CardTitle>
-                    <CardDescription>
-                      Manage programs, degrees, branches & specializations
+                    <CardTitle className="text-foreground">
+                      Academic Programs
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                      Manage departments, programs, degrees, branches,
+                      specializations, years, semesters, and sections
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-
               <CardContent>
                 <AcademicHierarchy
                   programs={data.programs}
+                  departments={data.departments}
                   config={academicHierarchyConfig}
-                  onChange={handleProgramsChange}
+                  onProgramsChange={handleProgramsChange}
+                  onDepartmentsChange={handleDepartmentsChange}
                 />
               </CardContent>
             </Card>

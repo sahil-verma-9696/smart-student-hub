@@ -7,10 +7,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle2, AlertTriangle } from "lucide-react";
-import ConfigField from "./config-field";
+import {ConfigField} from "./config-field";
 import { adminCredentialsConfig } from "./ui-config";
 
-export default function AdminCredentialsSection({
+export function AdminCredentialsSection({
   data,
   onChange,
   onVerify,

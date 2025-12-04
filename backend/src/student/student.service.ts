@@ -384,12 +384,12 @@ export class StudentService {
     }
 
     // Update AcademicDetails of student
-    if (dto.academicDetails) {
-      await this.academicService.updateById(
-        student.academicDetails.toString(),
-        dto.academicDetails,
-      );
-    }
+    // if (dto.academicDetails) {
+    //   await this.academicService.updateById(
+    //     student.academicDetails.toString(),
+    //     dto.academicDetails,
+    //   );
+    // } 
 
     // Separate student-specific fields from user fields
     const studentFields: Partial<Student> = {};

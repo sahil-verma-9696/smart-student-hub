@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, X, ImageIcon } from "lucide-react";
 
-export default function LogoUpload({
+export function LogoUpload({
   currentLogo,
   onUpload,
   onRemove,
