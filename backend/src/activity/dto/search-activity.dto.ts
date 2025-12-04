@@ -14,4 +14,7 @@ export class SearchActivityDto {
   from?: string;
   @IsOptional()
   to?: string;
+
+  @IsOptional()
+  instituteId?: string;
 }

@@ -6,10 +6,14 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { GlobalExceptionFilter } from './common/filters/exception.filter';
 import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
+import { IoAdapter } from '@nestjs/platform-socket.io'; // 👈 ADD THIS
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
+  // 👇 VERY IMPORTANT
+  app.useWebSocketAdapter(new IoAdapter(app));
+
   // for dot env variables
   const config = app.get(ConfigService);
 

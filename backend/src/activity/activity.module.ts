@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { Activity, ActivitySchema } from './schema/activity.schema';
@@ -10,6 +10,7 @@ import { ActivityController } from './activity.controller';
 import { ActivityService } from './activity.service';
 import { ACTIVITY_TYPES } from './types/enum';
 import { DefaultActivitySchema } from './schema/defaulty.schema';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,8 @@ import { DefaultActivitySchema } from './schema/defaulty.schema';
         },
       },
     ]),
+
+    forwardRef(() => NotificationModule),
   ],
   controllers: [ActivityController],
   providers: [ActivityService],

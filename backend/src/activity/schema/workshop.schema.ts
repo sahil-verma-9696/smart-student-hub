@@ -4,9 +4,6 @@ import { HydratedDocument } from 'mongoose';
 export type WorkshopDocument = HydratedDocument<WorkshopActivity>;
 @Schema()
 export class WorkshopActivity {
-  @Prop({ required: true })
-  workshopName: string;
-
   @Prop()
   speaker?: string;
 

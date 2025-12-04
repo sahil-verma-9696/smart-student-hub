@@ -6,7 +6,7 @@ export const ActivityConfig = {
       {
         name: "description",
         label: "Description",
-        type: "textarea",
+        type: "textarea", 
         section: "basic",
       },
     ],
@@ -58,12 +58,12 @@ export const ActivityConfig = {
         type: "text",
         section: "details",
       },
-      {
-        name: "teamMember",
-        label: "Team Member",
-        type: "text",
-        section: "details",
-      },
+      // {
+      //   name: "teamMember",
+      //   label: "Team Member",
+      //   type: "text",
+      //   section: "details",
+      // },
     ],
   },
 

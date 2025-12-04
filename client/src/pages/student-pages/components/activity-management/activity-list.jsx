@@ -2,10 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  CardContent,
-  Card,
-} from "@/components/ui/card";
+import { CardContent, Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,30 +13,52 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Calendar, Download, CheckCircle, AlertCircle, Hourglass } from "lucide-react";
-import { useActivityPageContext } from "@/hooks/useActivityPageContext";
+import {
+  Search,
+  Calendar,
+  Download,
+  CheckCircle,
+  AlertCircle,
+  Hourglass,
+} from "lucide-react";
+import { useActivityPageContext } from "@/pages/student-pages/hooks/useActivityPageContext";
+import { Image } from "antd";
 
 export function ActivityList() {
+  /*************************************************************
+   * ************* Access ActivityPageContext *******************
+   * ************************************************************/
   const { activities, fetchFilteredActivities } = useActivityPageContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Load initial filters from URL
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("title") || "");
+  /************************************************************
+   * ************* Activity Filters ***********************
+   * ***********************************************************/
+
+  /** title filter */
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("title") || "*"
+  );
+
+  /** Status Filter */
   const [statusFilter, setStatusFilter] = useState(
     searchParams.get("status") || "all"
   );
+
+  /** activityType Filter */
   const [typeFilter, setTypeFilter] = useState(
     searchParams.get("activityType") || "all"
   );
 
   // 1. Update URL when filters change
   useEffect(() => {
+    // Create Map for params
     const params = {};
 
-    if (searchTerm) params.title = searchTerm;
-    if (statusFilter !== "all") params.status = statusFilter;
-    if (typeFilter !== "all") params.activityType = typeFilter;
+    params.title = searchTerm;
+    params.status = statusFilter;
+    params.activityType = typeFilter;
 
     setSearchParams(params);
   }, [searchTerm, statusFilter, typeFilter]);
@@ -55,6 +74,8 @@ export function ActivityList() {
     if (title) filters.title = title;
     if (status) filters.status = status;
     if (type) filters.activityType = type;
+
+    console.log(filters);
 
     fetchFilteredActivities(filters);
   }, [searchParams]);
@@ -131,7 +152,9 @@ function ActivityCard({ activity }) {
         <h3 className="font-semibold">{activity.title}</h3>
       </div>
 
-      <p className="text-sm text-muted-foreground mt-2">{activity.description}</p>
+      <p className="text-sm text-muted-foreground mt-2">
+        {activity.description}
+      </p>
 
       <div className="flex items-center gap-4 text-xs text-muted-foreground mt-3">
         <div className="flex items-center gap-1">
@@ -145,10 +168,12 @@ function ActivityCard({ activity }) {
       {activity.attachments?.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {activity.attachments.map((a) => (
-            <Button key={a._id} size="sm" variant="outline" className="text-xs">
-              <Download className="h-3 w-3 mr-1" />
-              File
-            </Button>
+            <Image
+              key={a._id}
+              src={a.url}
+              alt={a.name}
+              className="w-16 h-16 object-cover rounded-md"
+            />
           ))}
         </div>
       )}

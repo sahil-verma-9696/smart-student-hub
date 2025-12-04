@@ -20,21 +20,21 @@ import { cn } from "@/lib/utils";
 export default function AuthModal({ open, onOpenChange }) {
   const [mode, setMode] = useState("");
 
-  // Login fields + errors
+  // Login fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginErrors, setLoginErrors] = useState({});
 
-  // Institute registration fields + errors
+  // Institute state with YOUR keys
   const [institute, setInstitute] = useState({
-    institute_name: "",
-    institute_type: "",
-    official_email: "",
-    official_phone: "",
-    address_line1: "",
-    city: "",
-    state: "",
-    pincode: "",
+    inst_name: "",
+    inst_type: "",
+    inst_email: "",
+    inst_phone: "",
+    inst_address_line1: "",
+    inst_city: "",
+    inst_state: "",
+    inst_pincode: "",
 
     admin_name: "",
     admin_email: "",
@@ -47,76 +47,78 @@ export default function AuthModal({ open, onOpenChange }) {
       address: "",
     },
 
-    is_affiliated: "true",
-    affiliation_university: "",
-    affiliation_id: "",
+    inst_is_affiliated: "true",
+    inst_affiliation_university: "",
+    inst_affiliation_id: "",
   });
 
   const [registerErrors, setRegisterErrors] = useState({});
 
   // Hooks
-  const {
-    registerInstitute,
-    loading: registerLoading,
-    error: registerError,
-  } = useRegisterInstitute();
-  const {
-    login,
-    loading: loginLoading,
-    error: loginError,
-  } = useAuthantication();
+  const { registerInstitute, loading: registerLoading, error: registerError } =
+    useRegisterInstitute();
 
-  // Update fields
+  const { login, loading: loginLoading, error: loginError } =
+    useAuthantication();
+
+  // Update normal field
   const handleInstituteChange = (field, value) => {
     setInstitute((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Update nested contact info
   const handleAdminContactChange = (field, value) => {
     setInstitute((prev) => ({
       ...prev,
-      admin_contactInfo: {
-        ...prev.admin_contactInfo,
-        [field]: value,
-      },
+      admin_contactInfo: { ...prev.admin_contactInfo, [field]: value },
     }));
   };
 
   /******************************************
-   * FORM VALIDATION
+   * LOGIN VALIDATION
    ******************************************/
   const validateLogin = () => {
     const errs = {};
     if (!email) errs.email = "Email is required";
     if (!password) errs.password = "Password is required";
+
     setLoginErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
+  /******************************************
+   * INSTITUTE VALIDATION (USING YOUR KEYS)
+   ******************************************/
   const validateInstitute = () => {
-    const errs = {};
-    const fields = [
-      "institute_name",
-      "institute_type",
-      "official_email",
-      "official_phone",
-      "address_line1",
-      "city",
-      "state",
-      "pincode",
+    const requiredFields = [
+      "inst_name",
+      "inst_type",
+      "inst_email",
+      "inst_phone",
+      "inst_address_line1",
+      "inst_city",
+      "inst_state",
+      "inst_pincode",
+
       "admin_name",
       "admin_email",
       "admin_password",
       "admin_gender",
-      "affiliation_university",
-      "affiliation_id",
+
+      "inst_affiliation_university",
+      "inst_affiliation_id",
     ];
 
-    fields.forEach((f) => {
-      if (!institute[f]) errs[f] = "Required field";
+    const errs = {};
+
+    requiredFields.forEach((key) => {
+      if (!institute[key]) errs[key] = "Required field";
     });
 
+    // nested contact info
     if (!institute.admin_contactInfo.phone)
       errs["admin_contactInfo.phone"] = "Required";
+
     if (!institute.admin_contactInfo.address)
       errs["admin_contactInfo.address"] = "Required";
 
@@ -139,10 +141,13 @@ export default function AuthModal({ open, onOpenChange }) {
     if (mode === "register-institute") {
       if (!validateInstitute()) return;
 
-      registerInstitute({
+      // prepare trimmed payload
+      const payload = {
         ...institute,
-        is_affiliated: institute.is_affiliated === "true",
-      });
+        inst_is_affiliated: institute.inst_is_affiliated === "true",
+      };
+
+      registerInstitute(payload);
     }
   };
 
@@ -158,7 +163,7 @@ export default function AuthModal({ open, onOpenChange }) {
           </DialogDescription>
         </DialogHeader>
 
-        {/* ================= SIMPLE TWO OPTIONS ================= */}
+        {/* ================= OPTIONS ================= */}
         {!mode && (
           <div className="grid gap-3 py-4">
             <Button onClick={() => setMode("login")} variant="outline">
@@ -173,7 +178,7 @@ export default function AuthModal({ open, onOpenChange }) {
         {/* ================= FORMS ================= */}
         {mode && (
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            {/* ================= SHOW API ERRORS ================= */}
+            {/* ==== GLOBAL API ERRORS ==== */}
             {mode === "login" && loginError && (
               <p className="text-red-500 text-sm border p-2 rounded">
                 {loginError}
@@ -226,32 +231,27 @@ export default function AuthModal({ open, onOpenChange }) {
                   )}
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loginLoading}
-                >
+                <Button type="submit" className="w-full" disabled={loginLoading}>
                   {loginLoading ? "Logging in..." : "Login"}
                 </Button>
               </>
             )}
 
-            {/* ================= REGISTER INSTITUTE FORM ================= */}
+            {/* ================= REGISTER INSTITUTE ================= */}
             {mode === "register-institute" && (
               <>
-                <h3 className="font-semibold text-lg mt-2">
-                  Institute Details
-                </h3>
+                <h3 className="font-semibold text-lg mt-2">Institute Details</h3>
 
+                {/* Using EXACT state keys */}
                 {[
-                  ["institute_name", "Institute Name"],
-                  ["institute_type", "Institute Type"],
-                  ["official_email", "Official Email"],
-                  ["official_phone", "Official Phone"],
-                  ["address_line1", "Address Line 1"],
-                  ["city", "City"],
-                  ["state", "State"],
-                  ["pincode", "Pincode"],
+                  ["inst_name", "Institute Name"],
+                  ["inst_type", "Institute Type"],
+                  ["inst_email", "Official Email"],
+                  ["inst_phone", "Phone Number"],
+                  ["inst_address_line1", "Address Line 1"],
+                  ["inst_city", "City"],
+                  ["inst_state", "State"],
+                  ["inst_pincode", "Pincode"],
                 ].map(([key, label]) => (
                   <div key={key} className="grid gap-2">
                     <Label>{label}</Label>
@@ -331,13 +331,14 @@ export default function AuthModal({ open, onOpenChange }) {
                   Affiliation Details
                 </h3>
 
+                {/* SELECT */}
                 <div className="grid gap-2">
                   <Label>Is Affiliated?</Label>
                   <select
                     className="border p-2 rounded-md"
-                    value={institute.is_affiliated}
+                    value={institute.inst_is_affiliated}
                     onChange={(e) =>
-                      handleInstituteChange("is_affiliated", e.target.value)
+                      handleInstituteChange("inst_is_affiliated", e.target.value)
                     }
                   >
                     <option value="true">Yes</option>
@@ -345,13 +346,13 @@ export default function AuthModal({ open, onOpenChange }) {
                   </select>
                 </div>
 
-                {["affiliation_university", "affiliation_id"].map((key) => (
+                {/* TEXT INPUTS */}
+                {[
+                  ["inst_affiliation_university", "Affiliation University"],
+                  ["inst_affiliation_id", "Affiliation ID"],
+                ].map(([key, label]) => (
                   <div key={key} className="grid gap-2">
-                    <Label>
-                      {key === "affiliation_university"
-                        ? "Affiliation University"
-                        : "Affiliation ID"}
-                    </Label>
+                    <Label>{label}</Label>
                     <Input
                       className={cn(registerErrors[key] && "border-red-500")}
                       value={institute[key]}

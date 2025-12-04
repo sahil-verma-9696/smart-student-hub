@@ -16,7 +16,7 @@ import MindPilot from "@/pages/student-pages/MindPilot";
 import PrivateVault from "@/pages/student-pages/PrivateVault";
 import Settings from "@/pages/student-pages/Settings";
 import { PortfolioPreview } from "@/pages/student-pages/portfolio/portfolio-preview";
-import ActivityPageProvider from "@/providers/activity-page-provider";
+import ActivityPageProvider from "@/pages/student-pages/provider/activity-page-provider";
 import ActivitiesManagement from "@/pages/admin-pages/components/activity-management/activity-management";
 import AdminInstPageProvider from "@/pages/admin-pages/provider/admin-inst.provider";
 import StudentManagementProvider from "@/pages/admin-pages/provider/student-management.provider";

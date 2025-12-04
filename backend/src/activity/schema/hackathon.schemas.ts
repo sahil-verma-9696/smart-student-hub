@@ -4,9 +4,6 @@ import { HydratedDocument } from 'mongoose';
 export type HackathonDocument = HydratedDocument<HackathonActivity>;
 @Schema()
 export class HackathonActivity {
-  @Prop({ required: true })
-  name: string;
-
   @Prop()
   teamSize?: number;
 
@@ -14,7 +11,17 @@ export class HackathonActivity {
   rank?: string;
 
   @Prop()
-  description?: string;
+  level?: string;
+
+  @Prop()
+  participantType?: string;
+
+  @Prop({ type: Date, default: Date.now })
+  deadline?: Date;
+
+  @Prop()
+  organizer?: string;
 }
 
-export const HackathonActivitySchema = SchemaFactory.createForClass(HackathonActivity);
+export const HackathonActivitySchema =
+  SchemaFactory.createForClass(HackathonActivity);

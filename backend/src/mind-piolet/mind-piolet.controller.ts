@@ -10,7 +10,6 @@ import {
 import { MindPioletService } from './mind-piolet.service';
 import { CreateMindPioletDto } from './dto/create-mind-piolet.dto';
 import { UpdateMindPioletDto } from './dto/update-mind-piolet.dto';
-import { mindPioletData } from './constants';
 
 @Controller('mind-piolet')
 export class MindPioletController {
@@ -23,7 +22,7 @@ export class MindPioletController {
 
   @Get()
   findAll() {
-    return mindPioletData;
+    return this.mindPioletService.findAll();
   }
 
   @Get(':id')

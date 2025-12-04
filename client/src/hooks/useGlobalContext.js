@@ -1,4 +1,4 @@
-import GlobalContext from "@/contexts/global-context";
+import GlobalContext from "@/contexts/notification-context";
 import { useContext } from "react";
 
 const useGlobalContext = () => {

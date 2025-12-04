@@ -1,6 +1,6 @@
-import { ActivityList } from "@/pages/student-pages/activity/activity-list";
-import { ActivityStats } from "@/pages/student-pages/activity/activity-stats";
-import { ActivityTracker } from "@/pages/student-pages/activity/activity-tracker";
+import { ActivityList } from "@/pages/student-pages/components/activity-management/activity-list";
+import { ActivityStats } from "@/pages/student-pages/components/activity-management/activity-stats";
+import { ActivityTracker } from "@/pages/student-pages/components/activity-management/activity-tracker";
 import React from "react";
 
 const Settings = () => {

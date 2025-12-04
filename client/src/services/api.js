@@ -33,6 +33,7 @@ export const studentAPI = {
 
   // Get all students with optional query params
   getStudents: async (query = {}) => {
+    console.log(query);
     const response = await apiClient.get('/student', { params: query });
     return response.data;
   },

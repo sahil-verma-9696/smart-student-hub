@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   Dialog,
@@ -28,13 +26,32 @@ import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { ActivityConfig } from "./constants";
-import { useActivityPageContext } from "../../../hooks/useActivityPageContext";
+import { useActivityPageContext } from "../../hooks/useActivityPageContext";
 
 registerPlugin(
   FilePondPluginImagePreview,
   FilePondPluginImageExifOrientation,
   FilePondPluginFileValidateSize
 );
+
+/* ----------------------------------------------------
+  Helper: sanitize payload based on current activity config
+-----------------------------------------------------*/
+function sanitizePayload(data, cfg) {
+  const allowedFieldNames = new Set(cfg.fields.map((f) => f.name));
+
+  const trimmed = {};
+  Object.entries(data).forEach(([key, value]) => {
+    if (allowedFieldNames.has(key)) {
+      // optional: skip completely empty values
+      if (value !== undefined && value !== null && value !== "") {
+        trimmed[key] = value;
+      }
+    }
+  });
+
+  return trimmed;
+}
 
 export function ActivityTracker() {
   /***************************************
@@ -50,8 +67,13 @@ export function ActivityTracker() {
    * ******** Custom & Helpers hooks *****
    **************************************/
   const { postActivity } = useActivityPageContext();
+
+  /****************************************************
+   * ********** Form Hooks ********************
+   ****************************************************/
   const form = useForm({
     defaultValues: {},
+    shouldUnregister: true, // let RHF unregister unmounted fields
   });
 
   const cfg =
@@ -60,7 +82,7 @@ export function ActivityTracker() {
           ...ActivityConfig.custom,
           fields: [...ActivityConfig.custom.fields, ...customFields],
         }
-      : ActivityConfig[activityType];
+      : ActivityConfig[activityType] || ActivityConfig.default;
 
   const addCustomField = () => {
     const newField = {
@@ -80,11 +102,17 @@ export function ActivityTracker() {
     try {
       setSubmitting(true);
 
+      // Trim data so only fields belonging to this cfg remain
+      const sanitized = sanitizePayload(data, cfg);
+
       const payload = {
-        ...data,
+        ...sanitized,
         activityType, // send selected type to backend
       };
 
+      console.log("Final Payload:", payload);
+
+      // call backend
       await postActivity(payload, files);
 
       // reset UI
@@ -106,6 +134,13 @@ export function ActivityTracker() {
       ? "grid grid-cols-1 gap-8"
       : "grid grid-cols-1 lg:grid-cols-2 gap-8";
 
+  const handleActivityTypeChange = (v) => {
+    setActivityType(v);
+    setCustomFields([]);
+    // clear form values when switching type so UI also resets
+    form.reset({});
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -123,10 +158,7 @@ export function ActivityTracker() {
               <Label className="mb-2 block text-sm">Activity Type</Label>
               <Select
                 value={activityType}
-                onValueChange={(v) => {
-                  setActivityType(v);
-                  setCustomFields([]);
-                }}
+                onValueChange={handleActivityTypeChange}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
@@ -166,7 +198,7 @@ export function ActivityTracker() {
             <AnimatePresence mode="popLayout">
               {activityType !== "default" && (
                 <motion.div
-                  key={activityType + customFields.length}
+                  key={String(activityType) + customFields.length}
                   initial={{ opacity: 0, x: 22 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 22 }}
@@ -176,7 +208,7 @@ export function ActivityTracker() {
                   <h2 className="text-lg font-semibold">
                     {activityType === "custom"
                       ? "Custom Activity Fields"
-                      : `${activityType.toUpperCase()} Details`}
+                      : `${String(activityType).toUpperCase()} Details`}
                   </h2>
 
                   {/* RIGHT PANEL FIELDS */}
@@ -220,7 +252,7 @@ export function ActivityTracker() {
 }
 
 /* ----------------------------------------------------
- UNIVERSAL FIELD RENDERER
+  UNIVERSAL FIELD RENDERER
 -----------------------------------------------------*/
 function renderField(field, form) {
   const common = form.register(field.name);
@@ -233,7 +265,11 @@ function renderField(field, form) {
       return <Textarea rows={4} {...common} />;
     case "select":
       return (
-        <Select onValueChange={(v) => form.setValue(field.name, v)}>
+        <Select
+          onValueChange={(v) => form.setValue(field.name, v)}
+          // RHF: ensure value in form state
+          defaultValue={form.getValues(field.name)}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select" />
           </SelectTrigger>

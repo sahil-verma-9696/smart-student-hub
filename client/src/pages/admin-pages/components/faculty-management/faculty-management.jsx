@@ -7,24 +7,29 @@ import { UpdateFacultyCsv } from "./update-faculty-csv";
 import { Users, UserPlus, Upload, FileEdit } from "lucide-react";
 import { facultyAPI } from "@/services/api";
 import toast from "react-hot-toast";
-
-const INSTITUTE_ID = "69290e999fe3149cdc284749";
+import useAuthContext from "@/hooks/useAuthContext";
 
 export function FacultyManagement() {
   const [faculties, setFaculties] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const { user } = useAuthContext();
+
+  const INSTITUTE_ID = user?.institute._id;
 
   /*********************************************************
    * **************** Fetch Faculties ********************
    *********************************************************/
   useEffect(() => {
     fetchFaculties();
-  }, []);
+  }, [user]);
 
   const fetchFaculties = async () => {
     try {
       setLoading(true);
-      const response = await facultyAPI.getFaculties({ instituteId: INSTITUTE_ID });
+      const response = await facultyAPI.getFaculties({
+        instituteId: INSTITUTE_ID,
+      });
       setFaculties(response.data || response || []);
     } catch (error) {
       console.error("Error fetching faculties:", error);
@@ -76,24 +81,32 @@ export function FacultyManagement() {
     try {
       setLoading(true);
       const response = await facultyAPI.bulkCreateFaculties(payload);
-      
+
       // Handle the response from backend
       const result = response.data || response;
-      
-      if (result.status === 'success') {
+
+      if (result.status === "success") {
         toast.success(`Successfully added ${result.created} faculty members!`);
-      } else if (result.status === 'partial') {
-        const duplicates = result.failures.filter(f => f.reason?.includes('duplicate key')).length;
+      } else if (result.status === "partial") {
+        const duplicates = result.failures.filter((f) =>
+          f.reason?.includes("duplicate key")
+        ).length;
         if (duplicates > 0) {
-          toast.success(`Added ${result.created} faculty. ${duplicates} already exist (duplicates skipped).`);
+          toast.success(
+            `Added ${result.created} faculty. ${duplicates} already exist (duplicates skipped).`
+          );
         } else {
-          toast.success(`Added ${result.created} faculty. ${result.failed} failed.`);
+          toast.success(
+            `Added ${result.created} faculty. ${result.failed} failed.`
+          );
         }
         if (result.failures && result.failures.length > 0) {
           console.warn("Failed faculty:", result.failures);
         }
-      } else if (result.status === 'failed') {
-        const allDuplicates = result.failures.every(f => f.reason?.includes('duplicate key'));
+      } else if (result.status === "failed") {
+        const allDuplicates = result.failures.every((f) =>
+          f.reason?.includes("duplicate key")
+        );
         if (allDuplicates) {
           toast.error(`All faculty members already exist in the database.`);
         } else {
@@ -101,12 +114,14 @@ export function FacultyManagement() {
         }
         console.error("Failed faculty:", result.failures);
       }
-      
+
       await fetchFaculties(); // Refresh the list
       return response;
     } catch (error) {
       console.error("Error bulk adding faculties:", error);
-      toast.error(error.response?.data?.message || "Failed to bulk add faculties");
+      toast.error(
+        error.response?.data?.message || "Failed to bulk add faculties"
+      );
       throw error;
     } finally {
       setLoading(false);
@@ -118,7 +133,7 @@ export function FacultyManagement() {
     try {
       setLoading(true);
       let updatedCount = 0;
-      
+
       for (const update of updates) {
         const faculty = faculties.find(
           (f) =>
@@ -138,7 +153,10 @@ export function FacultyManagement() {
             ...(update.contactInfo && { contactInfo: update.contactInfo }),
           };
 
-          await facultyAPI.updateFaculty(faculty._id || faculty.id, updatePayload);
+          await facultyAPI.updateFaculty(
+            faculty._id || faculty.id,
+            updatePayload
+          );
           updatedCount++;
         }
       }
@@ -147,7 +165,9 @@ export function FacultyManagement() {
       await fetchFaculties(); // Refresh the list
     } catch (error) {
       console.error("Error updating faculties:", error);
-      toast.error(error.response?.data?.message || "Failed to update faculties");
+      toast.error(
+        error.response?.data?.message || "Failed to update faculties"
+      );
       throw error;
     } finally {
       setLoading(false);

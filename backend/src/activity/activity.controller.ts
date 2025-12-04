@@ -58,4 +58,9 @@ export class ActivityController {
   remove(@Param('id') id: string) {
     return this.activityService.remove(id);
   }
+
+  @Get('/test/notification')
+  test() {
+    return this.activityService.test();
+  }
 }

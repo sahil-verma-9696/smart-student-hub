@@ -15,6 +15,7 @@ import { AcademicModule } from './academic/academic.module';
 import { AcadmicProgramModule } from './acadmic-program/acadmic-program.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { MindPioletModule } from './mind-piolet/mind-piolet.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -51,6 +52,8 @@ import { MindPioletModule } from './mind-piolet/mind-piolet.module';
     AssignmentModule,
 
     MindPioletModule,
+
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

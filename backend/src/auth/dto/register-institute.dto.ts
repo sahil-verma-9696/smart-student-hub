@@ -14,6 +14,54 @@ import { Type } from 'class-transformer';
 
 export class RegisterInstituteDto {
   /**
+   * Institute state
+   * */
+  @IsString()
+  inst_name: string;
+
+  /**
+   * Institute state
+   * */
+  @IsEnum(InstituteType)
+  inst_type: InstituteType;
+
+  /**
+   * Institute state
+   * */
+  @IsString()
+  inst_email: string;
+
+  /**
+   * Institute state
+   * */
+  @IsString()
+  inst_phone: string;
+
+  /**
+   * Institute address line 1
+   */
+  @IsString()
+  inst_address_line1: string;
+
+  /**
+   * Institute city
+   */
+  @IsString()
+  inst_city: string;
+
+  /**
+   * Institute state
+   * */
+  @IsString()
+  inst_state: string;
+
+  /**
+   * Institute state
+   * */
+  @IsString()
+  inst_pincode: string;
+
+  /**
    * Admin name
    */
   @IsString()
@@ -39,13 +87,6 @@ export class RegisterInstituteDto {
   admin_gender: string;
 
   /**
-   * Institute name (Mandatory)
-   */
-  @IsString()
-  @IsNotEmpty()
-  instituteName: string;
-
-  /**
    * Institute code or short form
    */
   @IsString()
@@ -66,50 +107,6 @@ export class RegisterInstituteDto {
   @ValidateNested()
   @Type(() => ContactInfoDto)
   admin_contactInfo: ContactInfoDto;
-
-  /**
-   * Institute address line 1
-   */
-  @IsString()
-  inst_address_line1: string;
-
-  /**
-   * Institute city
-   */
-  @IsString()
-  inst_city: string;
-
-  /**
-   * Institute state
-   * */
-  @IsString()
-  inst_state: string;
-
-  /**
-   * Institute state
-   * */
-  @IsString()
-  inst_pincode: string;
-  /**
-   * Institute state
-   * */
-  @IsString()
-  inst_name: string;
-  /**
-   * Institute state
-   * */
-  @IsEnum(InstituteType)
-  inst_type: InstituteType;
-  /**
-   * Institute state
-   * */
-  @IsString()
-  inst_email: string;
-  /**
-   * Institute state
-   * */
-  @IsString()
-  inst_phone: string;
 
   /**
    * Institute state

@@ -1,6 +1,6 @@
 import AuthContext from "@/contexts/auth-context";
 import useCheckAuthenticity from "@/hooks/useCheckAuthenticity";
-import { useState } from "react";
+import React, { useState } from "react";
 
 const AuthProvider = ({ children }) => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
@@ -15,9 +15,9 @@ const AuthProvider = ({ children }) => {
   const contextValue = {
     isUserAuthenticated,
     userRole,
+    user,
     setIsUserAuthenticated,
     setUserRole,
-    user,
     setUser,
   };
   return (

@@ -23,6 +23,7 @@ import { BulkCreateStudentDto } from './dto/create-student-bulk.dto';
 import { StudentQueryDto } from './dto/query.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { mindPioletData, MOCK_STUDENT_DATA } from './constants';
 
 @Controller('student')
 export class StudentController {
@@ -98,6 +99,15 @@ export class StudentController {
   @Patch(':id')
   updateStudent(@Param('id') id: string, @Body() body: UpdateStudentDto) {
     return this.studentService.updateStudentAcademicDetails(id, body);
+  }
+
+  @Get(':id/portfolio-data')
+  getPortfolioData(@Param('id') id: string) {
+    return MOCK_STUDENT_DATA;
+  }
+  @Get(':id/mind-piolet-data')
+  getMindPioletData(@Param('id') id: string) {
+    return mindPioletData;
   }
 
   @Put(':id')
