@@ -1,5 +1,5 @@
 // withAuth.js
-import { useGlobalContext } from "@/contexts/global-context";
+import { useGlobalContext } from "@/contexts/notification-context";
 import { useEffect, useState } from "react";
 
 export default function withAuth(Component) {

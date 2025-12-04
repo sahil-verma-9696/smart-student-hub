@@ -1,12 +1,10 @@
-import GlobalContext from "@/contexts/global-context";
+import NotificationContext from "@/contexts/notification-context";
 
+const NotificationContextProvider = ({ children }) => {
 
-const GlobalContextProvider = ({ children }) => {
-  return (
-    <GlobalContext.Provider value={{ }}>
-      {children}
-    </GlobalContext.Provider>
-  );
+  // connect with socket here
+  // write logic for notification 
+  return <NotificationContext.Provider value={{}}>{children}</NotificationContext.Provider>;
 };
 
-export default GlobalContextProvider;
+export default NotificationContextProvider;
