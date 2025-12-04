@@ -10,6 +10,7 @@ export class NotificationService {
   constructor(
     @InjectModel(Notification.name)
     private notificationModel: Model<Notification>,
+
     @Inject(forwardRef(() => NotificationGateway)) // forwardRef is used to avoid circular dependency
     private gateway: NotificationGateway,
   ) {}

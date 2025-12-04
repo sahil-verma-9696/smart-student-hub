@@ -13,12 +13,14 @@ import {
   ActivityStatsResponse,
 } from './types/types';
 import { ACTIVITY_STATUS } from './types/enum';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class ActivityService {
   constructor(
     @InjectModel(Activity.name)
     private readonly activityModel: Model<ActivityDocument>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   // -----------------------------
@@ -368,4 +370,14 @@ export class ActivityService {
   //   facultyId: string,
   //   status: ACTIVITY_STATUS,
   // ): Promise<ActivityDocument> {}
+
+  async test(): Promise<{ message: string }> {
+    await this.notificationService.createNotification(
+      '123',
+      'test',
+      'test message',
+    );
+
+    return { message: 'send Notification' };
+  }
 }
