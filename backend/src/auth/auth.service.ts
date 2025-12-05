@@ -87,6 +87,8 @@ export class AuthService {
       null;
     const role = user.role as USER_ROLE;
 
+    
+
     switch (role) {
       case USER_ROLE.STUDENT:
         userData = await this.studentService.getByUserId(user.userId);

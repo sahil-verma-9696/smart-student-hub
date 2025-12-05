@@ -134,6 +134,9 @@ export class StudentService {
           contactInfo: entry.contactInfo,
           roll_number: entry.roll_number,
           instituteId,
+          branch: entry.branch,
+          degree: entry.degree,
+          program: entry.program,
         };
 
         const created = await this.createStudent(singleDto);
@@ -152,6 +155,7 @@ export class StudentService {
         });
 
         // continue loop, do NOT stop processing
+        continue;
       }
     }
 
@@ -293,6 +297,9 @@ export class StudentService {
       gender: mapped.gender,
       instituteId: mapped.instituteId,
       roll_number: mapped.roll_number,
+      branch: mapped.branch,
+      program: mapped.program,
+      degree: mapped.degree,
       contactInfo: {
         phone: mapped.phone,
         alternatePhone: mapped.alternatePhone,
@@ -361,7 +368,7 @@ export class StudentService {
 
     return this.studentModel
       .find(filter)
-      .populate('basicUserDetails','-passwordHash')
+      .populate('basicUserDetails', '-passwordHash')
       .populate('academicDetails')
       .populate('institute')
       .exec();
@@ -389,14 +396,15 @@ export class StudentService {
     //     student.academicDetails.toString(),
     //     dto.academicDetails,
     //   );
-    // } 
+    // }
 
     // Separate student-specific fields from user fields
     const studentFields: Partial<Student> = {};
     const userFields: any = {};
 
     // Student-specific fields
-    if (dto.roll_number !== undefined) studentFields.roll_number = dto.roll_number;
+    if (dto.roll_number !== undefined)
+      studentFields.roll_number = dto.roll_number;
 
     // User-specific fields (stored in basicUserDetails)
     if (dto.name !== undefined) userFields.name = dto.name;
@@ -421,7 +429,7 @@ export class StudentService {
     // Return updated student with populated user details
     return await this.studentModel
       .findById(studentId)
-      .populate('basicUserDetails','-passwordHash')
+      .populate('basicUserDetails', '-passwordHash')
       .populate('academicDetails');
   }
 }

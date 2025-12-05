@@ -26,6 +26,9 @@ const CSV_CONFIG = {
     "phone",
     "alternatePhone",
     "address",
+    "branch",
+    "degree",
+    "program",
   ],
   headerAliases: {
     roll_number: ["rollnumber", "roll number", "roll", "roll_no"],
@@ -37,7 +40,9 @@ const normalize = (h) => h.toLowerCase().trim();
 
 const findHeaderKey = (headers, key) => {
   const normalized = headers.map(normalize);
-  const aliases = [key, ...(CSV_CONFIG.headerAliases[key] || [])].map(normalize);
+  const aliases = [key, ...(CSV_CONFIG.headerAliases[key] || [])].map(
+    normalize
+  );
 
   for (let alias of aliases) {
     const index = normalized.indexOf(alias);
@@ -78,9 +83,7 @@ export function CsvUpload({ onUpload }) {
           }
 
           if (missing.length > 0) {
-            throw new Error(
-              `Missing required columns: ${missing.join(", ")}`
-            );
+            throw new Error(`Missing required columns: ${missing.join(", ")}`);
           }
 
           // Transform rows
@@ -104,9 +107,7 @@ export function CsvUpload({ onUpload }) {
                   student.valid = false;
                 }
                 student.gender = g;
-              } else if (
-                ["phone", "alternatePhone"].includes(key)
-              ) {
+              } else if (["phone", "alternatePhone"].includes(key)) {
                 student[key] = value.toString();
               } else {
                 student[key] = value;
@@ -125,6 +126,9 @@ export function CsvUpload({ onUpload }) {
                 alternatePhone: student.alternatePhone,
                 address: student.address,
               },
+              branch: student.branch,
+              degree: student.degree,
+              program: student.program,
             });
           }
 
@@ -146,10 +150,7 @@ export function CsvUpload({ onUpload }) {
   };
 
   const downloadTemplate = () => {
-    const template =
-      "name,email,gender,roll_number,phone,alternatePhone,address\n" +
-      `Student One,student1@gmail.com,male,S1,9876501234,9988776655,"JP Nagar, Bengaluru"\n` +
-      `Student Two,student2@gmail.com,female,S2,9876505678,8877665544,"BTM Layout, Bengaluru"\n`;
+    const template = CSV_CONFIG.requiredHeaders.join(",") + "\n";
 
     const blob = new Blob([template], { type: "text/csv" });
     const a = document.createElement("a");
@@ -192,7 +193,12 @@ export function CsvUpload({ onUpload }) {
             disabled={uploading}
           />
 
-          <label htmlFor="csv-upload" className={uploading ? "cursor-not-allowed opacity-50" : "cursor-pointer"}>
+          <label
+            htmlFor="csv-upload"
+            className={
+              uploading ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+            }
+          >
             {uploading ? (
               <div className="flex flex-col items-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>

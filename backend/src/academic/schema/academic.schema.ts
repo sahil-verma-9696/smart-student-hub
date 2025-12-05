@@ -5,13 +5,13 @@ export type AcademicDocument = HydratedDocument<Academic>;
 
 @Schema({ timestamps: true })
 export class Academic {
-  @Prop({ type: Types.ObjectId, ref: 'AcademicProgram', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'AcademicProgram', default: null })
   program: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Degree', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Degree', default: null })
   degree: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Branch', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Branch', default: null })
   branch: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Specialization' })

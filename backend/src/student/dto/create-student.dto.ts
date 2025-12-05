@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsObject,
+  IsOptional,
   // IsEnum,
   IsString,
   ValidateNested,
@@ -32,6 +33,18 @@ export class CreateStudentDto {
 
   @IsString()
   roll_number: string;
+
+  @IsString()
+  @IsOptional()
+  branch: string;
+
+  @IsString()
+  @IsOptional()
+  degree: string;
+
+  @IsString()
+  @IsOptional()
+  program: string;
 }
 
 export class CreateStudentWithoutInstituteDto extends OmitType(
