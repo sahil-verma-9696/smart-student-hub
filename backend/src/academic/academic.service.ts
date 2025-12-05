@@ -23,6 +23,10 @@ import { UpdateSemesterDto } from 'src/auth/dto/sub/update-semester.dto';
 import { UpdateSectionDto } from 'src/auth/dto/sub/update-section.dto';
 import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 import { UpdateDepartmentDto } from 'src/auth/dto/sub/update-department.dto';
+import Institute, {
+  InstituteDocument,
+} from 'src/institute/schemas/institute.schema';
+import { AdminService } from 'src/admin/admin.service';
 
 @Injectable()
 export class AcademicService {
@@ -53,6 +57,11 @@ export class AcademicService {
 
     @InjectModel(Semester.name)
     private readonly semesterModel: Model<SemesterDocument>,
+
+    @InjectModel(Institute.name)
+    private instituteModel: Model<InstituteDocument>,
+
+    private readonly adminService: AdminService,
   ) {}
 
   async create(details: {
@@ -502,11 +511,13 @@ export class AcademicService {
     const specialization = await this.specializationModel.findOne({
       branch: new Types.ObjectId(branchId),
       name: dto.name,
+      sectionIntake: dto.sectionIntake,
     });
 
     if (!specialization) {
       return this.specializationModel.create({
         name: dto.name,
+        sectionIntake: dto.sectionIntake,
         branch: branchId,
       });
     } else {
@@ -636,5 +647,144 @@ export class AcademicService {
     }
 
     return { message: 'Institute structure updated successfully' };
+  }
+
+  async getInstituteDetails(strInstituteId: string): Promise<any> {
+    const instituteId = new Types.ObjectId(strInstituteId)
+    const institute = await this.instituteModel.findById(instituteId).lean();
+
+    if (!institute) {
+      throw new NotFoundException('Institute not found');
+    }
+
+    const departments = await this.departmentModel
+      .find({ institute: instituteId })
+      .lean();
+    console.log(departments,"departments");
+    const programs = await this.programModel
+      .find({ institute: instituteId })
+      .lean();
+
+    const programDetails = await Promise.all(
+      programs.map(async (program) => {
+        const degrees = await this.degreeModel
+          .find({ program: program._id })
+          .lean();
+
+        const degreeDetails = await Promise.all(
+          degrees.map(async (degree) => {
+            const branches = await this.branchModel
+              .find({ degree: degree._id })
+              .lean();
+
+            const branchDetails = await Promise.all(
+              branches.map(async (branch) => {
+                const specializations = await this.specializationModel
+                  .find({ branch: branch._id })
+                  .lean();
+
+                return {
+                  id: branch._id.toString(),
+                  name: branch.name,
+                  degreeId: degree._id.toString(),
+                  departmentId: branch.department.toString(),
+                  specializations: specializations.map((spec) => ({
+                    id: spec._id.toString(),
+                    name: spec.name,
+                    branchId: branch._id.toString(),
+                    sectionIntake: spec.sectionIntake,
+                  })),
+                };
+              }),
+            );
+
+            const yearLevels = await this.yearLevelModel
+              .find({ degree: degree._id })
+              .lean();
+
+            const yearLevelDetails = await Promise.all(
+              yearLevels.map(async (yearLevel) => {
+                const semesters = await this.semesterModel
+                  .find({ year: yearLevel._id })
+                  .lean();
+
+                const semesterDetails = await Promise.all(
+                  semesters.map(async (semester) => {
+                    const sections = await this.sectionModel
+                      .find({ semester: semester._id })
+                      .lean();
+
+                    return {
+                      id: semester._id.toString(),
+                      semNumber: semester.semNumber,
+                      yearId: yearLevel._id.toString(),
+                      sections: sections.map((section) => ({
+                        id: section._id.toString(),
+                        name: section.name,
+                        seatCapacity: section.seatCapacity,
+                        specializationId: section.specialization.toString(),
+                        semesterId: semester._id.toString(),
+                      })),
+                    };
+                  }),
+                );
+
+                return {
+                  id: yearLevel._id.toString(),
+                  year: yearLevel.year,
+                  degreeId: degree._id.toString(),
+                  semesters: semesterDetails,
+                };
+              }),
+            );
+
+            return {
+              id: degree._id.toString(),
+              name: degree.name,
+              programId: program._id.toString(),
+              duration: 4, // Assuming duration is 4 years for UG
+              durationUnit: 'Years',
+              branches: branchDetails,
+              yearLevels: yearLevelDetails,
+            };
+          }),
+        );
+
+        return {
+          id: program._id.toString(),
+          name: program.name,
+          instituteId: instituteId,
+          degrees: degreeDetails,
+        };
+      }),
+    );
+
+    return {
+      instituteId: institute._id.toString(),
+      instituteName: institute.institute_name,
+      instituteCode: institute.instituteCode,
+      establishedYear: institute.establishedYear,
+      accreditationStatus: institute.accreditationStatus,
+      instituteType: institute.institute_type,
+      email: institute.official_email,
+      phone: institute.official_phone,
+      alternatePhone: institute.alternatePhone,
+      website: institute.website,
+      addressLine1: institute.address_line1,
+      addressLine2: institute.addressLine2,
+      city: institute.city,
+      state: institute.state,
+      pincode: institute.pincode,
+      logo: institute.logo,
+      departments: departments.map((dept) => ({
+        id: dept._id.toString(),
+        name: dept.name,
+        instituteId: dept.institute.toString(),
+      })),
+      programs: programDetails,
+      // adminName: admin.,
+      // adminEmail: admin.adminEmail,
+      // adminPhone: admin.adminPhone,
+    };
   }
 }

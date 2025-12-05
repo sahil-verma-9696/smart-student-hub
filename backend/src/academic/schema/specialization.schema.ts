@@ -8,6 +8,9 @@ export class Specialization {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ type: Number, required: true, default: 0 })
+  sectionIntake: number;
+
   @Prop({ type: Types.ObjectId, ref: 'Branch', required: true })
   branch: Types.ObjectId;
 }

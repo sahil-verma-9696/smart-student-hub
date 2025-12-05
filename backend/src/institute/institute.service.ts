@@ -148,6 +148,10 @@ export class InstituteService implements IInstituteService {
     };
   }
 
+  getInstituteDetails(instituteId: string) {
+    return this.academicService.getInstituteDetails(instituteId);
+  }
+
   // async getInstituteFullStructure(instituteId: string) {
   //   const result = await this.instituteModel.aggregate([
   //     {

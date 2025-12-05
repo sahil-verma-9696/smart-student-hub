@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,6 +27,7 @@ import {
   Hash,
 } from "lucide-react"
 
+
 export function AcademicHierarchy({
   programs,
   departments,
@@ -35,7 +37,7 @@ export function AcademicHierarchy({
 }) {
   const [expandedItems, setExpandedItems] = useState(new Set())
   const [editingId, setEditingId] = useState(null)
-  const [editValue, setEditValue] = useState("")
+  const [editValue, setEditValue] = useState({})
   const [addingTo, setAddingTo] = useState(null)
   const [newItemData, setNewItemData] = useState({})
 
@@ -50,19 +52,33 @@ export function AcademicHierarchy({
     })
   }
 
-  const startEdit = (id, value) => {
+  const startEdit = (id, data) => {
     setEditingId(id)
-    setEditValue(value)
+    setEditValue(data)
   }
 
   const cancelEdit = () => {
     setEditingId(null)
-    setEditValue("")
+    setEditValue({})
   }
 
   const resetAddForm = () => {
     setAddingTo(null)
     setNewItemData({})
+  }
+
+  // Auto-generate year levels when degree duration changes
+  const generateYearLevels = (duration, durationUnit, degreeId) => {
+    const years = durationUnit === "Years" ? duration : Math.ceil(duration / 12)
+    return Array.from({ length: years }, (_, i) => ({
+      id: generateId(),
+      year: i + 1,
+      degreeId,
+      semesters: [
+        { id: generateId(), semNumber: i * 2 + 1, yearId: "", sections: [] },
+        { id: generateId(), semNumber: i * 2 + 2, yearId: "", sections: [] },
+      ],
+    }))
   }
 
   // Department CRUD
@@ -100,6 +116,10 @@ export function AcademicHierarchy({
   // Degree CRUD
   const addDegree = (programId) => {
     if (!newItemData.name?.trim()) return
+    const duration = Number(newItemData.duration) || 4
+    const durationUnit = newItemData.durationUnit || "Years"
+    const degreeId = generateId()
+
     onProgramsChange(
       programs.map((p) =>
         p.id === programId
@@ -108,13 +128,13 @@ export function AcademicHierarchy({
               degrees: [
                 ...p.degrees,
                 {
-                  id: generateId(),
+                  id: degreeId,
                   name: newItemData.name,
                   programId,
-                  duration: Number(newItemData.duration) || 4,
-                  durationUnit: newItemData.durationUnit || "Years",
+                  duration,
+                  durationUnit,
                   branches: [],
-                  yearLevels: [],
+                  yearLevels: generateYearLevels(duration, durationUnit, degreeId),
                 },
               ],
             }
@@ -128,10 +148,28 @@ export function AcademicHierarchy({
     onProgramsChange(
       programs.map((p) =>
         p.id === programId
-          ? { ...p, degrees: p.degrees.map((d) => (d.id === degreeId ? { ...d, ...updates } : d)) }
+          ? {
+              ...p,
+              degrees: p.degrees.map((d) => {
+                if (d.id === degreeId) {
+                  const newDegree = { ...d, ...updates }
+                  // Regenerate year levels if duration changed
+                  if (updates.duration !== undefined || updates.durationUnit !== undefined) {
+                    newDegree.yearLevels = generateYearLevels(
+                      updates.duration ?? d.duration,
+                      updates.durationUnit ?? d.durationUnit,
+                      degreeId,
+                    )
+                  }
+                  return newDegree
+                }
+                return d
+              }),
+            }
           : p,
       ),
     )
+    cancelEdit()
   }
 
   const deleteDegree = (programId, degreeId) => {
@@ -172,6 +210,32 @@ export function AcademicHierarchy({
     resetAddForm()
   }
 
+  const updateBranch = (
+    programId,
+    degreeId,
+    branchId,
+    updates,
+  ) => {
+    onProgramsChange(
+      programs.map((p) =>
+        p.id === programId
+          ? {
+              ...p,
+              degrees: p.degrees.map((d) =>
+                d.id === degreeId
+                  ? {
+                      ...d,
+                      branches: d.branches.map((b) => (b.id === branchId ? { ...b, ...updates } : b)),
+                    }
+                  : d,
+              ),
+            }
+          : p,
+      ),
+    )
+    cancelEdit()
+  }
+
   const deleteBranch = (programId, degreeId, branchId) => {
     onProgramsChange(
       programs.map((p) =>
@@ -205,7 +269,12 @@ export function AcademicHierarchy({
                               ...b,
                               specializations: [
                                 ...b.specializations,
-                                { id: generateId(), name: newItemData.name, branchId },
+                                {
+                                  id: generateId(),
+                                  name: newItemData.name,
+                                  branchId,
+                                  sectionIntake: Number(newItemData.sectionIntake) || 60,
+                                },
                               ],
                             }
                           : b,
@@ -218,6 +287,42 @@ export function AcademicHierarchy({
       ),
     )
     resetAddForm()
+  }
+
+  const updateSpecialization = (
+    programId,
+    degreeId,
+    branchId,
+    specId,
+    updates,
+  ) => {
+    onProgramsChange(
+      programs.map((p) =>
+        p.id === programId
+          ? {
+              ...p,
+              degrees: p.degrees.map((d) =>
+                d.id === degreeId
+                  ? {
+                      ...d,
+                      branches: d.branches.map((b) =>
+                        b.id === branchId
+                          ? {
+                              ...b,
+                              specializations: b.specializations.map((s) =>
+                                s.id === specId ? { ...s, ...updates } : s,
+                              ),
+                            }
+                          : b,
+                      ),
+                    }
+                  : d,
+              ),
+            }
+          : p,
+      ),
+    )
+    cancelEdit()
   }
 
   const deleteSpecialization = (programId, degreeId, branchId, specId) => {
@@ -244,104 +349,8 @@ export function AcademicHierarchy({
     )
   }
 
-  // YearLevel CRUD
-  const addYearLevel = (programId, degreeId) => {
-    if (!newItemData.year) return
-    onProgramsChange(
-      programs.map((p) =>
-        p.id === programId
-          ? {
-              ...p,
-              degrees: p.degrees.map((d) =>
-                d.id === degreeId
-                  ? {
-                      ...d,
-                      yearLevels: [
-                        ...d.yearLevels,
-                        { id: generateId(), year: Number(newItemData.year), degreeId, semesters: [] },
-                      ],
-                    }
-                  : d,
-              ),
-            }
-          : p,
-      ),
-    )
-    resetAddForm()
-  }
-
-  const deleteYearLevel = (programId, degreeId, yearId) => {
-    onProgramsChange(
-      programs.map((p) =>
-        p.id === programId
-          ? {
-              ...p,
-              degrees: p.degrees.map((d) =>
-                d.id === degreeId ? { ...d, yearLevels: d.yearLevels.filter((y) => y.id !== yearId) } : d,
-              ),
-            }
-          : p,
-      ),
-    )
-  }
-
-  // Semester CRUD
-  const addSemester = (programId, degreeId, yearId) => {
-    if (!newItemData.semNumber) return
-    onProgramsChange(
-      programs.map((p) =>
-        p.id === programId
-          ? {
-              ...p,
-              degrees: p.degrees.map((d) =>
-                d.id === degreeId
-                  ? {
-                      ...d,
-                      yearLevels: d.yearLevels.map((y) =>
-                        y.id === yearId
-                          ? {
-                              ...y,
-                              semesters: [
-                                ...y.semesters,
-                                { id: generateId(), semNumber: Number(newItemData.semNumber), yearId, sections: [] },
-                              ],
-                            }
-                          : y,
-                      ),
-                    }
-                  : d,
-              ),
-            }
-          : p,
-      ),
-    )
-    resetAddForm()
-  }
-
-  const deleteSemester = (programId, degreeId, yearId, semId) => {
-    onProgramsChange(
-      programs.map((p) =>
-        p.id === programId
-          ? {
-              ...p,
-              degrees: p.degrees.map((d) =>
-                d.id === degreeId
-                  ? {
-                      ...d,
-                      yearLevels: d.yearLevels.map((y) =>
-                        y.id === yearId ? { ...y, semesters: y.semesters.filter((s) => s.id !== semId) } : y,
-                      ),
-                    }
-                  : d,
-              ),
-            }
-          : p,
-      ),
-    )
-  }
-
   // Section CRUD
-  const addSection = (programId, degreeId, yearId, semId, specId) => {
+  const addSection = (programId, degreeId, yearId, semId) => {
     if (!newItemData.name?.trim() || !newItemData.seatCapacity) return
     onProgramsChange(
       programs.map((p) =>
@@ -366,7 +375,6 @@ export function AcademicHierarchy({
                                           id: generateId(),
                                           name: newItemData.name,
                                           seatCapacity: Number(newItemData.seatCapacity),
-                                          specializationId: specId,
                                           semesterId: semId,
                                         },
                                       ],
@@ -384,6 +392,50 @@ export function AcademicHierarchy({
       ),
     )
     resetAddForm()
+  }
+
+  const updateSection = (
+    programId,
+    degreeId,
+    yearId,
+    semId,
+    sectionId,
+    updates,
+  ) => {
+    onProgramsChange(
+      programs.map((p) =>
+        p.id === programId
+          ? {
+              ...p,
+              degrees: p.degrees.map((d) =>
+                d.id === degreeId
+                  ? {
+                      ...d,
+                      yearLevels: d.yearLevels.map((y) =>
+                        y.id === yearId
+                          ? {
+                              ...y,
+                              semesters: y.semesters.map((sem) =>
+                                sem.id === semId
+                                  ? {
+                                      ...sem,
+                                      sections: sem.sections.map((sec) =>
+                                        sec.id === sectionId ? { ...sec, ...updates } : sec,
+                                      ),
+                                    }
+                                  : sem,
+                              ),
+                            }
+                          : y,
+                      ),
+                    }
+                  : d,
+              ),
+            }
+          : p,
+      ),
+    )
+    cancelEdit()
   }
 
   const deleteSection = (programId, degreeId, yearId, semId, sectionId) => {
@@ -417,21 +469,16 @@ export function AcademicHierarchy({
     )
   }
 
-  // Helper to get department name
-  const getDepartmentName = (deptId) => {
-    return departments.find((d) => d.id === deptId)?.name || "Unknown Dept"
-  }
-
-  // Render inline add form
+  // Add Form Renderer
   const renderAddForm = (type, onAdd) => {
-    if (type === "department" || type === "program" || type === "specialization") {
+    if (type === "department" || type === "program") {
       return (
         <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
           <Input
             placeholder={`Enter ${type} name`}
             value={newItemData.name || ""}
             onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
-            className="h-8 text-sm"
+            className="h-8 text-sm flex-1"
             autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter") onAdd()
@@ -450,18 +497,19 @@ export function AcademicHierarchy({
 
     if (type === "degree") {
       return (
-        <div className="p-4 bg-muted/30 rounded-lg space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
+        <div className="p-4 bg-muted/30 rounded-lg space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2">
               <Label className="text-xs">Degree Name</Label>
               <Input
-                placeholder="e.g., B.Tech, MBA"
+                placeholder="e.g., B.Tech, M.Tech, MBA"
                 value={newItemData.name || ""}
                 onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
-                className="h-8 text-sm"
+                className="h-8 text-sm mt-1"
+                autoFocus
               />
             </div>
-            <div className="space-y-2">
+            <div>
               <Label className="text-xs">Duration</Label>
               <Input
                 type="number"
@@ -469,16 +517,16 @@ export function AcademicHierarchy({
                 placeholder="4"
                 value={newItemData.duration || ""}
                 onChange={(e) => setNewItemData({ ...newItemData, duration: e.target.value })}
-                className="h-8 text-sm"
+                className="h-8 text-sm mt-1"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="text-xs">Duration Unit</Label>
+            <div>
+              <Label className="text-xs">Unit</Label>
               <Select
                 value={newItemData.durationUnit || "Years"}
-                onValueChange={(val) => setNewItemData({ ...newItemData, durationUnit: val })}
+                onValueChange={(v) => setNewItemData({ ...newItemData, durationUnit: v })}
               >
-                <SelectTrigger className="h-8 text-sm">
+                <SelectTrigger className="h-8 text-sm mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -503,24 +551,25 @@ export function AcademicHierarchy({
 
     if (type === "branch") {
       return (
-        <div className="p-4 bg-muted/30 rounded-lg space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+        <div className="p-4 bg-muted/30 rounded-lg space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
               <Label className="text-xs">Branch Name</Label>
               <Input
                 placeholder="e.g., Computer Science"
                 value={newItemData.name || ""}
                 onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
-                className="h-8 text-sm"
+                className="h-8 text-sm mt-1"
+                autoFocus
               />
             </div>
-            <div className="space-y-2">
+            <div>
               <Label className="text-xs">Department</Label>
               <Select
                 value={newItemData.departmentId || ""}
-                onValueChange={(val) => setNewItemData({ ...newItemData, departmentId: val })}
+                onValueChange={(v) => setNewItemData({ ...newItemData, departmentId: v })}
               >
-                <SelectTrigger className="h-8 text-sm">
+                <SelectTrigger className="h-8 text-sm mt-1">
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
                 <SelectContent>
@@ -537,7 +586,7 @@ export function AcademicHierarchy({
             <Button size="sm" variant="ghost" onClick={resetAddForm}>
               Cancel
             </Button>
-            <Button size="sm" onClick={onAdd}>
+            <Button size="sm" onClick={onAdd} disabled={!newItemData.name || !newItemData.departmentId}>
               Add Branch
             </Button>
           </div>
@@ -545,48 +594,40 @@ export function AcademicHierarchy({
       )
     }
 
-    if (type === "yearLevel") {
+    if (type === "specialization") {
       return (
-        <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
-          <Label className="text-xs whitespace-nowrap">Year:</Label>
-          <Input
-            type="number"
-            min="1"
-            max="6"
-            placeholder="1"
-            value={newItemData.year || ""}
-            onChange={(e) => setNewItemData({ ...newItemData, year: e.target.value })}
-            className="h-8 text-sm w-20"
-          />
-          <Button size="sm" onClick={onAdd}>
-            <Check className="h-3 w-3" />
-          </Button>
-          <Button size="sm" variant="ghost" onClick={resetAddForm}>
-            <X className="h-3 w-3" />
-          </Button>
-        </div>
-      )
-    }
-
-    if (type === "semester") {
-      return (
-        <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
-          <Label className="text-xs whitespace-nowrap">Semester #:</Label>
-          <Input
-            type="number"
-            min="1"
-            max="12"
-            placeholder="1"
-            value={newItemData.semNumber || ""}
-            onChange={(e) => setNewItemData({ ...newItemData, semNumber: e.target.value })}
-            className="h-8 text-sm w-20"
-          />
-          <Button size="sm" onClick={onAdd}>
-            <Check className="h-3 w-3" />
-          </Button>
-          <Button size="sm" variant="ghost" onClick={resetAddForm}>
-            <X className="h-3 w-3" />
-          </Button>
+        <div className="p-4 bg-muted/30 rounded-lg space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">Specialization Name</Label>
+              <Input
+                placeholder="e.g., AI & ML, Data Science"
+                value={newItemData.name || ""}
+                onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
+                className="h-8 text-sm mt-1"
+                autoFocus
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Section Intake (Students)</Label>
+              <Input
+                type="number"
+                min="1"
+                placeholder="60"
+                value={newItemData.sectionIntake || ""}
+                onChange={(e) => setNewItemData({ ...newItemData, sectionIntake: e.target.value })}
+                className="h-8 text-sm mt-1"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button size="sm" variant="ghost" onClick={resetAddForm}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={onAdd}>
+              Add Specialization
+            </Button>
+          </div>
         </div>
       )
     }
@@ -601,6 +642,7 @@ export function AcademicHierarchy({
               value={newItemData.name || ""}
               onChange={(e) => setNewItemData({ ...newItemData, name: e.target.value })}
               className="h-8 text-sm w-20"
+              autoFocus
             />
           </div>
           <div className="flex items-center gap-2">
@@ -627,8 +669,13 @@ export function AcademicHierarchy({
     return null
   }
 
+  // Get department name helper
+  const getDepartmentName = (departmentId) => {
+    return departments.find((d) => d.id === departmentId)?.name || "Unknown"
+  }
+
   return (
-    <Tabs defaultValue="structure" className="w-full">
+    <Tabs defaultValue="departments" className="w-full">
       <TabsList className="grid w-full grid-cols-3 mb-4">
         <TabsTrigger value="departments">Departments</TabsTrigger>
         <TabsTrigger value="structure">Academic Structure</TabsTrigger>
@@ -655,16 +702,16 @@ export function AcademicHierarchy({
               {editingId === dept.id ? (
                 <div className="flex-1 flex items-center gap-2">
                   <Input
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    value={editValue.name || ""}
+                    onChange={(e) => setEditValue({ ...editValue, name: e.target.value })}
                     className="h-8 text-sm"
                     autoFocus
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") updateDepartment(dept.id, editValue)
+                      if (e.key === "Enter") updateDepartment(dept.id, editValue.name)
                       if (e.key === "Escape") cancelEdit()
                     }}
                   />
-                  <Button size="sm" variant="ghost" onClick={() => updateDepartment(dept.id, editValue)}>
+                  <Button size="sm" variant="ghost" onClick={() => updateDepartment(dept.id, editValue.name)}>
                     <Check className="h-3 w-3" />
                   </Button>
                   <Button size="sm" variant="ghost" onClick={cancelEdit}>
@@ -679,7 +726,7 @@ export function AcademicHierarchy({
                       size="icon"
                       variant="ghost"
                       className="h-7 w-7 opacity-0 group-hover:opacity-100"
-                      onClick={() => startEdit(dept.id, dept.name)}
+                      onClick={() => startEdit(dept.id, { name: dept.name })}
                     >
                       <Edit2 className="h-3 w-3" />
                     </Button>
@@ -721,9 +768,9 @@ export function AcademicHierarchy({
 
         <div className="space-y-3">
           {programs.map((program) => (
-            <div key={program.id} className="border border-border rounded-lg bg-card overflow-hidden">
+            <Card key={program.id} className="border-border overflow-hidden">
               {/* Program Header */}
-              <div className="flex items-center gap-2 p-3 bg-muted/30 group">
+              <div className="flex items-center gap-2 p-3 bg-muted/50 group">
                 <button onClick={() => toggleExpand(program.id)} className="p-0.5 hover:bg-muted rounded">
                   {expandedItems.has(program.id) ? (
                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -732,29 +779,54 @@ export function AcademicHierarchy({
                   )}
                 </button>
                 <GraduationCap className="h-4 w-4 text-primary" />
-                <span className="flex-1 font-medium">{program.name}</span>
-                <Badge variant="secondary" className="text-xs">
-                  {program.degrees.length} Degree{program.degrees.length !== 1 ? "s" : ""}
-                </Badge>
-                {config.programs.editable && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-7 w-7 opacity-0 group-hover:opacity-100"
-                    onClick={() => startEdit(program.id, program.name)}
-                  >
-                    <Edit2 className="h-3 w-3" />
-                  </Button>
-                )}
-                {config.programs.allowDelete && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
-                    onClick={() => deleteProgram(program.id)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
+
+                {editingId === program.id ? (
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input
+                      value={editValue.name || ""}
+                      onChange={(e) => setEditValue({ ...editValue, name: e.target.value })}
+                      className="h-8 text-sm"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") updateProgram(program.id, editValue.name)
+                        if (e.key === "Escape") cancelEdit()
+                      }}
+                    />
+                    <Button size="sm" variant="ghost" onClick={() => updateProgram(program.id, editValue.name)}>
+                      <Check className="h-3 w-3" />
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <span className="font-semibold text-sm">{program.name}</span>
+                    <Badge variant="secondary" className="text-xs ml-2">
+                      {program.degrees.length} Degree{program.degrees.length !== 1 ? "s" : ""}
+                    </Badge>
+                    <div className="flex-1" />
+                    {config.programs.editable && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100"
+                        onClick={() => startEdit(program.id, { name: program.name })}
+                      >
+                        <Edit2 className="h-3 w-3" />
+                      </Button>
+                    )}
+                    {config.programs.allowDelete && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
+                        onClick={() => deleteProgram(program.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -762,7 +834,6 @@ export function AcademicHierarchy({
               <Collapsible open={expandedItems.has(program.id)}>
                 <CollapsibleContent>
                   <div className="p-3 space-y-3 border-t border-border">
-                    {/* Add Degree Button */}
                     {config.degrees.allowAdd && (
                       <Button
                         size="sm"
@@ -780,7 +851,7 @@ export function AcademicHierarchy({
 
                     {/* Degrees */}
                     {program.degrees.map((degree) => (
-                      <div key={degree.id} className="border border-border rounded-lg overflow-hidden ml-4">
+                      <div key={degree.id} className="border border-border rounded-lg overflow-hidden">
                         {/* Degree Header */}
                         <div className="flex items-center gap-2 p-3 bg-card group">
                           <button onClick={() => toggleExpand(degree.id)} className="p-0.5 hover:bg-muted rounded">
@@ -791,24 +862,94 @@ export function AcademicHierarchy({
                             )}
                           </button>
                           <BookOpen className="h-4 w-4 text-blue-500" />
-                          <span className="font-medium text-sm">{degree.name}</span>
-                          <Badge variant="outline" className="text-xs gap-1">
-                            <Clock className="h-3 w-3" />
-                            {degree.duration} {degree.durationUnit}
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {degree.branches.length} Branch{degree.branches.length !== 1 ? "es" : ""}
-                          </Badge>
-                          <div className="flex-1" />
-                          {config.degrees.allowDelete && (
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
-                              onClick={() => deleteDegree(program.id, degree.id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
+
+                          {editingId === degree.id ? (
+                            <div className="flex-1 space-y-2">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Input
+                                  value={editValue.name || ""}
+                                  onChange={(e) => setEditValue({ ...editValue, name: e.target.value })}
+                                  className="h-8 text-sm w-40"
+                                  placeholder="Degree name"
+                                  autoFocus
+                                />
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  value={editValue.duration || ""}
+                                  onChange={(e) => setEditValue({ ...editValue, duration: e.target.value })}
+                                  className="h-8 text-sm w-20"
+                                  placeholder="Duration"
+                                />
+                                <Select
+                                  value={editValue.durationUnit || "Years"}
+                                  onValueChange={(v) => setEditValue({ ...editValue, durationUnit: v })}
+                                >
+                                  <SelectTrigger className="h-8 text-sm w-28">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Years">Years</SelectItem>
+                                    <SelectItem value="Months">Months</SelectItem>
+                                    <SelectItem value="Semesters">Semesters</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() =>
+                                    updateDegree(program.id, degree.id, {
+                                      name: editValue.name,
+                                      duration: Number(editValue.duration),
+                                      durationUnit: editValue.durationUnit,
+                                    })
+                                  }
+                                >
+                                  <Check className="h-3 w-3" />
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <span className="font-medium text-sm">{degree.name}</span>
+                              <Badge variant="outline" className="text-xs flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {degree.duration} {degree.durationUnit}
+                              </Badge>
+                              <Badge variant="secondary" className="text-xs">
+                                {degree.branches.length} Branch{degree.branches.length !== 1 ? "es" : ""}
+                              </Badge>
+                              <div className="flex-1" />
+                              {config.degrees.editable && (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-7 w-7 opacity-0 group-hover:opacity-100"
+                                  onClick={() =>
+                                    startEdit(degree.id, {
+                                      name: degree.name,
+                                      duration: degree.duration,
+                                      durationUnit: degree.durationUnit,
+                                    })
+                                  }
+                                >
+                                  <Edit2 className="h-3 w-3" />
+                                </Button>
+                              )}
+                              {config.degrees.allowDelete && (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
+                                  onClick={() => deleteDegree(program.id, degree.id)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </>
                           )}
                         </div>
 
@@ -833,9 +974,12 @@ export function AcademicHierarchy({
 
                               {/* Branches */}
                               {degree.branches.map((branch) => (
-                                <div key={branch.id} className="border border-border rounded-lg overflow-hidden ml-4">
+                                <div
+                                  key={branch.id}
+                                  className="border border-border rounded-lg overflow-hidden bg-card"
+                                >
                                   {/* Branch Header */}
-                                  <div className="flex items-center gap-2 p-3 bg-card group">
+                                  <div className="flex items-center gap-2 p-3 group">
                                     <button
                                       onClick={() => toggleExpand(branch.id)}
                                       className="p-0.5 hover:bg-muted rounded"
@@ -846,22 +990,85 @@ export function AcademicHierarchy({
                                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                       )}
                                     </button>
-                                    <Layers className="h-4 w-4 text-green-500" />
-                                    <span className="font-medium text-sm">{branch.name}</span>
-                                    <Badge variant="outline" className="text-xs gap-1">
-                                      <Building className="h-3 w-3" />
-                                      {getDepartmentName(branch.departmentId)}
-                                    </Badge>
-                                    <div className="flex-1" />
-                                    {config.branches.allowDelete && (
-                                      <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
-                                        onClick={() => deleteBranch(program.id, degree.id, branch.id)}
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </Button>
+                                    <Layers className="h-4 w-4 text-orange-500" />
+
+                                    {editingId === branch.id ? (
+                                      <div className="flex-1 flex items-center gap-2 flex-wrap">
+                                        <Input
+                                          value={editValue.name || ""}
+                                          onChange={(e) => setEditValue({ ...editValue, name: e.target.value })}
+                                          className="h-8 text-sm w-40"
+                                          autoFocus
+                                        />
+                                        <Select
+                                          value={editValue.departmentId || ""}
+                                          onValueChange={(v) => setEditValue({ ...editValue, departmentId: v })}
+                                        >
+                                          <SelectTrigger className="h-8 text-sm w-40">
+                                            <SelectValue placeholder="Select dept" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {departments.map((dept) => (
+                                              <SelectItem key={dept.id} value={dept.id}>
+                                                {dept.name}
+                                              </SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() =>
+                                            updateBranch(program.id, degree.id, branch.id, {
+                                              name: editValue.name,
+                                              departmentId: editValue.departmentId,
+                                            })
+                                          }
+                                        >
+                                          <Check className="h-3 w-3" />
+                                        </Button>
+                                        <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                                          <X className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <span className="font-medium text-sm">{branch.name}</span>
+                                        <Badge variant="outline" className="text-xs flex items-center gap-1">
+                                          <Building className="h-3 w-3" />
+                                          {getDepartmentName(branch.departmentId)}
+                                        </Badge>
+                                        <Badge variant="secondary" className="text-xs">
+                                          {branch.specializations.length} Specialization
+                                          {branch.specializations.length !== 1 ? "s" : ""}
+                                        </Badge>
+                                        <div className="flex-1" />
+                                        {config.branches.editable && (
+                                          <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="h-7 w-7 opacity-0 group-hover:opacity-100"
+                                            onClick={() =>
+                                              startEdit(branch.id, {
+                                                name: branch.name,
+                                                departmentId: branch.departmentId,
+                                              })
+                                            }
+                                          >
+                                            <Edit2 className="h-3 w-3" />
+                                          </Button>
+                                        )}
+                                        {config.branches.allowDelete && (
+                                          <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
+                                            onClick={() => deleteBranch(program.id, degree.id, branch.id)}
+                                          >
+                                            <Trash2 className="h-3 w-3" />
+                                          </Button>
+                                        )}
+                                      </>
                                     )}
                                   </div>
 
@@ -895,27 +1102,90 @@ export function AcademicHierarchy({
                                         {branch.specializations.map((spec) => (
                                           <div
                                             key={spec.id}
-                                            className="flex items-center gap-2 p-2 bg-card rounded-lg border border-border ml-4 group"
+                                            className="flex items-center gap-2 p-2.5 border border-border rounded-lg bg-card group"
                                           >
-                                            <Sparkles className="h-4 w-4 text-amber-500" />
-                                            <span className="flex-1 text-sm">{spec.name}</span>
-                                            {config.specializations.allowDelete && (
-                                              <Button
-                                                size="icon"
-                                                variant="ghost"
-                                                className="h-6 w-6 opacity-0 group-hover:opacity-100 hover:text-destructive"
-                                                onClick={() =>
-                                                  deleteSpecialization(program.id, degree.id, branch.id, spec.id)
-                                                }
-                                              >
-                                                <Trash2 className="h-3 w-3" />
-                                              </Button>
+                                            <Sparkles className="h-4 w-4 text-purple-500" />
+
+                                            {editingId === spec.id ? (
+                                              <div className="flex-1 flex items-center gap-2 flex-wrap">
+                                                <Input
+                                                  value={editValue.name || ""}
+                                                  onChange={(e) => setEditValue({ ...editValue, name: e.target.value })}
+                                                  className="h-8 text-sm w-40"
+                                                  autoFocus
+                                                />
+                                                <div className="flex items-center gap-1">
+                                                  <Users className="h-3 w-3 text-muted-foreground" />
+                                                  <Input
+                                                    type="number"
+                                                    min="1"
+                                                    value={editValue.sectionIntake || ""}
+                                                    onChange={(e) =>
+                                                      setEditValue({ ...editValue, sectionIntake: e.target.value })
+                                                    }
+                                                    className="h-8 text-sm w-20"
+                                                    placeholder="Intake"
+                                                  />
+                                                </div>
+                                                <Button
+                                                  size="sm"
+                                                  variant="ghost"
+                                                  onClick={() =>
+                                                    updateSpecialization(program.id, degree.id, branch.id, spec.id, {
+                                                      name: editValue.name,
+                                                      sectionIntake: Number(editValue.sectionIntake),
+                                                    })
+                                                  }
+                                                >
+                                                  <Check className="h-3 w-3" />
+                                                </Button>
+                                                <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                                                  <X className="h-3 w-3" />
+                                                </Button>
+                                              </div>
+                                            ) : (
+                                              <>
+                                                <span className="text-sm">{spec.name}</span>
+                                                <Badge variant="outline" className="text-xs flex items-center gap-1">
+                                                  <Users className="h-3 w-3" />
+                                                  {spec.sectionIntake} students/section
+                                                </Badge>
+                                                <div className="flex-1" />
+                                                {config.specializations.editable && (
+                                                  <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="h-7 w-7 opacity-0 group-hover:opacity-100"
+                                                    onClick={() =>
+                                                      startEdit(spec.id, {
+                                                        name: spec.name,
+                                                        sectionIntake: spec.sectionIntake,
+                                                      })
+                                                    }
+                                                  >
+                                                    <Edit2 className="h-3 w-3" />
+                                                  </Button>
+                                                )}
+                                                {config.specializations.allowDelete && (
+                                                  <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
+                                                    onClick={() =>
+                                                      deleteSpecialization(program.id, degree.id, branch.id, spec.id)
+                                                    }
+                                                  >
+                                                    <Trash2 className="h-3 w-3" />
+                                                  </Button>
+                                                )}
+                                              </>
                                             )}
                                           </div>
                                         ))}
+
                                         {branch.specializations.length === 0 && (
-                                          <p className="text-xs text-muted-foreground text-center py-2">
-                                            No specializations added
+                                          <p className="text-xs text-muted-foreground text-center py-4">
+                                            No specializations yet
                                           </p>
                                         )}
                                       </div>
@@ -923,9 +1193,10 @@ export function AcademicHierarchy({
                                   </Collapsible>
                                 </div>
                               ))}
+
                               {degree.branches.length === 0 && (
-                                <p className="text-sm text-muted-foreground text-center py-4">
-                                  No branches added. Add departments first, then add branches.
+                                <p className="text-xs text-muted-foreground text-center py-4">
+                                  No branches yet. Add departments first, then add branches.
                                 </p>
                               )}
                             </div>
@@ -933,14 +1204,12 @@ export function AcademicHierarchy({
                         </Collapsible>
                       </div>
                     ))}
-                    {program.degrees.length === 0 && (
-                      <p className="text-sm text-muted-foreground text-center py-4">No degrees added yet</p>
-                    )}
                   </div>
                 </CollapsibleContent>
               </Collapsible>
-            </div>
+            </Card>
           ))}
+
           {programs.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-8">
               No programs added yet. Add your first program (e.g., UG, PG, Diploma) to get started.
@@ -951,250 +1220,232 @@ export function AcademicHierarchy({
 
       {/* Year/Semester/Sections Tab */}
       <TabsContent value="sections" className="space-y-4">
-        <p className="text-sm text-muted-foreground">Manage year levels, semesters, and sections for each degree</p>
+        <p className="text-sm text-muted-foreground">
+          Year levels are auto-generated based on degree duration. Manage semesters and sections here.
+        </p>
 
-        {programs.map((program) =>
-          program.degrees.map((degree) => (
-            <Card key={degree.id} className="border-border">
-              <CardHeader className="py-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-primary" />
-                  {program.name} - {degree.name}
-                  <Badge variant="outline" className="ml-auto">
-                    {degree.duration} {degree.durationUnit}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {config.yearLevels.allowAdd && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full bg-transparent"
-                    onClick={() => setAddingTo({ type: "yearLevel", parentIds: [program.id, degree.id] })}
-                  >
-                    <Plus className="h-3 w-3 mr-1" /> Add Year Level
-                  </Button>
-                )}
-
-                {addingTo?.type === "yearLevel" &&
-                  addingTo.parentIds[1] === degree.id &&
-                  renderAddForm("yearLevel", () => addYearLevel(program.id, degree.id))}
-
-                {/* Year Levels */}
-                {degree.yearLevels
-                  .sort((a, b) => a.year - b.year)
-                  .map((yearLevel) => (
-                    <div key={yearLevel.id} className="border border-border rounded-lg overflow-hidden">
-                      <div className="flex items-center gap-2 p-3 bg-muted/30 group">
-                        <button onClick={() => toggleExpand(yearLevel.id)} className="p-0.5 hover:bg-muted rounded">
-                          {expandedItems.has(yearLevel.id) ? (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </button>
-                        <Calendar className="h-4 w-4 text-blue-500" />
-                        <span className="font-medium text-sm">Year {yearLevel.year}</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {yearLevel.semesters.length} Semester{yearLevel.semesters.length !== 1 ? "s" : ""}
-                        </Badge>
-                        <div className="flex-1" />
-                        {config.yearLevels.allowDelete && (
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
-                            onClick={() => deleteYearLevel(program.id, degree.id, yearLevel.id)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        )}
-                      </div>
-
-                      <Collapsible open={expandedItems.has(yearLevel.id)}>
-                        <CollapsibleContent>
-                          <div className="p-3 space-y-3 border-t border-border">
-                            {config.semesters.allowAdd && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full bg-transparent"
-                                onClick={() =>
-                                  setAddingTo({
-                                    type: "semester",
-                                    parentIds: [program.id, degree.id, yearLevel.id],
-                                  })
-                                }
-                              >
-                                <Plus className="h-3 w-3 mr-1" /> Add Semester
-                              </Button>
+        {programs.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-8">
+            Add programs and degrees first in the Academic Structure tab.
+          </p>
+        ) : (
+          programs.map((program) =>
+            program.degrees.map((degree) => (
+              <Card key={degree.id} className="border-border">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-primary" />
+                    {program.name} - {degree.name}
+                    <Badge variant="outline" className="ml-auto">
+                      {degree.duration} {degree.durationUnit}
+                    </Badge>
+                    <Badge variant="secondary">
+                      {degree.yearLevels.length} Year{degree.yearLevels.length !== 1 ? "s" : ""}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Year Levels */}
+                  {degree.yearLevels
+                    .sort((a, b) => a.year - b.year)
+                    .map((yearLevel) => (
+                      <div key={yearLevel.id} className="border border-border rounded-lg overflow-hidden">
+                        <div className="flex items-center gap-2 p-3 bg-muted/30 group">
+                          <button onClick={() => toggleExpand(yearLevel.id)} className="p-0.5 hover:bg-muted rounded">
+                            {expandedItems.has(yearLevel.id) ? (
+                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4 text-muted-foreground" />
                             )}
+                          </button>
+                          <Calendar className="h-4 w-4 text-blue-500" />
+                          <span className="font-medium text-sm">Year {yearLevel.year}</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {yearLevel.semesters.length} Semester{yearLevel.semesters.length !== 1 ? "s" : ""}
+                          </Badge>
+                        </div>
 
-                            {addingTo?.type === "semester" &&
-                              addingTo.parentIds[2] === yearLevel.id &&
-                              renderAddForm("semester", () => addSemester(program.id, degree.id, yearLevel.id))}
-
-                            {/* Semesters */}
-                            {yearLevel.semesters
-                              .sort((a, b) => a.semNumber - b.semNumber)
-                              .map((semester) => (
-                                <div key={semester.id} className="border border-border rounded-lg overflow-hidden ml-4">
-                                  <div className="flex items-center gap-2 p-3 bg-card group">
-                                    <button
+                        <Collapsible open={expandedItems.has(yearLevel.id)}>
+                          <CollapsibleContent>
+                            <div className="p-3 space-y-3 border-t border-border">
+                              {/* Semesters */}
+                              {yearLevel.semesters
+                                .sort((a, b) => a.semNumber - b.semNumber)
+                                .map((semester) => (
+                                  <div key={semester.id} className="border border-border rounded-lg overflow-hidden">
+                                    <div
+                                      className="flex items-center gap-2 p-2.5 bg-card group cursor-pointer"
                                       onClick={() => toggleExpand(semester.id)}
-                                      className="p-0.5 hover:bg-muted rounded"
                                     >
                                       {expandedItems.has(semester.id) ? (
                                         <ChevronDown className="h-4 w-4 text-muted-foreground" />
                                       ) : (
                                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                       )}
-                                    </button>
-                                    <Hash className="h-4 w-4 text-green-500" />
-                                    <span className="font-medium text-sm">Semester {semester.semNumber}</span>
-                                    <Badge variant="secondary" className="text-xs">
-                                      {semester.sections.length} Section{semester.sections.length !== 1 ? "s" : ""}
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs gap-1">
-                                      <Users className="h-3 w-3" />
-                                      {semester.sections.reduce((acc, s) => acc + s.seatCapacity, 0)} seats
-                                    </Badge>
-                                    <div className="flex-1" />
-                                    {config.semesters.allowDelete && (
-                                      <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive"
-                                        onClick={() => deleteSemester(program.id, degree.id, yearLevel.id, semester.id)}
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
+                                      <Hash className="h-4 w-4 text-green-500" />
+                                      <span className="text-sm font-medium">Semester {semester.semNumber}</span>
+                                      <Badge variant="outline" className="text-xs">
+                                        {semester.sections.length} Section{semester.sections.length !== 1 ? "s" : ""}
+                                      </Badge>
+                                      {semester.sections.length > 0 && (
+                                        <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                                          <Users className="h-3 w-3" />
+                                          {semester.sections.reduce((sum, s) => sum + s.seatCapacity, 0)} total seats
+                                        </Badge>
+                                      )}
+                                    </div>
 
-                                  <Collapsible open={expandedItems.has(semester.id)}>
-                                    <CollapsibleContent>
-                                      <div className="p-3 space-y-2 border-t border-border bg-muted/10">
-                                        {/* Add Section - need to select specialization */}
-                                        {config.sections.allowAdd && degree.branches.length > 0 && (
-                                          <div className="space-y-2">
-                                            <Label className="text-xs">Add Section for Specialization:</Label>
-                                            <div className="flex flex-wrap gap-2">
-                                              {degree.branches.flatMap((branch) =>
-                                                branch.specializations.map((spec) => (
-                                                  <Button
-                                                    key={spec.id}
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() =>
-                                                      setAddingTo({
-                                                        type: "section",
-                                                        parentIds: [
+                                    <Collapsible open={expandedItems.has(semester.id)}>
+                                      <CollapsibleContent>
+                                        <div className="p-3 space-y-2 border-t border-border bg-muted/10">
+                                          {config.sections.allowAdd && (
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              className="w-full bg-transparent"
+                                              onClick={() =>
+                                                setAddingTo({
+                                                  type: "section",
+                                                  parentIds: [program.id, degree.id, yearLevel.id, semester.id],
+                                                })
+                                              }
+                                            >
+                                              <Plus className="h-3 w-3 mr-1" /> Add Section
+                                            </Button>
+                                          )}
+
+                                          {addingTo?.type === "section" &&
+                                            addingTo.parentIds[3] === semester.id &&
+                                            renderAddForm("section", () =>
+                                              addSection(program.id, degree.id, yearLevel.id, semester.id),
+                                            )}
+
+                                          {/* Sections */}
+                                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                                            {semester.sections.map((section) => (
+                                              <div
+                                                key={section.id}
+                                                className="flex items-center gap-2 p-2 border border-border rounded-lg bg-card group"
+                                              >
+                                                {editingId === section.id ? (
+                                                  <div className="flex-1 flex items-center gap-1">
+                                                    <Input
+                                                      value={editValue.name || ""}
+                                                      onChange={(e) =>
+                                                        setEditValue({ ...editValue, name: e.target.value })
+                                                      }
+                                                      className="h-7 text-xs w-12"
+                                                      autoFocus
+                                                    />
+                                                    <Input
+                                                      type="number"
+                                                      min="1"
+                                                      value={editValue.seatCapacity || ""}
+                                                      onChange={(e) =>
+                                                        setEditValue({ ...editValue, seatCapacity: e.target.value })
+                                                      }
+                                                      className="h-7 text-xs w-14"
+                                                    />
+                                                    <Button
+                                                      size="icon"
+                                                      variant="ghost"
+                                                      className="h-6 w-6"
+                                                      onClick={() =>
+                                                        updateSection(
                                                           program.id,
                                                           degree.id,
                                                           yearLevel.id,
                                                           semester.id,
-                                                          spec.id,
-                                                        ],
-                                                      })
-                                                    }
-                                                  >
-                                                    <Plus className="h-3 w-3 mr-1" />
-                                                    {spec.name}
-                                                  </Button>
-                                                )),
-                                              )}
-                                            </div>
+                                                          section.id,
+                                                          {
+                                                            name: editValue.name,
+                                                            seatCapacity: Number(editValue.seatCapacity),
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <Check className="h-3 w-3" />
+                                                    </Button>
+                                                    <Button
+                                                      size="icon"
+                                                      variant="ghost"
+                                                      className="h-6 w-6"
+                                                      onClick={cancelEdit}
+                                                    >
+                                                      <X className="h-3 w-3" />
+                                                    </Button>
+                                                  </div>
+                                                ) : (
+                                                  <>
+                                                    <span className="text-sm font-medium">Section {section.name}</span>
+                                                    <Badge variant="outline" className="text-xs">
+                                                      {section.seatCapacity}
+                                                    </Badge>
+                                                    <div className="flex-1" />
+                                                    {config.sections.editable && (
+                                                      <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                                                        onClick={() =>
+                                                          startEdit(section.id, {
+                                                            name: section.name,
+                                                            seatCapacity: section.seatCapacity,
+                                                          })
+                                                        }
+                                                      >
+                                                        <Edit2 className="h-3 w-3" />
+                                                      </Button>
+                                                    )}
+                                                    {config.sections.allowDelete && (
+                                                      <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-6 w-6 opacity-0 group-hover:opacity-100 hover:text-destructive"
+                                                        onClick={() =>
+                                                          deleteSection(
+                                                            program.id,
+                                                            degree.id,
+                                                            yearLevel.id,
+                                                            semester.id,
+                                                            section.id,
+                                                          )
+                                                        }
+                                                      >
+                                                        <Trash2 className="h-3 w-3" />
+                                                      </Button>
+                                                    )}
+                                                  </>
+                                                )}
+                                              </div>
+                                            ))}
                                           </div>
-                                        )}
 
-                                        {addingTo?.type === "section" &&
-                                          addingTo.parentIds[3] === semester.id &&
-                                          renderAddForm("section", () =>
-                                            addSection(
-                                              program.id,
-                                              degree.id,
-                                              yearLevel.id,
-                                              semester.id,
-                                              addingTo.parentIds[4],
-                                            ),
+                                          {semester.sections.length === 0 && (
+                                            <p className="text-xs text-muted-foreground text-center py-3">
+                                              No sections yet
+                                            </p>
                                           )}
+                                        </div>
+                                      </CollapsibleContent>
+                                    </Collapsible>
+                                  </div>
+                                ))}
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      </div>
+                    ))}
 
-                                        {/* Sections */}
-                                        {semester.sections.map((section) => {
-                                          const spec = degree.branches
-                                            .flatMap((b) => b.specializations)
-                                            .find((s) => s.id === section.specializationId)
-
-                                          return (
-                                            <div
-                                              key={section.id}
-                                              className="flex items-center gap-2 p-2 bg-card rounded-lg border border-border group"
-                                            >
-                                              <Users className="h-4 w-4 text-amber-500" />
-                                              <span className="font-medium text-sm">Section {section.name}</span>
-                                              <Badge variant="outline" className="text-xs">
-                                                {section.seatCapacity} seats
-                                              </Badge>
-                                              {spec && (
-                                                <Badge variant="secondary" className="text-xs">
-                                                  {spec.name}
-                                                </Badge>
-                                              )}
-                                              <div className="flex-1" />
-                                              {config.sections.allowDelete && (
-                                                <Button
-                                                  size="icon"
-                                                  variant="ghost"
-                                                  className="h-6 w-6 opacity-0 group-hover:opacity-100 hover:text-destructive"
-                                                  onClick={() =>
-                                                    deleteSection(
-                                                      program.id,
-                                                      degree.id,
-                                                      yearLevel.id,
-                                                      semester.id,
-                                                      section.id,
-                                                    )
-                                                  }
-                                                >
-                                                  <Trash2 className="h-3 w-3" />
-                                                </Button>
-                                              )}
-                                            </div>
-                                          )
-                                        })}
-                                        {semester.sections.length === 0 && (
-                                          <p className="text-xs text-muted-foreground text-center py-2">
-                                            No sections added. Add specializations first.
-                                          </p>
-                                        )}
-                                      </div>
-                                    </CollapsibleContent>
-                                  </Collapsible>
-                                </div>
-                              ))}
-                            {yearLevel.semesters.length === 0 && (
-                              <p className="text-sm text-muted-foreground text-center py-2">No semesters added</p>
-                            )}
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
-                    </div>
-                  ))}
-                {degree.yearLevels.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    No year levels added. Add year levels to manage semesters and sections.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          )),
-        )}
-        {programs.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-8">
-            Add programs and degrees in the Academic Structure tab first.
-          </p>
+                  {degree.yearLevels.length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      Set degree duration to auto-generate year levels
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )),
+          )
         )}
       </TabsContent>
     </Tabs>

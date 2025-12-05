@@ -14,6 +14,8 @@ import { YearLevel, YearLevelSchema } from './schema/year-level.schema';
 import { Degree, DegreeSchema } from './schema/degree.schema';
 import { Section, SectionSchema } from './schema/section.schema';
 import { Semester, SemesterSchema } from './schema/semester.schema';
+import Institute, { InstituteSchema } from 'src/institute/schemas/institute.schema';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   imports: [
@@ -27,7 +29,11 @@ import { Semester, SemesterSchema } from './schema/semester.schema';
       { name: Section.name, schema: SectionSchema }, // A, B, C
       { name: Semester.name, schema: SemesterSchema }, // 1, 2
       { name: Department.name, schema: DepartmentSchema }, //
+      { name: Institute.name, schema: InstituteSchema },
+
     ]),
+
+    AdminModule
   ],
   providers: [AcademicService],
   controllers: [AcademicController],

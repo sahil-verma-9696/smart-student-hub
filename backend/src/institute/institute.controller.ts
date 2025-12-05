@@ -38,6 +38,10 @@ export class InstituteController {
   ) {
     return this.instituteService.updateInstitute(updateInstituteDto, id);
   }
+  @Get(':id/institute-details')
+  getInstitute(@Param('id') id: string) {
+    return this.instituteService.getInstituteDetails(id);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {
