@@ -10,7 +10,7 @@ import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 import { AdminService } from 'src/admin/admin.service';
 import { UpdateAdminDto } from 'src/admin/dto/update-admin.dto';
 import { AcademicService } from 'src/academic/academic.service';
-
+// `inst3admin@gmail.com
 @Injectable()
 export class InstituteService implements IInstituteService {
   constructor(
@@ -89,7 +89,7 @@ export class InstituteService implements IInstituteService {
   }
 
   async updateInstitute(dto: UpdateInstituteDto, instituteId: string) {
-    const updatedInstitute: Partial<InstituteDocument> = {
+    const updatedInstitutePayload: Partial<InstituteDocument> = {
       official_email: dto.email,
       official_phone: dto.phone,
       alternatePhone: dto.alternatePhone,
@@ -103,16 +103,16 @@ export class InstituteService implements IInstituteService {
     };
 
     // institute basic details updated
-    await this.instituteModel.findByIdAndUpdate(
+    const updatedInstitute = await this.instituteModel.findByIdAndUpdate(
       new Types.ObjectId(instituteId),
-      updatedInstitute,
+      updatedInstitutePayload,
       {
         new: true,
       },
     );
 
     // update institue admin details
-    const updatedAdmin: UpdateAdminDto = {
+    const updatedAdminPayload: UpdateAdminDto = {
       name: dto.adminName as string,
       email: dto.adminEmail as string,
       contactInfo: {
@@ -120,13 +120,16 @@ export class InstituteService implements IInstituteService {
       },
     };
 
-    const instituteAdmin =
+    const instituteAdmins =
       await this.adminService.getAdminsByInstitute(instituteId);
 
+    if (instituteAdmins.length === 0) {
+      return { message: 'Institute admin not found' };
+    }
 
-    await this.adminService.updateAdmin(
-      instituteAdmin[0]._id.toString(),
-      updatedAdmin,
+    const updatedAdmin = await this.adminService.updateAdmin(
+      instituteAdmins[0]._id.toString(),
+      updatedAdminPayload,
     );
 
     // update programs
@@ -138,7 +141,11 @@ export class InstituteService implements IInstituteService {
     await this.academicService.upsertFullStructure(programPayload, instituteId);
     // update departments
 
-    return { message: 'Institute updated successfully' };
+    return {
+      updatedInstitute,
+      updatedAdmin,
+      message: 'Institute updated successfully',
+    };
   }
 
   // async getInstituteFullStructure(instituteId: string) {

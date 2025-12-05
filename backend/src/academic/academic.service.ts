@@ -23,7 +23,6 @@ import { UpdateSemesterDto } from 'src/auth/dto/sub/update-semester.dto';
 import { UpdateSectionDto } from 'src/auth/dto/sub/update-section.dto';
 import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 import { UpdateDepartmentDto } from 'src/auth/dto/sub/update-department.dto';
-import e from 'express';
 
 @Injectable()
 export class AcademicService {
@@ -390,7 +389,6 @@ export class AcademicService {
     programDto: UpdateProgramDto,
     instituteId: Types.ObjectId,
   ) {
-    console.log(programDto);
     let program = await this.programModel.findOne({
       institute: instituteId,
       id: programDto.id,
@@ -415,6 +413,7 @@ export class AcademicService {
     // Upsert Degrees
     // ------------------------------------
     for (const degreeDto of programDto.degrees ?? []) {
+      console.log(degreeDto, 'degreeDto');
       await this.upsertDegree(degreeDto, program._id, instituteId);
     }
 
@@ -429,9 +428,11 @@ export class AcademicService {
     programId: Types.ObjectId,
     instituteId: Types.ObjectId,
   ) {
+    console.log(programId, 'programId');
     // Find existing degree under this program
     let degree = await this.degreeModel.findOne({
-      program: programId,
+      name: dto.name,
+      program: new Types.ObjectId(programId),
     });
 
     // Create if missing
@@ -465,8 +466,8 @@ export class AcademicService {
   async upsertBranch(dto: UpdateBranchDto, degreeId: Types.ObjectId) {
     // Find existing branch under this degree
     let branch = await this.branchModel.findOne({
-      degree: degreeId,
-      department: dto.departmentId,
+      name: dto.name,
+      degree: new Types.ObjectId(degreeId),
     });
 
     // Create
@@ -499,7 +500,7 @@ export class AcademicService {
     branchId: Types.ObjectId,
   ) {
     const specialization = await this.specializationModel.findOne({
-      branch: branchId,
+      branch: new Types.ObjectId(branchId),
       name: dto.name,
     });
 
@@ -508,6 +509,9 @@ export class AcademicService {
         name: dto.name,
         branch: branchId,
       });
+    } else {
+      if (dto.name) specialization.name = dto.name;
+      await specialization.save();
     }
 
     return specialization;
@@ -567,7 +571,7 @@ export class AcademicService {
   // AUTO CREATE or UPDATE SECTION
   // -----------------------------
   async upsertSection(dto: UpdateSectionDto, semesterId: Types.ObjectId) {
-    let sec = await this.sectionModel.findOne({
+    const sec = await this.sectionModel.findOne({
       semester: semesterId,
       name: dto.name,
     });
@@ -595,27 +599,17 @@ export class AcademicService {
     dto: UpdateDepartmentDto,
     instituteId: Types.ObjectId,
   ) {
-    let department: DepartmentDocument | null;
+    let department: DepartmentDocument | null =
+      await this.departmentModel.findOne({
+        name: dto.name,
+        institute: instituteId,
+      });
 
     // If frontend sent an id → update
-    if (dto.id) {
-      department = await this.departmentModel.findByIdAndUpdate(
-        dto.id,
-        { name: dto.name },
-        { new: true },
-      );
-
-      // If record not found → create new one
-      if (!department) {
-        department = await this.departmentModel.create({
-          name: dto.name,
-          institute: instituteId,
-        });
-      }
-    }
-
-    // If no id → always create a new department
-    else {
+    if (department) {
+      if (dto.name) department.name = dto.name;
+      await department.save();
+    } else {
       department = await this.departmentModel.create({
         name: dto.name,
         institute: instituteId,
@@ -632,9 +626,9 @@ export class AcademicService {
     const instituteObjectId = new Types.ObjectId(instituteId);
 
     // 🔥 Upsert Departments
-    // for (const deptDto of dto.departments ?? []) {
-    //   await this.upsertDepartment(deptDto, instituteObjectId);
-    // }
+    for (const deptDto of dto.departments ?? []) {
+      await this.upsertDepartment(deptDto, instituteObjectId);
+    }
 
     // 🔥 Upsert Programs (already exists)
     for (const programDto of dto.programs ?? []) {

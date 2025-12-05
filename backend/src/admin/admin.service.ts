@@ -59,6 +59,15 @@ export class AdminService implements IAdminService {
     return admin;
   }
 
+  async createAdminWithInstitueId(
+    instituteId: string,
+    dto: CreateAdminDto,
+  ): Promise<AdminDocument> {
+    const admin = await this.createAdmin(dto);
+    await this.joinInstitute(admin._id.toString(), instituteId);
+    return admin;
+  }
+
   async deleteAdmin(adminId: string): Promise<void> {
     await this.adminModel.deleteOne({ _id: adminId }).exec();
   }
@@ -76,15 +85,10 @@ export class AdminService implements IAdminService {
   }
 
   async getAdminsByInstitute(instituteId: string): Promise<AdminDocument[]> {
-
-    const admin = await this.adminModel
+    const admins = await this.adminModel
       .find({ institute: new Types.ObjectId(instituteId) })
       .exec();
-
-    if (!admin) {
-      throw new Error('Admin not found');
-    }
-    return admin;
+    return admins;
   }
 
   async getByUserId(userId: string): Promise<AdminDocument> {
