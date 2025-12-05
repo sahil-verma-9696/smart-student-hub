@@ -6,6 +6,8 @@ export type ProgramDocument = HydratedDocument<Program>;
 
 @Schema({ timestamps: true })
 export class Program {
+  @Prop({ type: String })
+  id: string;
   @Prop({ required: true })
   name: string; // UG, PG, Diploma
 

@@ -76,13 +76,11 @@ export class AdminService implements IAdminService {
   }
 
   async getAdminsByInstitute(instituteId: string): Promise<AdminDocument[]> {
-    console.log('instituteId', instituteId);
 
     const admin = await this.adminModel
       .find({ institute: new Types.ObjectId(instituteId) })
       .exec();
 
-    console.log('admin', admin);
     if (!admin) {
       throw new Error('Admin not found');
     }

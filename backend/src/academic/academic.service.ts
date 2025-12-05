@@ -23,6 +23,7 @@ import { UpdateSemesterDto } from 'src/auth/dto/sub/update-semester.dto';
 import { UpdateSectionDto } from 'src/auth/dto/sub/update-section.dto';
 import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 import { UpdateDepartmentDto } from 'src/auth/dto/sub/update-department.dto';
+import e from 'express';
 
 @Injectable()
 export class AcademicService {
@@ -389,26 +390,30 @@ export class AcademicService {
     programDto: UpdateProgramDto,
     instituteId: Types.ObjectId,
   ) {
-    let program: ProgramDocument | null;
+    console.log(programDto);
+    let program = await this.programModel.findOne({
+      institute: instituteId,
+      id: programDto.id,
+    });
 
-    if (programDto.id) {
-      program = await this.programModel.findByIdAndUpdate(
-        programDto.id,
-        { name: programDto.name },
-        { new: true },
-      );
-    } else {
+    if (!program) {
       program = await this.programModel.create({
+        id: programDto.id,
         name: programDto.name,
         institute: instituteId,
       });
     }
 
-    console.log(program, 'program');
+    // If ID exists → try to update existing program
+    if (program) {
+      // Update fields
+      if (programDto.name) program.name = programDto.name;
+      program = await program.save();
+    }
 
-    if (!program) throw new NotFoundException('Program not found');
-
+    // ------------------------------------
     // Upsert Degrees
+    // ------------------------------------
     for (const degreeDto of programDto.degrees ?? []) {
       await this.upsertDegree(degreeDto, program._id, instituteId);
     }
@@ -424,32 +429,31 @@ export class AcademicService {
     programId: Types.ObjectId,
     instituteId: Types.ObjectId,
   ) {
-    let degree: DegreeDocument | null;
+    // Find existing degree under this program
+    let degree = await this.degreeModel.findOne({
+      program: programId,
+    });
 
-    if (dto.id) {
-      degree = await this.degreeModel.findByIdAndUpdate(
-        dto.id,
-        { name: dto.name },
-        { new: true },
-      );
-    } else {
+    // Create if missing
+    if (!degree) {
       degree = await this.degreeModel.create({
         name: dto.name,
         program: programId,
-        institute: new Types.ObjectId(instituteId),
+        institute: instituteId,
       });
+    } else {
+      if (dto.name) degree.name = dto.name;
+      await degree.save();
     }
-
-    if (!degree) throw new NotFoundException('Degree not found');
 
     // Branches
     for (const branchDto of dto.branches ?? []) {
       await this.upsertBranch(branchDto, degree._id);
     }
 
-    // Year Levels
+    // YearLevels
     for (const yearDto of dto.yearLevels ?? []) {
-      await this.upsertYear(yearDto, degree?._id);
+      await this.upsertYear(yearDto, degree._id);
     }
 
     return degree;
@@ -459,23 +463,25 @@ export class AcademicService {
   // AUTO CREATE or UPDATE BRANCH
   // -----------------------------
   async upsertBranch(dto: UpdateBranchDto, degreeId: Types.ObjectId) {
-    let branch: BranchDocument | null;
+    // Find existing branch under this degree
+    let branch = await this.branchModel.findOne({
+      degree: degreeId,
+      department: dto.departmentId,
+    });
 
-    if (dto.id) {
-      branch = await this.branchModel.findByIdAndUpdate(
-        dto.id,
-        { name: dto.name },
-        { new: true },
-      );
-    } else {
+    // Create
+    if (!branch) {
       branch = await this.branchModel.create({
         name: dto.name,
-        degree: new Types.ObjectId(degreeId),
-        department: new Types.ObjectId(dto.departmentId),
+        degree: degreeId,
+        department: dto.departmentId,
       });
     }
-
-    if (!branch) throw new NotFoundException('Branch not found');
+    // Update
+    else {
+      if (dto.name) branch.name = dto.name;
+      await branch.save();
+    }
 
     // Specializations
     for (const specDto of dto.specializations ?? []) {
@@ -492,42 +498,39 @@ export class AcademicService {
     dto: UpdateSpecializationDto,
     branchId: Types.ObjectId,
   ) {
-    if (dto.id) {
-      return this.specializationModel.findByIdAndUpdate(
-        dto.id,
-        { name: dto.name },
-        { new: true },
-      );
+    const specialization = await this.specializationModel.findOne({
+      branch: branchId,
+      name: dto.name,
+    });
+
+    if (!specialization) {
+      return this.specializationModel.create({
+        name: dto.name,
+        branch: branchId,
+      });
     }
 
-    return this.specializationModel.create({
-      name: dto.name,
-      branch: branchId,
-    });
+    return specialization;
   }
 
   // -----------------------------
   // AUTO CREATE or UPDATE YEAR LEVEL
   // -----------------------------
   async upsertYear(dto: UpdateYearLevelDto, degreeId: Types.ObjectId) {
-    let year: YearLevelDocument | null;
+    let year = await this.yearLevelModel.findOne({
+      degree: degreeId,
+      year: dto.year,
+    });
 
-    if (dto.id) {
-      year = await this.yearLevelModel.findByIdAndUpdate(
-        dto.id,
-        { year: dto.year },
-        { new: true },
-      );
-    } else {
+    if (!year) {
       year = await this.yearLevelModel.create({
         year: dto.year,
         degree: degreeId,
       });
+    } else {
+      await year.save();
     }
 
-    if (!year) throw new NotFoundException('Year Level not found');
-
-    // Semesters
     for (const semDto of dto.semesters ?? []) {
       await this.upsertSemester(semDto, year._id);
     }
@@ -539,52 +542,50 @@ export class AcademicService {
   // AUTO CREATE or UPDATE SEMESTER
   // -----------------------------
   async upsertSemester(dto: UpdateSemesterDto, yearId: Types.ObjectId) {
-    let semester: SemesterDocument | null;
+    let sem = await this.semesterModel.findOne({
+      year: yearId,
+      semNumber: dto.semNumber,
+    });
 
-    if (dto.id) {
-      semester = await this.semesterModel.findByIdAndUpdate(
-        dto.id,
-        { semNumber: dto.semNumber },
-        { new: true },
-      );
-    } else {
-      semester = await this.semesterModel.create({
+    if (!sem) {
+      sem = await this.semesterModel.create({
         semNumber: dto.semNumber,
         year: yearId,
       });
+    } else {
+      await sem.save();
     }
 
-    if (!semester) throw new NotFoundException('Semester not found');
-
-    // Sections
     for (const secDto of dto.sections ?? []) {
-      await this.upsertSection(secDto, semester._id);
+      await this.upsertSection(secDto, sem._id);
     }
 
-    return semester;
+    return sem;
   }
 
   // -----------------------------
   // AUTO CREATE or UPDATE SECTION
   // -----------------------------
   async upsertSection(dto: UpdateSectionDto, semesterId: Types.ObjectId) {
-    if (dto.id) {
-      return this.sectionModel.findByIdAndUpdate(
-        dto.id,
-        {
-          name: dto.name,
-          seatCapacity: dto.seatCapacity,
-        },
-        { new: true },
-      );
+    let sec = await this.sectionModel.findOne({
+      semester: semesterId,
+      name: dto.name,
+    });
+
+    if (!sec) {
+      return this.sectionModel.create({
+        name: dto.name,
+        seatCapacity: dto.seatCapacity,
+        specialization: dto.specializationId,
+        semester: semesterId,
+      });
     }
 
-    return this.sectionModel.create({
-      name: dto.name,
-      seatCapacity: dto.seatCapacity,
-      specialization: dto.specializationId,
-      semester: semesterId,
-    });
+    // Update
+    if (dto.seatCapacity) sec.seatCapacity = dto.seatCapacity;
+    await sec.save();
+
+    return sec;
   }
 
   // =========================================

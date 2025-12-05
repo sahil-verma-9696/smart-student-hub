@@ -123,7 +123,6 @@ export class InstituteService implements IInstituteService {
     const instituteAdmin =
       await this.adminService.getAdminsByInstitute(instituteId);
 
-    console.log(instituteAdmin, 'instituteAdmin');
 
     await this.adminService.updateAdmin(
       instituteAdmin[0]._id.toString(),
