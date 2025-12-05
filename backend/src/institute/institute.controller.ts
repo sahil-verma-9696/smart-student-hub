@@ -5,11 +5,12 @@ import {
   Body,
   // Patch,
   Param,
+  Patch,
   // Delete,
 } from '@nestjs/common';
 import { InstituteService } from './institute.service';
 import CreateInstituteDto from './dto/create-institute.dto';
-// import { UpdateInstituteDto } from './dto/update-institute.dto';
+import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 
 @Controller('institute')
 export class InstituteController {
@@ -30,13 +31,13 @@ export class InstituteController {
     return this.instituteService.getInstituteById(id);
   }
 
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateInstituteDto: UpdateInstituteDto,
-  // ) {
-  //   return this.instituteService.update(+id, updateInstituteDto);
-  // }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateInstituteDto: UpdateInstituteDto,
+  ) {
+    return this.instituteService.updateInstitute(updateInstituteDto, id);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {

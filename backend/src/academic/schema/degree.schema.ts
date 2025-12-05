@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 import { Types } from 'mongoose';
 
-export type DegreeDocument = Degree & Document;
+export type DegreeDocument = HydratedDocument<Degree>;
 
 @Schema({ timestamps: true })
 export class Degree {

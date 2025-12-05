@@ -6,11 +6,17 @@ import { Model, Types } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
 import { IInstituteService } from './types/service.interface';
 import { ClientSession } from 'mongoose';
+import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
+import { AdminService } from 'src/admin/admin.service';
+import { UpdateAdminDto } from 'src/admin/dto/update-admin.dto';
+import { AcademicService } from 'src/academic/academic.service';
 
 @Injectable()
 export class InstituteService implements IInstituteService {
   constructor(
     @InjectModel(Institute.name) private instituteModel: Model<Institute>,
+    private readonly adminService: AdminService,
+    private readonly academicService: AcademicService,
   ) {}
 
   async create(createInstituteDto: CreateInstituteDto) {
@@ -81,4 +87,298 @@ export class InstituteService implements IInstituteService {
 
     return updatedInstitute;
   }
+
+  async updateInstitute(dto: UpdateInstituteDto, instituteId: string) {
+    const updatedInstitute: Partial<InstituteDocument> = {
+      official_email: dto.email,
+      official_phone: dto.phone,
+      alternatePhone: dto.alternatePhone,
+      website: dto.website,
+      address_line1: dto.addressLine1,
+      addressLine2: dto.addressLine2,
+      city: dto.city,
+      state: dto.state,
+      pincode: dto.pincode,
+      logo: dto.logo,
+    };
+
+    // institute basic details updated
+    await this.instituteModel.findByIdAndUpdate(
+      new Types.ObjectId(instituteId),
+      updatedInstitute,
+      {
+        new: true,
+      },
+    );
+
+    // update institue admin details
+    const updatedAdmin: UpdateAdminDto = {
+      name: dto.adminName as string,
+      email: dto.adminEmail as string,
+      contactInfo: {
+        phone: dto.adminPhone as string,
+      },
+    };
+
+    const instituteAdmin =
+      await this.adminService.getAdminsByInstitute(instituteId);
+
+    console.log(instituteAdmin, 'instituteAdmin');
+
+    await this.adminService.updateAdmin(
+      instituteAdmin[0]._id.toString(),
+      updatedAdmin,
+    );
+
+    // update programs
+    const programPayload: UpdateInstituteDto = {
+      programs: dto.programs,
+      departments: dto.departments,
+    };
+
+    await this.academicService.upsertFullStructure(programPayload, instituteId);
+    // update departments
+
+    return { message: 'Institute updated successfully' };
+  }
+
+  // async getInstituteFullStructure(instituteId: string) {
+  //   const result = await this.instituteModel.aggregate([
+  //     {
+  //       $match: { _id: new Types.ObjectId(instituteId) },
+  //     },
+
+  //     // ========== Departments ==========
+  //     {
+  //       $lookup: {
+  //         from: 'departments',
+  //         localField: '_id',
+  //         foreignField: 'institute',
+  //         as: 'departments',
+  //       },
+  //     },
+
+  //     // ========== Programs ==========
+  //     {
+  //       $lookup: {
+  //         from: 'programs',
+  //         localField: '_id',
+  //         foreignField: 'institute',
+  //         as: 'programs',
+  //       },
+  //     },
+
+  //     // ========== Degrees ==========
+  //     {
+  //       $lookup: {
+  //         from: 'degrees',
+  //         let: { programIds: '$programs._id' },
+  //         pipeline: [
+  //           {
+  //             $match: {
+  //               $expr: { $in: ['$program', '$$programIds'] },
+  //             },
+  //           },
+  //         ],
+  //         as: 'degrees',
+  //       },
+  //     },
+
+  //     // ========== Branches ==========
+  //     {
+  //       $lookup: {
+  //         from: 'branches',
+  //         let: { degreeIds: '$degrees._id' },
+  //         pipeline: [
+  //           {
+  //             $match: {
+  //               $expr: { $in: ['$degree', '$$degreeIds'] },
+  //             },
+  //           },
+  //         ],
+  //         as: 'branches',
+  //       },
+  //     },
+
+  //     // ========== Specializations ==========
+  //     {
+  //       $lookup: {
+  //         from: 'specializations',
+  //         let: { branchIds: '$branches._id' },
+  //         pipeline: [
+  //           {
+  //             $match: {
+  //               $expr: { $in: ['$branch', '$$branchIds'] },
+  //             },
+  //           },
+  //         ],
+  //         as: 'specializations',
+  //       },
+  //     },
+
+  //     // ========== Year Levels ==========
+  //     {
+  //       $lookup: {
+  //         from: 'yearlevels',
+  //         let: { degreeIds: '$degrees._id' },
+  //         pipeline: [
+  //           {
+  //             $match: {
+  //               $expr: { $in: ['$degree', '$$degreeIds'] },
+  //             },
+  //           },
+  //         ],
+  //         as: 'yearLevels',
+  //       },
+  //     },
+
+  //     // ========== Semesters ==========
+  //     {
+  //       $lookup: {
+  //         from: 'semesters',
+  //         let: { yearIds: '$yearLevels._id' },
+  //         pipeline: [
+  //           {
+  //             $match: {
+  //               $expr: { $in: ['$year', '$$yearIds'] },
+  //             },
+  //           },
+  //         ],
+  //         as: 'semesters',
+  //       },
+  //     },
+
+  //     // ========== Sections ==========
+  //     {
+  //       $lookup: {
+  //         from: 'sections',
+  //         let: { semIds: '$semesters._id' },
+  //         pipeline: [
+  //           {
+  //             $match: {
+  //               $expr: { $in: ['$semester', '$$semIds'] },
+  //             },
+  //           },
+  //         ],
+  //         as: 'sections',
+  //       },
+  //     },
+
+  //     // ========== FINAL MERGE INTO YOUR DESIRED STRUCTURE ==========
+  //     {
+  //       $addFields: {
+  //         programs: {
+  //           $map: {
+  //             input: '$programs',
+  //             as: 'p',
+  //             in: {
+  //               id: '$$p._id',
+  //               name: '$$p.name',
+  //               degrees: {
+  //                 $map: {
+  //                   input: {
+  //                     $filter: {
+  //                       input: '$degrees',
+  //                       cond: { $eq: ['$$this.program', '$$p._id'] },
+  //                     },
+  //                   },
+  //                   as: 'd',
+  //                   in: {
+  //                     id: '$$d._id',
+  //                     name: '$$d.name',
+  //                     branches: {
+  //                       $map: {
+  //                         input: {
+  //                           $filter: {
+  //                             input: '$branches',
+  //                             cond: { $eq: ['$$this.degree', '$$d._id'] },
+  //                           },
+  //                         },
+  //                         as: 'b',
+  //                         in: {
+  //                           id: '$$b._id',
+  //                           name: '$$b.name',
+  //                           specializations: {
+  //                             $filter: {
+  //                               input: '$specializations',
+  //                               cond: { $eq: ['$$this.branch', '$$b._id'] },
+  //                             },
+  //                           },
+  //                         },
+  //                       },
+  //                     },
+  //                     yearLevels: {
+  //                       $map: {
+  //                         input: {
+  //                           $filter: {
+  //                             input: '$yearLevels',
+  //                             cond: { $eq: ['$$this.degree', '$$d._id'] },
+  //                           },
+  //                         },
+  //                         as: 'y',
+  //                         in: {
+  //                           id: '$$y._id',
+  //                           year: '$$y.year',
+  //                           semesters: {
+  //                             $map: {
+  //                               input: {
+  //                                 $filter: {
+  //                                   input: '$semesters',
+  //                                   cond: { $eq: ['$$this.year', '$$y._id'] },
+  //                                 },
+  //                               },
+  //                               as: 's',
+  //                               in: {
+  //                                 id: '$$s._id',
+  //                                 semNumber: '$$s.semNumber',
+  //                                 sections: {
+  //                                   $filter: {
+  //                                     input: '$sections',
+  //                                     cond: {
+  //                                       $eq: ['$$this.semester', '$$s._id'],
+  //                                     },
+  //                                   },
+  //                                 },
+  //                               },
+  //                             },
+  //                           },
+  //                         },
+  //                       },
+  //                     },
+  //                   },
+  //                 },
+  //               },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+
+  //     {
+  //       $project: {
+  //         departments: 1,
+  //         programs: 1,
+  //         instituteId: 1,
+  //         instituteName: 1,
+  //         instituteCode: 1,
+  //         accreditationStatus: 1,
+  //         addressLine1: 1,
+  //         addressLine2: 1,
+  //         city: 1,
+  //         state: 1,
+  //         pincode: 1,
+  //         email: 1,
+  //         phone: 1,
+  //         alternatePhone: 1,
+  //         adminName: 1,
+  //         adminEmail: 1,
+  //         adminPhone: 1,
+  //         adminDesignation: 1,
+  //         verification: 1,
+  //       },
+  //     },
+  //   ]);
+
+  //   return result[0] || null;
+  // }
 }

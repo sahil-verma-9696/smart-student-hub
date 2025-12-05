@@ -16,6 +16,7 @@ import { VerificationDto } from './sub/verification.dto';
 
 export class CreateInstituteDto {
   @IsString()
+  @IsOptional()
   instituteId: string;
 
   @IsString()
@@ -92,6 +93,7 @@ export class CreateInstituteDto {
   adminPhone: string;
 
   @IsString()
+  @IsOptional()
   adminDesignation: string;
 
   // Verification

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import { InstituteType } from 'src/auth/types/auth.enum';
 
 export type InstituteDocument = Institute & Document;
@@ -42,8 +42,28 @@ export default class Institute {
   @Prop()
   affiliation_id?: string;
 
-  @Prop({ type: [Types.ObjectId], default: [], ref: 'Admin' })
-  admins: Types.ObjectId[];
+  @Prop({ default: '' })
+  instituteCode?: string;
+
+  @Prop({ default: 0 })
+  establishedYear?: number;
+
+  @Prop({ default: '' })
+  accreditationStatus?: string;
+
+  // ---- CONTACT INFO ----
+  @Prop()
+  alternatePhone?: string;
+
+  @Prop({ default: '' })
+  website?: string;
+
+  // ---- ADDRESS ----
+  @Prop()
+  addressLine2?: string;
+
+  @Prop()
+  logo?: string;
 }
 
 export const InstituteSchema = SchemaFactory.createForClass(Institute);

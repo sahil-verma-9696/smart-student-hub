@@ -19,4 +19,12 @@ export class AcademicController {
   update(@Param('studentId') studentId: string, @Body() updateData: any) {
     return this.academicService.updateForStudent(studentId, updateData);
   }
+
+  // @Patch('/institute/:instituteId')
+  // updateInstitute(
+  //   @Param('instituteId') instituteId: string,
+  //   @Body() updateData: any,
+  // ) {
+  //   return this.academicService.updateForInstitute(instituteId, updateData);
+  // }
 }

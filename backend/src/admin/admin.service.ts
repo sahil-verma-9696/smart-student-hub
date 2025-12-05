@@ -7,17 +7,16 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { USER_ROLE } from 'src/user/types/enum';
-import { InstituteService } from 'src/institute/institute.service';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { UserDocument } from 'src/user/schema/user.schema';
 import { InstituteDocument } from 'src/institute/schemas/institute.schema';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 
 @Injectable()
 export class AdminService implements IAdminService {
   constructor(
     @InjectModel(Admin.name) private adminModel: Model<AdminDocument>,
     private readonly userService: UserService,
-    private readonly instituteService: InstituteService,
   ) {}
 
   async createAdmin(
@@ -65,7 +64,11 @@ export class AdminService implements IAdminService {
   }
 
   async getAdminById(adminId: string): Promise<AdminDocument> {
-    const admin = await this.adminModel.findById(adminId).exec();
+    const admin = await this.adminModel
+      .findById(new Types.ObjectId(adminId))
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
+      .exec();
     if (!admin) {
       throw new Error('Admin not found');
     }
@@ -73,7 +76,13 @@ export class AdminService implements IAdminService {
   }
 
   async getAdminsByInstitute(instituteId: string): Promise<AdminDocument[]> {
-    const admin = await this.adminModel.find({ institute: instituteId }).exec();
+    console.log('instituteId', instituteId);
+
+    const admin = await this.adminModel
+      .find({ institute: new Types.ObjectId(instituteId) })
+      .exec();
+
+    console.log('admin', admin);
     if (!admin) {
       throw new Error('Admin not found');
     }
@@ -107,27 +116,11 @@ export class AdminService implements IAdminService {
       throw new NotFoundException(`Admin ${adminId} not found`);
     }
 
-    // 2. Validate institute exists
-    const institute = await this.instituteService.getInstituteById(
-      instituteId,
-      session,
-    );
-    if (!institute) {
-      throw new NotFoundException(`Institute ${instituteId} not found`);
-    }
-
     // 3. Update admin.institute inside transaction
     await this.adminModel.updateOne(
       { _id: adminId },
       { $set: { institute: new Types.ObjectId(instituteId) } },
       { session },
-    );
-
-    // 4. Update institute.admins[] inside transaction
-    await this.instituteService.addAdminToInstitute(
-      instituteId,
-      adminId,
-      session,
     );
 
     // 5. Return updated, populated admin
@@ -148,12 +141,32 @@ export class AdminService implements IAdminService {
     adminId: string,
     dto: UpdateAdminDto,
   ): Promise<AdminDocument> {
-    const admin = await this.adminModel.findByIdAndUpdate(adminId, dto, {
-      new: true,
-    });
-    if (!admin) {
-      throw new NotFoundException(`Admin ${adminId} not found`);
+    // USER only have basicUserDetails so we need to update User only
+    const admin = await this.getAdminById(adminId);
+
+    if (!admin || !admin.basicUserDetails) {
+      throw new NotFoundException(
+        `Admin or Admin.basicUserDetails ${adminId} not found`,
+      );
     }
+
+    const userAsAdmin = await this.userService.getUserById(
+      admin.basicUserDetails._id.toString(),
+    );
+
+    const userUpdatePayload: Partial<UpdateUserDto> = {
+      name: dto.name,
+      email: dto.email,
+      password: dto.password,
+      gender: dto.gender,
+      contactInfo: dto.contactInfo,
+    };
+
+    await this.userService.updateUser(
+      userAsAdmin._id.toString(),
+      userUpdatePayload,
+    );
+
     return this.adminModel
       .findById(adminId)
       .populate('basicUserDetails', '-passwordHash')
