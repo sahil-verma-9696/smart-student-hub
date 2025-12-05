@@ -1,28 +1,31 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <header
       className="
         sticky top-0 z-50 
-        border-b border-white/10 
-        bg-blue-500 backdrop-blur-xl 
-        animate-headerDrop
+        bg-[#F8F4ED]/70 backdrop-blur-xl 
+        border-b border-[#e4dcd2]
+        shadow-[0_2px_12px_rgba(0,0,0,0.05)]
       "
     >
-      <nav className="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-
-        {/* Logo */}
+      <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+        {/* SIH Logo + Name */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-teal-500 flex items-center justify-center shadow-md">
-            <span className="text-white font-semibold text-lg">S</span>
-          </div>
-          <span className="font-semibold text-xl text-white hidden sm:inline tracking-wide">
+          <h1
+            className="w-10 h-10 bg-amber-500 text-white font-extrabold 
+               flex items-center justify-center rounded-lg text-2xl"
+          >
+            S
+          </h1>
+
+          <span className="font-semibold text-xl text-[#0B234A] tracking-wide">
             Smart Student Hub
           </span>
         </div>
@@ -34,54 +37,53 @@ export default function Header() {
               key={item}
               href={`#${item.toLowerCase()}`}
               className="
-                text-gray-300 hover:text-white 
-                relative group transition 
-                tracking-wide
+                text-[#334155] hover:text-[#0B234A]
+                relative group transition
+                font-medium tracking-wide
               "
             >
               {item}
-              <span className="
-                absolute left-0 -bottom-1 h-[2px] w-0 
-                bg-teal-400 rounded-full 
-                transition-all duration-300 
-                group-hover:w-full
-              "></span>
+              <span
+                className="
+                  absolute left-0 -bottom-1 h-[2px] w-0 
+                  bg-[#0B234A] rounded-full 
+                  transition-all duration-300 
+                  group-hover:w-full
+                "
+              ></span>
             </a>
           ))}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-white"
+          className="md:hidden text-[#0B234A]"
         >
           {isOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div
-            className="
-              absolute top-16 left-0 right-0 
-              bg-black/70 backdrop-blur-xl 
-              border-b border-white/10 
-              p-5 md:hidden flex flex-col gap-6 
-              animate-mobileMenu
-            "
-          >
-            {["Features", "About", "Team"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-gray-300 hover:text-white text-lg tracking-wide"
-              >
-                {item}
-              </a>
-            ))}
-          </div>
-        )}
-
       </nav>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div
+          className="
+          md:hidden bg-[#FFFDF8] 
+          border-t border-[#e4dcd2] 
+          py-4 px-6 flex flex-col gap-4 shadow-sm
+        "
+        >
+          {["Features", "About", "Team"].map((item) => (
+            <a
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              className="text-[#334155] font-medium hover:text-[#0B234A] transition"
+            >
+              {item}
+            </a>
+          ))}
+        </div>
+      )}
     </header>
-  )
+  );
 }

@@ -2,90 +2,109 @@ import { Card } from '@/components/ui/card'
 import { Github, Linkedin, Mail } from 'lucide-react'
 
 const team = [
-  {
-    name: 'Sahil Verma',
+  { 
+    name: 'Sahil Verma', 
     role: 'Lead Developer',
-    // image: '/professional-developer-headshot.png'
+    image: '/placeholder.svg'
   },
-  {
-
-
-    name: 'Sonal Verma',
+  { 
+    name: 'Sonal Verma', 
     role: 'Product Manager',
-    // image: '/professional-product-manager-headshot.jpg'
+    image: "https://i.ibb.co/pvZkttnL/IMG-20250204-WA0007.jpg"
   },
-  {
-    name: 'Krishna Gupta',
+  { 
+    name: 'Krishna Gupta', 
     role: 'Backend Engineer',
-    // image: '/professional-backend-engineer-headshot.jpg'
+    image: "https://i.ibb.co/0Rh6ycJ7/IMG-20250204-WA0005.jpg"
   },
-  {
-    name: 'Prakhar Shukla',
+  { 
+    name: 'Prakhar Shukla', 
     role: 'Frontend Engineer',
-    // image: '/professional-frontend-engineer-headshot.jpg'
+    image: "https://i.ibb.co/yBkbCHqn/IMG-20250204-WA0006.jpg"
   },
-  {
-    name: 'Adarsh Singh',
+  { 
+    name: 'Adarsh Singh', 
     role: 'UI/UX Designer',
-    // image: '/professional-designer-headshot.png'
+    image: '/placeholder.svg'
   },
-  {
-    name: 'Gaurav Sharma',
+  { 
+    name: 'Gaurav Sharma', 
     role: 'DevOps Engineer',
-    // image: '/professional-devops-engineer-headshot.jpg'
+    image: '/placeholder.svg'
   }
 ]
 
 export default function Team() {
   return (
-    <section id="team" className="px-4 py-20 sm:px-6 lg:px-8 bg-card">
+    <section id="team" className="px-4 py-20 sm:px-6 lg:px-8 bg-[#F7F4ED]">
       <div className="max-w-7xl mx-auto">
-        <div className="space-y-4 mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
+
+        {/* Header */}
+        <div className="space-y-4 mb-14 text-center">
+          <h2 className="text-4xl sm:text-5xl font-bold text-[#0B234A]">
             Meet Our Team
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            Dedicated professionals bringing Smart Student Hub to life with expertise and innovation
+          <p className="text-lg text-[#4b5563] max-w-2xl mx-auto">
+            Dedicated professionals bringing Smart Student Hub to life
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Team Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {team.map((member, index) => (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-border">
-              <div className="aspect-square overflow-hidden bg-muted">
-                <img
-                  src={member.image || "/placeholder.svg"}
-                  alt={member.name}
-                  className="w-full h-full object-cover"
-                />
+            <Card
+              key={index}
+              className="
+                rounded-2xl overflow-hidden
+                bg-white/80 backdrop-blur-sm
+                border border-[#e6e0d6]
+                shadow-sm hover:shadow-md 
+                transition-all duration-300
+              "
+            >
+
+              {/* Clean, Adjusted Full-Width Image */}
+              <div className="px-4 pt-4">
+                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#e9e5dd]">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
               </div>
 
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-foreground mb-1">
+              {/* Content */}
+              <div className="p-6 text-center">
+                <h3 className="text-xl font-semibold text-[#0B234A]">
                   {member.name}
                 </h3>
 
-                <p className="text-primary font-medium mb-4">
+                <p className="text-[#2A4F8E] font-medium text-sm mb-4">
                   {member.role}
                 </p>
 
-                <div className="flex gap-3">
-                  <button className="p-2 rounded-lg hover:bg-muted transition-colors">
-                    <Mail className="w-4 h-4 text-muted-foreground" />
+                {/* Social Buttons */}
+                <div className="flex justify-center gap-3">
+                  <button className="p-2 rounded-lg hover:bg-[#f0ede7] transition-colors">
+                    <Mail className="w-4 h-4 text-[#4b5563]" />
                   </button>
 
-                  <button className="p-2 rounded-lg hover:bg-muted transition-colors">
-                    <Linkedin className="w-4 h-4 text-muted-foreground" />
+                  <button className="p-2 rounded-lg hover:bg-[#f0ede7] transition-colors">
+                    <Linkedin className="w-4 h-4 text-[#4b5563]" />
                   </button>
 
-                  <button className="p-2 rounded-lg hover:bg-muted transition-colors">
-                    <Github className="w-4 h-4 text-muted-foreground" />
+                  <button className="p-2 rounded-lg hover:bg-[#f0ede7] transition-colors">
+                    <Github className="w-4 h-4 text-[#4b5563]" />
                   </button>
                 </div>
               </div>
+
             </Card>
           ))}
         </div>
+
       </div>
     </section>
   )

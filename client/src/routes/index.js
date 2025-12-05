@@ -6,8 +6,6 @@ import ScholarWindowPage from "@/pages/student-pages/scholar-window/page";
 import FacultyDashboardPage from "@/pages/faculty-pages/faculty-dashboard";
 import AdminDashboardPage from "@/pages/admin-pages/admin-dashboard";
 import ApprovalPannel from "@/pages/faculty-pages/approval-pannel";
-import AdminAddStudentsPage from "@/pages/admin-pages/add-students";
-import AdminAddFacultyPage from "@/pages/admin-pages/add-faculty";
 import ActivitiesFilterPage from "@/pages/admin-pages/student-panel";
 import AdminAnalyticsPage from "@/pages/admin-pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-pages/admin-settings";
@@ -21,6 +19,8 @@ import ActivitiesManagement from "@/pages/admin-pages/components/activity-manage
 import AdminInstPageProvider from "@/pages/admin-pages/provider/admin-inst.provider";
 import StudentManagementProvider from "@/pages/admin-pages/provider/student-management.provider";
 import FacultyManagementProvider from "@/pages/admin-pages/provider/faculty-management.provider";
+import { Share } from "lucide-react";
+import ShareAchivos from "@/pages/student-pages/ShareAchivos";
 
 export default createBrowserRouter([
   {
@@ -57,6 +57,10 @@ export default createBrowserRouter([
       {
         path: "private-vault",
         Component: PrivateVault,
+      },
+      {
+        path:"share-achivos",
+        Component:ShareAchivos
       },
       {
         path: "setting",

@@ -7,68 +7,53 @@ export default function Hero({ onGetStarted }) {
   const [authOpen, setAuthOpen] = useState(false);
 
   return (
-    <section className="relative px-4 py-20 sm:px-6 lg:px-8 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-[#F7F4ED]">
+      <div className="max-w-4xl mx-auto text-center">
 
-          {/* Left Content */}
-          <div className="space-y-6">
-            <div className="inline-block">
-              <span className="px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium text-[#3b82f6]">
-                Government Initiative • J&K Higher Education
-              </span>
-            </div>
+        {/* Heading */}
+        <h1 className="text-5xl font-extrabold text-[#0B234A] leading-tight">
+          Centralized Student Activity <br />
+          <span className="text-[#2A4F8E]">Records Management Platform</span>
+        </h1>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Centralized Student Activity <span className="text-[#3b82f6]">Records Platform</span>
-            </h1>
+        {/* Subtitle */}
+        <p className="text-lg text-gray-600 mt-6 max-w-2xl mx-auto">
+          A unified digital solution for Higher Educational Institutions to
+          securely manage, track, and validate student achievements and activities.
+        </p>
 
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
-              Smart Student Hub revolutionizes how Higher Educational Institutions manage comprehensive student activity records. A unified digital platform designed for the Government of Jammu and Kashmir's Higher Education Department.
-            </p>
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+          <Button
+            size="lg"
+            className="bg-[#2A4F8E] hover:bg-[#1E3A6A] text-white shadow-md px-7 py-6 text-base"
+            onClick={onGetStarted}
+          >
+            Get Started <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button
-                size="lg"
-                className="bg-[#3b82f6] hover:bg-primary/90"
-                onClick={onGetStarted}
-              >
-                Get Started
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-
-              <Button size="lg" variant="outline">
-                Learn More
-              </Button>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-8 pt-8 border-t border-border">
-              <div>
-                <p className="text-3xl font-bold text-foreground">100+</p>
-                <p className="text-sm text-muted-foreground">HEIs Supported</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-foreground">50K+</p>
-                <p className="text-sm text-muted-foreground">Students Managed</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Visual */}
-          <div className="relative h-96 sm:h-full bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl border border-border flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="inline-block px-6 py-3 rounded-lg bg-primary/10 border border-primary/20">
-                <p className="text-sm font-semibold text-[#3b82f6]">Platform Features</p>
-              </div>
-              <p className="text-muted-foreground">Comprehensive Activity Tracking</p>
-            </div>
-          </div>
-
-          {/* Modal */}
-          <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
-
+          <Button
+            size="lg"
+            variant="outline"
+            className="border-[#2A4F8E] text-[#2A4F8E] hover:bg-[#2A4F8E]/10 px-7 py-6 text-base"
+          >
+            Learn More
+          </Button>
         </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-10 mt-16 justify-center max-w-md mx-auto border-t border-gray-300 pt-10">
+          <div>
+            <p className="text-4xl font-bold text-orange-500">100+</p>
+            <p className="text-gray-600">HEIs Supported</p>
+          </div>
+
+          <div>
+            <p className="text-4xl font-bold text-[#1B5E20]">50K+</p>
+            <p className="text-gray-600">Students Managed</p>
+          </div>
+        </div>
+
       </div>
     </section>
   );

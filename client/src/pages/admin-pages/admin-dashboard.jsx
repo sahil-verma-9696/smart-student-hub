@@ -85,7 +85,6 @@ export default function AdminDashboardPage() {
     ]);
   }, []);
 
-  const { user } = useAuthContext();
 
   useEffect(() => {
     const fetchData = async () => {

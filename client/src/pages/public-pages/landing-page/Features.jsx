@@ -36,38 +36,71 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="px-4 py-20 sm:px-6 lg:px-8 bg-card">
+    <section
+      id="features"
+      className="
+        px-4 py-24 sm:px-6 lg:px-8 
+        bg-[#F7F4ED] 
+      "
+    >
       <div className="max-w-7xl mx-auto">
-        <div className="space-y-4 mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
+
+        {/* Section Header */}
+        <div className="space-y-4 mb-16 text-center">
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-[#0B234A]">
             Powerful Features
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            Everything you need to streamline student activity management across your institution
+          <p className="text-lg text-[#4b5563] max-w-2xl mx-auto">
+            Everything you need to streamline student activity management in one unified system
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
-              <Card 
-                key={index} 
-                className="p-8 hover:shadow-lg transition-shadow duration-300 border-border hover:border-primary/50"
+              <Card
+                key={index}
+                className="
+                  p-8 rounded-2xl 
+                  bg-white/70 backdrop-blur-sm 
+                  border border-[#e6e0d6] 
+                  shadow-sm
+                  hover:shadow-xl 
+                  hover:-translate-y-[4px]
+                  transition-all duration-300
+                "
               >
-                <div className="inline-block p-3 rounded-lg bg-primary/10 mb-6">
-                  <Icon className="w-6 h-6 text-primary" />
+                {/* Icon Container */}
+                <div 
+                  className="
+                    inline-flex items-center justify-center
+                    w-14 h-14 rounded-xl
+                    bg-[#2A4F8E]/10
+                    backdrop-blur-sm
+                    shadow-md
+                    mb-6
+                  "
+                >
+                  <Icon className="w-7 h-7 text-[#2A4F8E]" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">
+
+                {/* Title */}
+                <h3 className="text-xl font-semibold text-[#0B234A] mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+
+                {/* Description */}
+                <p className="text-[#4b5563] leading-relaxed">
                   {feature.description}
                 </p>
+
               </Card>
             )
           })}
         </div>
+
       </div>
     </section>
   )
