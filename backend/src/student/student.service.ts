@@ -320,23 +320,6 @@ export class StudentService {
 
     return student;
   }
-  async getById(studentId: string) {
-    const student = await this.studentModel
-      .findOne({ _id: new Types.ObjectId(studentId) })
-      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
-      .populate<{ institute: InstituteDocument }>('institute')
-      .populate<{ adademicDetails: AcademicDocument }>('academicDetails')
-      .exec();
-
-    if (!student) {
-      throw new NotFoundException(
-        `Student with basicUserDetails ${studentId} not found`,
-      );
-    }
-
-    return student;
-  }
-
   /**
    * Get student by student document id
    */
