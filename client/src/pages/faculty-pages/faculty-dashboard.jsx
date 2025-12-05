@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserPlus, BarChart3, CheckCircle, Users, Award, TrendingUp, Clock, AlertCircle, XCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export default function FacultyDashboardPage() {
+  const navigate = useNavigate();
   const [activities] = useState([
     { id: 1, student: 'Alice Johnson', action: 'Completed Project Submission', time: '2 hours ago', status: 'pending' },
     { id: 2, student: 'Bob Smith', action: 'Workshop Attendance', time: '5 hours ago', status: 'verified' },
@@ -59,7 +61,7 @@ export default function FacultyDashboardPage() {
   };
 
   const handleVerifyActivity = (activityId) => {
-    console.log('Verifying activity:', activityId);
+    navigate('/faculty/approval-pannel');
   };
 
   const getStatusConfig = (status) => {

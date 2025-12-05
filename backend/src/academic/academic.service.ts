@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ClientSession } from 'mongoose';
 import { Academic } from './schema/academic.schema';
 import { CreateAcademicDto } from './dto/create-academic.dto';
+import { UpdateAcademicDto } from './dto/update-academic.dto';
 
 import { NotFoundException } from '@nestjs/common';
 
@@ -31,7 +32,7 @@ export class AcademicService {
   }
 
   // UPDATE
-  async update(id: string, dto: CreateAcademicDto): Promise<Academic> {
+  async update(id: string, dto: UpdateAcademicDto): Promise<Academic> {
     const updated = await this.academicModel
       .findByIdAndUpdate(id, dto, { new: true })
       .exec();

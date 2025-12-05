@@ -5,5 +5,5 @@ import {
 
 export class CreateBasicStudentDto {
   @IsString()
-  instituteId: string;
+  institute: string;
 }

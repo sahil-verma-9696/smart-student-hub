@@ -8,9 +8,14 @@ import AdminDashboardPage from "@/pages/admin-pages/admin-dashboard";
 import ApprovalPannel from "@/pages/faculty-pages/approval-pannel";
 import AdminAddStudentsPage from "@/pages/admin-pages/add-students";
 import AdminAddFacultyPage from "@/pages/admin-pages/add-faculty";
+import AdminProgramsPage from "@/pages/admin-pages/add-programs";
 import ActivitiesFilterPage from "@/pages/admin-pages/student-panel";
 import AdminAnalyticsPage from "@/pages/admin-pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-pages/admin-settings";
+import FacultyAssignmentsPage from "@/pages/admin-pages/faculty-assignments";
+import AddActivityTypePage from "@/pages/admin-pages/add-activity-type";
+import ActivityAssignmentManagement from "@/pages/admin-pages/activity-assignment-management";
+import ActivityTypeManagement from "@/pages/admin-pages/activity-type-management";
 import { createBrowserRouter } from "react-router";
 import { UpDocs } from "@/pages/student-pages/UpDocs";
 import PortfolioPage from "@/pages/student-pages/portfolio";
@@ -94,6 +99,26 @@ export default createBrowserRouter([
       {
         path: "add-faculty",
         Component: AdminAddFacultyPage,
+      },
+      {
+        path: "faculty-assignments",
+        Component: FacultyAssignmentsPage,
+      },
+      {
+        path: "programs",
+        Component: AdminProgramsPage,
+      },
+      {
+        path: "add-activity-type",
+        Component: AddActivityTypePage,
+      },
+      {
+        path: "activity-type-management",
+        Component: ActivityTypeManagement,
+      },
+      {
+        path: "activity-assignment-management",
+        Component: ActivityAssignmentManagement,
       },
       {
         path: "students-panel",

@@ -43,11 +43,14 @@ let AuthService = class AuthService {
             role: 'admin',
             contactInfo: admin_contactInfo,
             gender: admin_gender,
-            instituteId: institute._id.toString(),
         });
-        const admin = await this.adminService.create(user._id);
+        const admin = await this.adminService.create(user._id, institute._id.toString());
+        const updatedUser = await this.userService.findById(user._id.toString());
+        if (!updatedUser) {
+            throw new common_1.BadRequestException('Failed to fetch updated user');
+        }
         const { passwordHash, ...sanitizedUser } = user.toObject();
-        const payload = this.buildJwtPayload(user);
+        const payload = await this.buildJwtPayload(updatedUser);
         const token = this.jwtService.sign(payload);
         return {
             institute,
@@ -62,21 +65,24 @@ let AuthService = class AuthService {
         const { password } = data || {};
         const user = await this.userService.create({
             passwordHash: password,
-            userId: '22CSME017',
-            instituteId,
+            userId: `STU${Date.now()}`,
             contactInfo: data.contactInfo,
             email: data.email,
             name: data.name,
             role: 'student',
             gender: data.gender,
         });
-        const studentData = await this.studentService.create(user._id.toString());
+        const student = await this.studentService.createProfile(user._id.toString(), instituteId);
+        const updatedUser = await this.userService.findById(user._id.toString());
+        if (!updatedUser) {
+            throw new common_1.BadRequestException('Failed to fetch updated user');
+        }
         const { passwordHash, ...sanitizedUser } = user.toObject();
-        const payload = this.buildJwtPayload(user);
+        const payload = await this.buildJwtPayload(updatedUser);
         const token = this.jwtService.sign(payload);
         return {
             user: sanitizedUser,
-            studentData,
+            student,
             token,
             expires_in: process.env.JWT_EXPIRES_IN_MILI,
             msg: 'Student Successfully Registered',
@@ -85,18 +91,21 @@ let AuthService = class AuthService {
     async facultyRegistration(data, instituteId) {
         const { password } = data;
         const user = await this.userService.create({
-            userId: 'FAC001',
+            userId: `FAC${Date.now()}`,
             email: data.email,
             name: data.name,
             gender: data.gender,
             contactInfo: data.contactInfo,
             passwordHash: password,
             role: 'faculty',
-            instituteId,
         });
-        const faculty = await this.facultyService.createProfile(user._id.toString());
+        const faculty = await this.facultyService.createProfile(user._id.toString(), instituteId);
+        const updatedUser = await this.userService.findById(user._id.toString());
+        if (!updatedUser) {
+            throw new common_1.BadRequestException('Failed to fetch updated user');
+        }
         const { passwordHash, ...sanitizedUser } = user.toObject();
-        const payload = this.buildJwtPayload(user);
+        const payload = await this.buildJwtPayload(updatedUser);
         const token = this.jwtService.sign(payload);
         return {
             user: sanitizedUser,
@@ -120,7 +129,7 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Invalid email or password');
         }
         const { passwordHash, ...sanitizedUser } = user.toObject();
-        const payload = this.buildJwtPayload(user);
+        const payload = await this.buildJwtPayload(user);
         const token = this.jwtService.sign(payload);
         return {
             user: sanitizedUser,
@@ -134,21 +143,42 @@ let AuthService = class AuthService {
         if (!userData) {
             throw new common_1.NotFoundException('User not found');
         }
-        const obj = userData.toObject();
-        const { passwordHash, ...sanitizedUser } = obj;
+        const freshPayload = await this.buildJwtPayload(userData);
         return {
-            userData: user,
-            msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
+            userData: freshPayload,
+            msg: `User ${freshPayload.name} (role: ${freshPayload.role}) authenticated successfully`,
         };
     }
-    buildJwtPayload(user) {
+    async buildJwtPayload(user) {
+        let instituteId = '';
+        let studentId = undefined;
+        let facultyId = undefined;
+        let adminId = undefined;
+        if (user.role === 'admin' && user.adminId) {
+            const admin = await this.adminService.findById(user.adminId.toString());
+            instituteId = admin?.instituteId?.toString() || '';
+            adminId = user.adminId.toString();
+        }
+        else if (user.role === 'student' && user.studentId) {
+            const student = await this.studentService.findById(user.studentId.toString());
+            instituteId = student?.instituteId?.toString() || '';
+            studentId = user.studentId.toString();
+        }
+        else if (user.role === 'faculty' && user.facultyId) {
+            const faculty = await this.facultyService.findById(user.facultyId.toString());
+            instituteId = faculty?.instituteId?.toString() || '';
+            facultyId = user.facultyId.toString();
+        }
         return {
             sub: user._id.toString(),
             userId: user.userId,
             email: user.email,
             role: user.role,
-            instituteId: user.instituteId.toString(),
+            instituteId,
             name: user.name,
+            studentId,
+            facultyId,
+            adminId,
         };
     }
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Filter, Search } from "lucide-react";
@@ -10,6 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import axios from "axios";
+import { env } from "@/env/config";
 
 export default function ActivitiesFilterPage() {
   // UI state
@@ -21,22 +23,60 @@ export default function ActivitiesFilterPage() {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
 
-  // Sample data
-  const students = [
-    { id: 1, name: "Sonal Verma", department: "CSE", year: "3rd", email: "sonal@example.com", phone: "9876543210", section: "A", course: "B.Tech" },
-    { id: 2, name: "Riya Sharma", department: "ECE", year: "2nd", email: "riya@example.com", phone: "9876501234", section: "B", course: "B.Tech" },
-    { id: 3, name: "Kunal Gupta", department: "IT", year: "1st", email: "kunal@example.com", phone: "9876123456", section: "A", course: "BCA" },
-    { id: 4, name: "Sahil Kumar", department: "ME", year: "4th", email: "sahil@example.com", phone: "9876001122", section: "C", course: "B.Tech" },
-    { id: 5, name: "Sakshi Singh", department: "CSE", year: "2nd", email: "sakshi@example.com", phone: "9876332211", section: "A", course: "B.Tech" },
-    { id: 6, name: "Priya Mehta", department: "ECE", year: "3rd", email: "priya@example.com", phone: "9988332211", section: "B", course: "B.Tech" },
-  ];
+  // Data state
+  const [students, setStudents] = useState([]);
+  const [faculty, setFaculty] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const faculty = [
-    { id: 1, name: "Dr. Mehta", department: "CSE", email: "mehta@example.com", phone: "9988776655" },
-    { id: 2, name: "Prof. Arjun", department: "IT", email: "arjun@example.com", phone: "8877665544" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("token");
+        const config = { headers: { Authorization: `Bearer ${token}` } };
 
-  const departments = ["CSE", "ECE", "IT", "ME"];
+        const [studentsRes, facultyRes] = await Promise.all([
+          axios.get(`${env.SERVER_URL}/api/student`, config),
+          axios.get(`${env.SERVER_URL}/api/faculty`, config),
+        ]);
+
+        // Normalize data
+        const studentData = Array.isArray(studentsRes.data) ? studentsRes.data : studentsRes.data.data || [];
+        const facultyData = Array.isArray(facultyRes.data) ? facultyRes.data : facultyRes.data.data || [];
+
+        setStudents(studentData.map(s => ({
+            id: s._id,
+            name: s.basicUserDetails?.name || "Unknown",
+            department: s.acadmicDetails?.branch || "N/A", // Assuming branch maps to department
+            year: s.acadmicDetails?.year ? String(s.acadmicDetails.year) : "N/A",
+            email: s.basicUserDetails?.email || "",
+            phone: s.basicUserDetails?.contactInfo?.phone || "",
+            section: s.acadmicDetails?.section || "",
+            course: s.acadmicDetails?.course || ""
+        })));
+
+        setFaculty(facultyData.map(f => ({
+            id: f._id,
+            name: f.basicUserDetails?.name || "Unknown",
+            department: f.department || "N/A",
+            email: f.basicUserDetails?.email || "",
+            phone: f.basicUserDetails?.contactInfo?.phone || ""
+        })));
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Set empty arrays on error to prevent rendering issues
+        setStudents([]);
+        setFaculty([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const departments = ["CSE", "ECE", "IT", "ME"]; // Ideally fetch from backend programs
 
   // Filtering helpers
   const filterStudents = () => {
@@ -86,6 +126,8 @@ export default function ActivitiesFilterPage() {
     setDeptDropdown(false);
     setDropdownOpen(false);
   };
+
+  if (loading) return <div className="p-6">Loading...</div>;
 
   // Render Table(s) based on selection
   const renderTable = () => {

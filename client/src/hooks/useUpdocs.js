@@ -23,11 +23,17 @@ export default function useUpDocs() {
       },
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      const msg = data?.message || data?.msg || 'Failed to get upload signature';
+      console.error('getUploadSignature error', msg, data);
+      throw new Error(msg);
+    }
 
-    console.log(data);
-
-    return data.data; // { timestamp, signature, apiKey }
+    // Backend may return the payload directly or wrapped in { data: payload }
+    const payload = data?.data ?? data;
+    console.debug('getUploadSignature payload', payload);
+    return payload; // { timestamp, signature, apiKey, cloudName, folder }
   };
 
   const postUpDoc = async (upDoc) => {
@@ -45,16 +51,20 @@ export default function useUpDocs() {
         }),
         method: "POST",
       });
-
+      const data = await res.json().catch(() => null);
       if (!res.ok) {
-        throw new Error(data.message);
+        // Server uses GlobalExceptionFilter -> { data: null, error: { message, details } }
+        const serverMsg = data?.error?.message || data?.message || data?.msg;
+        const msg = serverMsg || "Failed to save upload metadata";
+        console.error('postUpDoc server error', data);
+        throw new Error(msg);
       }
-      const data = await res.json();
 
-      toast.success(data.msg);
+      console.debug('postUpDoc: saved metadata', data);
+      toast.success(data.msg || 'Uploaded');
     } catch (error) {
-      toast.error(error.message);
-      console.error(error);
+      toast.error(error.message || 'Upload save failed');
+      console.error('postUpDoc error', error);
     }
   };
 
@@ -65,7 +75,7 @@ export default function useUpDocs() {
         const { timestamp, signature, apiKey, cloudName, folder } =
           await getUploadSignature();
 
-        console.log(timestamp, signature, apiKey, cloudName);
+          console.debug('getUploadSignature result', { timestamp, signature, apiKey, cloudName, folder });
 
         const form = new FormData();
         form.append("file", file);
@@ -83,9 +93,11 @@ export default function useUpDocs() {
         );
 
         const result = await upload;
+        console.debug('cloudinary upload result', result?.data);
 
         load(result.data.public_id);
 
+        // persist metadata to backend
         await postUpDoc({ ...result.data });
 
         return result.data;

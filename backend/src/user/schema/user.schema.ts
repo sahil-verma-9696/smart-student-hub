@@ -33,14 +33,6 @@ export class User {
   /*************************************
    * REFERENCES for deriving relations
    *************************************/
-  @Prop({
-    type: Types.ObjectId,
-    ref: 'Institute',
-    default: null,
-    required: true,
-  })
-  instituteId: Types.ObjectId;
-
   // MongoDB references (expandable later)
   @Prop({ type: Types.ObjectId, ref: 'Admin', default: null })
   adminId?: Types.ObjectId;
@@ -63,10 +55,7 @@ UserSchema.pre<User & Document>('save', async function (next) {
 });
 
 // 🔐 Compare Password Method
-UserSchema.methods.comparePassword = async function (
-  this: UserDocument,
-  plainPassword: string,
-): Promise<boolean> {
+UserSchema.methods.comparePassword = async function ( this: UserDocument,plainPassword: string): Promise<boolean> {
   return bcrypt.compare(plainPassword, this.passwordHash);
 };
 

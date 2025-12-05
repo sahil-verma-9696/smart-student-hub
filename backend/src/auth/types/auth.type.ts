@@ -28,6 +28,9 @@ export interface JwtPayload {
   userId: string;
   role: string;
   instituteId: string;
+  studentId?: string;
+  facultyId?: string;
+  adminId?: string;
   iat?: number;
   exp?: number;
 }

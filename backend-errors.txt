@@ -1,0 +1,214 @@
+﻿
+> backend@0.0.1 build
+> nest build
+
+node.exe : [96msrc/activity-boilerplate/activity.reposi
+tory.ts[0m:[93m28[0m:[93m62[0m - 
+[91merror[0m[90m TS2362: [0mThe left-hand side of 
+an arithmetic operation must be of type 'any', 
+'number', 'bigint' or an enum type.
+At C:\Program Files\nodejs\npm.ps1:29 char:3
++   & $NODE_EXE $NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([96msrc/a 
+   ctivi...r an enum type.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+[7m28[0m     const docs = await this.activityModel.fin
+d(filter).skip((page-1)*limit).limit(limit).lean();
+[7m  [0m [91m                                        
+                     ~~~~[0m
+[96msrc/activity-boilerplate/activity.repository.ts[0m
+:[93m28[0m:[93m70[0m - [91merror[0m[90m TS2363: 
+[0mThe right-hand side of an arithmetic operation must 
+be of type 'any', 'number', 'bigint' or an enum type.
+
+[7m28[0m     const docs = await this.activityModel.fin
+d(filter).skip((page-1)*limit).limit(limit).lean();
+[7m  [0m [91m                                        
+                             ~~~~~[0m
+[96msrc/activity-boilerplate/activity.repository.ts[0m
+:[93m28[0m:[93m83[0m - [91merror[0m[90m TS2345: 
+[0mArgument of type 'string | 20' is not assignable to 
+parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
+
+[7m28[0m     const docs = await this.activityModel.fin
+d(filter).skip((page-1)*limit).limit(limit).lean();
+[7m  [0m [91m                                        
+                                          ~~~~~[0m
+[96msrc/activity-boilerplate/activity.repository.ts[0m
+:[93m55[0m:[93m23[0m - [91merror[0m[90m TS2348: 
+[0mValue of type 'typeof ObjectId' is not callable. 
+Did you mean to include 'new'?
+
+[7m55[0m           approvedBy: 
+Types.ObjectId(dto.approvedBy),
+[7m  [0m [91m                      
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/activity-boilerplate/activity.repository.ts[0m
+:[93m72[0m:[93m23[0m - [91merror[0m[90m TS2348: 
+[0mValue of type 'typeof ObjectId' is not callable. 
+Did you mean to include 'new'?
+
+[7m72[0m           rejectedBy: 
+Types.ObjectId(dto.rejectedBy),
+[7m  [0m [91m                      
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/admin/admin.module.ts[0m:[93m9[0m:[93m10[0
+m - [91merror[0m[90m TS2305: [0mModule 
+'"src/activity/schema/activity.schema"' has no exported 
+member 'Activity'.
+
+[7m9[0m import { Activity, ActivitySchema } from 
+'src/activity/schema/activity.schema';
+[7m [0m [91m         ~~~~~~~~[0m
+[96msrc/admin/admin.module.ts[0m:[93m9[0m:[93m20[0
+m - [91merror[0m[90m TS2305: [0mModule 
+'"src/activity/schema/activity.schema"' has no exported 
+member 'ActivitySchema'.
+
+[7m9[0m import { Activity, ActivitySchema } from 
+'src/activity/schema/activity.schema';
+[7m [0m [91m                   ~~~~~~~~~~~~~~[0m
+[96msrc/admin/admin.service.ts[0m:[93m8[0m:[93m10[
+0m - [91merror[0m[90m TS2305: [0mModule 
+'"src/activity/schema/activity.schema"' has no exported 
+member 'Activity'.
+
+[7m8[0m import { Activity } from 
+'src/activity/schema/activity.schema';
+[7m [0m [91m         ~~~~~~~~[0m
+[96msrc/app.module.ts[0m:[93m10[0m:[93m10[0m - 
+[91merror[0m[90m TS2305: [0mModule 
+'"./activity/activity.module"' has no exported member 
+'ActivityModule'.
+
+[7m10[0m import { ActivityModule } from 
+'./activity/activity.module';
+[7m  [0m [91m         ~~~~~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m71[0m:[93m60[0
+m - [91merror[0m[90m TS2554: [0mExpected 1 
+arguments, but got 2.
+
+[7m71[0m     const admin = await 
+this.adminService.create(user._id, 
+institute._id.toString());
+[7m  [0m [91m                                        
+                   ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m82[0m:[93m48[0
+m - [91merror[0m[90m TS2345: [0mArgument of type 
+'(Document<unknown, {}, UserDocument, {}, {}> & User & 
+Document<ObjectId, any, any, Record<string, any>, {}> & 
+UserMethods & { ...; } & { ...; }) | null' is not 
+assignable to parameter of type 'User'.
+  Type 'null' is not assignable to type 'User'.
+
+[7m82[0m     const payload = await 
+this.buildJwtPayload(updatedUser);
+[7m  [0m [91m                                        
+       ~~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m128[0m:[93m11[
+0m - [91merror[0m[90m TS2451: [0mCannot redeclare 
+block-scoped variable 'payload'.
+
+[7m128[0m     const payload = await 
+this.buildJwtPayload(updatedUser);
+[7m   [0m [91m          ~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m128[0m:[93m48[
+0m - [91merror[0m[90m TS2345: [0mArgument of type 
+'(Document<unknown, {}, UserDocument, {}, {}> & User & 
+Document<ObjectId, any, any, Record<string, any>, {}> & 
+UserMethods & { ...; } & { ...; }) | null' is not 
+assignable to parameter of type 'User'.
+  Type 'null' is not assignable to type 'User'.
+
+[7m128[0m     const payload = await 
+this.buildJwtPayload(updatedUser);
+[7m   [0m [91m                                       
+        ~~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m131[0m:[93m11[
+0m - [91merror[0m[90m TS2451: [0mCannot redeclare 
+block-scoped variable 'payload'.
+
+[7m131[0m     const payload = await 
+this.buildJwtPayload(updatedUser);
+[7m   [0m [91m          ~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m131[0m:[93m48[
+0m - [91merror[0m[90m TS2345: [0mArgument of type 
+'(Document<unknown, {}, UserDocument, {}, {}> & User & 
+Document<ObjectId, any, any, Record<string, any>, {}> & 
+UserMethods & { ...; } & { ...; }) | null' is not 
+assignable to parameter of type 'User'.
+  Type 'null' is not assignable to type 'User'.
+
+[7m131[0m     const payload = await 
+this.buildJwtPayload(updatedUser);
+[7m   [0m [91m                                       
+        ~~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m135[0m:[93m7[0
+m - [91merror[0m[90m TS18004: [0mNo value exists in 
+scope for the shorthand property 'studentData'. Either 
+declare one or provide an initializer.
+
+[7m135[0m       studentData,
+[7m   [0m [91m      ~~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m174[0m:[93m48[
+0m - [91merror[0m[90m TS2345: [0mArgument of type 
+'(Document<unknown, {}, UserDocument, {}, {}> & User & 
+Document<ObjectId, any, any, Record<string, any>, {}> & 
+UserMethods & { ...; } & { ...; }) | null' is not 
+assignable to parameter of type 'User'.
+  Type 'null' is not assignable to type 'User'.
+
+[7m174[0m     const payload = await 
+this.buildJwtPayload(updatedUser);
+[7m   [0m [91m                                       
+        ~~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m251[0m:[93m45[
+0m - [91merror[0m[90m TS2341: [0mProperty 
+'adminModel' is private and only accessible within 
+class 'AdminService'.
+
+[7m251[0m       const admin = await this.adminService.
+adminModel.findById(user.adminId).lean();
+[7m   [0m [91m                                       
+     ~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m254[0m:[93m49[
+0m - [91merror[0m[90m TS2341: [0mProperty 
+'studentModel' is private and only accessible within 
+class 'StudentService'.
+
+[7m254[0m       const student = await this.studentServ
+ice.studentModel.findById(user.studentId).lean();
+[7m   [0m [91m                                       
+         ~~~~~~~~~~~~[0m
+[96msrc/auth/auth.service.ts[0m:[93m257[0m:[93m49[
+0m - [91merror[0m[90m TS2341: [0mProperty 
+'facultyModel' is private and only accessible within 
+class 'FacultyService'.
+
+Found 22 error(s).
+
+[7m257[0m       const faculty = await this.facultyServ
+ice.facultyModel.findById(user.facultyId).lean();
+[7m   [0m [91m                                       
+         ~~~~~~~~~~~~[0m
+[96msrc/student/student.module.ts[0m:[93m9[0m:[93m1
+0[0m - [91merror[0m[90m TS2305: [0mModule 
+'"src/activity/schema/activity.schema"' has no exported 
+member 'Activity'.
+
+[7m9[0m import { Activity, ActivitySchema } from 
+'src/activity/schema/activity.schema';
+[7m [0m [91m         ~~~~~~~~[0m
+[96msrc/student/student.module.ts[0m:[93m9[0m:[93m2
+0[0m - [91merror[0m[90m TS2305: [0mModule 
+'"src/activity/schema/activity.schema"' has no exported 
+member 'ActivitySchema'.
+
+[7m9[0m import { Activity, ActivitySchema } from 
+'src/activity/schema/activity.schema';
+[7m [0m [91m                   ~~~~~~~~~~~~~~[0m
+

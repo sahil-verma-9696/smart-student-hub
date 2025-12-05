@@ -1,7 +1,42 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VictoryPie, VictoryBar, VictoryChart, VictoryLine, VictoryArea, VictoryTheme } from "victory";
+import axios from "axios";
+import { env } from "@/env/config";
 
 export default function AdminAnalyticsPage() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${env.SERVER_URL}/api/admin/dashboard/analytics`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching analytics:", error);
+        // Set empty data structure on error to prevent rendering issues
+        setData({
+          studentDistribution: [],
+          studentYearlyStrength: [],
+          facultyDistribution: [],
+          attendanceTrend: [],
+          activityGrowth: []
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="p-8">Loading analytics...</div>;
+  if (!data) return <div className="p-8">Failed to load analytics.</div>;
+
   return (
     <div className="p-8 space-y-8">
       <h1 className="text-3xl font-bold mb-4">Admin Analytics — Overview</h1>
@@ -15,22 +50,19 @@ export default function AdminAnalyticsPage() {
             <CardTitle>Department-wise Student Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <VictoryPie
-              colorScale={["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]}
-              data={[
-                { x: "CSE", y: 45 },
-                { x: "ECE", y: 30 },
-                { x: "IT", y: 15 },
-                { x: "ME", y: 10 }
-              ]}
-              innerRadius={60}
-              labelRadius={95}
-              style={{ labels: { fill: "#4b5563", fontSize: 14 } }}
-            />
+            {data.studentDistribution && data.studentDistribution.length > 0 ? (
+              <VictoryPie
+                colorScale={["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"]}
+                data={data.studentDistribution}
+                innerRadius={60}
+                labelRadius={95}
+                style={{ labels: { fill: "#4b5563", fontSize: 14 } }}
+              />
+            ) : (
+              <div className="text-center py-10 text-gray-500">No student data available</div>
+            )}
           </CardContent>
         </Card>
-
-        
 
         {/* BAR – Year-wise Strength */}
         <Card className="shadow-lg rounded-2xl p-4">
@@ -38,17 +70,16 @@ export default function AdminAnalyticsPage() {
             <CardTitle>Year-wise Student Strength</CardTitle>
           </CardHeader>
           <CardContent>
-            <VictoryChart theme={VictoryTheme.material} domainPadding={20}>
-              <VictoryBar
-                style={{ data: { fill: "#3b82f6" } }}
-                data={[
-                  { x: "1st", y: 320 },
-                  { x: "2nd", y: 280 },
-                  { x: "3rd", y: 260 },
-                  { x: "4th", y: 210 }
-                ]}
-              />
-            </VictoryChart>
+            {data.studentYearlyStrength && data.studentYearlyStrength.length > 0 ? (
+              <VictoryChart theme={VictoryTheme.material} domainPadding={20}>
+                <VictoryBar
+                  style={{ data: { fill: "#3b82f6" } }}
+                  data={data.studentYearlyStrength}
+                />
+              </VictoryChart>
+            ) : (
+              <div className="text-center py-10 text-gray-500">No year-wise data available</div>
+            )}
           </CardContent>
         </Card>
 
@@ -58,21 +89,20 @@ export default function AdminAnalyticsPage() {
             <CardTitle>Faculty Distribution by Department</CardTitle>
           </CardHeader>
           <CardContent>
-            <VictoryChart theme={VictoryTheme.material} domainPadding={20}>
-              <VictoryBar
-                style={{ data: { fill: "#10b981" } }}
-                data={[
-                  { x: "CSE", y: 18 },
-                  { x: "ECE", y: 16 },
-                  { x: "IT", y: 12 },
-                  { x: "ME", y: 10 }
-                ]}
-              />
-            </VictoryChart>
+            {data.facultyDistribution && data.facultyDistribution.length > 0 ? (
+              <VictoryChart theme={VictoryTheme.material} domainPadding={20}>
+                <VictoryBar
+                  style={{ data: { fill: "#10b981" } }}
+                  data={data.facultyDistribution}
+                />
+              </VictoryChart>
+            ) : (
+              <div className="text-center py-10 text-gray-500">No faculty data available</div>
+            )}
           </CardContent>
         </Card>
 
-        {/* LINE – Attendance Trend */}
+        {/* LINE – Attendance Trend (Dummy Data for now) */}
         <Card className="shadow-lg rounded-2xl p-4">
           <CardHeader>
             <CardTitle>Attendance Trend Over Months</CardTitle>
@@ -81,36 +111,28 @@ export default function AdminAnalyticsPage() {
             <VictoryChart theme={VictoryTheme.material}>
               <VictoryLine
                 style={{ data: { stroke: "#6366f1" } }}
-                data={[
-                  { x: "Jan", y: 75 },
-                  { x: "Feb", y: 78 },
-                  { x: "Mar", y: 80 },
-                  { x: "Apr", y: 85 },
-                  { x: "May", y: 86 }
-                ]}
+                data={data.attendanceTrend}
               />
             </VictoryChart>
           </CardContent>
         </Card>
 
-        {/* AREA – Event Participation */}
+        {/* AREA – Event Participation Growth */}
         <Card className="shadow-lg rounded-2xl p-4">
           <CardHeader>
-            <CardTitle>Event Participation Growth</CardTitle>
+            <CardTitle>Activity Growth (Last 5 Years)</CardTitle>
           </CardHeader>
           <CardContent>
-            <VictoryChart theme={VictoryTheme.material}>
-              <VictoryArea
-                style={{ data: { fill: "#f59e0b", stroke: "#d97706" } }}
-                data={[
-                  { x: "2019", y: 50 },
-                  { x: "2020", y: 80 },
-                  { x: "2021", y: 120 },
-                  { x: "2022", y: 150 },
-                  { x: "2023", y: 210 }
-                ]}
-              />
-            </VictoryChart>
+            {data.activityGrowth && data.activityGrowth.length > 0 ? (
+              <VictoryChart theme={VictoryTheme.material}>
+                <VictoryArea
+                  style={{ data: { fill: "#f59e0b", stroke: "#d97706" } }}
+                  data={data.activityGrowth}
+                />
+              </VictoryChart>
+            ) : (
+              <div className="text-center py-10 text-gray-500">No activity data available</div>
+            )}
           </CardContent>
         </Card>
       </div>

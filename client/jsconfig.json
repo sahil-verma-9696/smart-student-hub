@@ -3,6 +3,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
-  }
+    },
+    "typeRoots": ["./node_modules/@types"],
+    "types": [],
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules", "dist", "build"],
+  "include": ["src"]
 }

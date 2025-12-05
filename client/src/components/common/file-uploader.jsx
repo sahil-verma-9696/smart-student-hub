@@ -5,6 +5,7 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import { useState } from "react";
+import useUpDocs from "@/hooks/useUpdocs";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -15,6 +16,8 @@ registerPlugin(
 export default function FileUploader({ onUpload }) {
   const [files, setFiles] = useState([]);
 
+  const { processFile } = useUpDocs();
+
   return (
     <FilePond
       files={files}
@@ -24,28 +27,22 @@ export default function FileUploader({ onUpload }) {
       name="file"
       labelIdle='Drag & Drop or <span class="filepond--label-action">Browse</span>'
       server={{
-        process: {
-          url: `https://api.cloudinary.com/v1_1/dfqdx3ieb/upload`,
-          method: "POST",
-          withCredentials: false,
-          headers: {},
-          timeout: 7000,
-
-          onload: (response) => {
-            const res = JSON.parse(response);
-            onUpload({
-              url: res.secure_url,
-              public_id: res.public_id,
-              resource_type: res.resource_type,
-            });
-            return res.public_id; // filePond unique id
-          },
-
-          ondata: (formData) => {
-            formData.append("upload_preset", "unsigned_upload");
-            return formData;
-          },
-        },
+        // use the hook-provided process handler which gets signature from backend
+        process: processFile(),
+      }}
+      onprocessfile={(error, file) => {
+        if (!error && file && file.serverId) {
+          // serverId is set to Cloudinary public_id by processFile
+          // The processFile already calls postUpDoc to persist metadata, but we still
+          // notify parent with the full server response stored in file.serverResponse
+          try {
+            const res = file.serverResponse || file.getMetadata?.() || null;
+            if (res) onUpload(res);
+          } catch (e) {
+            // fallback: no server response
+            console.error('File upload processed, but no server response available', e);
+          }
+        }
       }}
     />
   );

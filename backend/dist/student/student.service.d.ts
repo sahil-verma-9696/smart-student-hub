@@ -15,17 +15,28 @@ export declare class StudentService {
     private readonly userService;
     private readonly academicService;
     constructor(studentModel: Model<Student>, userService: UserService, academicService: AcademicService);
-    createProfile(userId: string): Promise<import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & {
+    createProfile(userId: string, institute: string): Promise<import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & {
         _id: import("mongoose").Types.ObjectId;
     } & {
         __v: number;
     }>;
-    create(userId: string): Promise<import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & {
+    findById(id: string): Promise<(import("mongoose").FlattenMaps<{
+        basicUserDetails: import("mongoose").Types.ObjectId;
+        acadmicDetails: import("mongoose").Types.ObjectId;
+        assignedFaculty: import("mongoose").Types.ObjectId;
+        activities: import("mongoose").Types.ObjectId[];
+        instituteId: import("mongoose").Types.ObjectId;
+    }> & {
         _id: import("mongoose").Types.ObjectId;
     } & {
         __v: number;
-    }>;
+    }) | null>;
     createStudentFromAdmin(dto: CreateStudentAdminDto): Promise<(import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }) | null>;
+    create(dto: CreateStudentAdminDto): Promise<(import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & {
         _id: import("mongoose").Types.ObjectId;
     } & {
         __v: number;
@@ -52,4 +63,9 @@ export declare class StudentService {
         __v: number;
     }) | null>;
     remove(id: string): Promise<string>;
+    addActivity(studentId: string, activityId: string): Promise<(import("mongoose").Document<unknown, {}, Student, {}, {}> & Student & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }) | null>;
 }

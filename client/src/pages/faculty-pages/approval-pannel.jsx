@@ -2,7 +2,9 @@
 
 import { Label } from "@/components/ui/label"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import axios from "axios"
+import { useActivityApprovalApi } from "@/hooks/useActivityApprovalApi"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,112 +20,70 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Search, Eye, Download, CheckCircle, XCircle, Clock, FileText, Calendar, User } from "lucide-react"
-
-const pendingActivities = [
-  {
-    id: 1,
-    student: {
-      name: "John Doe",
-      rollNo: "CS19B001",
-      year: "4th Year",
-      department: "Computer Science",
-      email: "john.doe@college.edu",
-    },
-    activity: {
-      title: "Machine Learning Workshop",
-      type: "Workshop",
-      organizer: "Google AI",
-      date: "2024-01-15",
-      duration: "3 days",
-      description:
-        "Comprehensive workshop covering ML fundamentals, neural networks, and practical applications using TensorFlow and Python.",
-      skills: ["Python", "TensorFlow", "Machine Learning", "Data Analysis"],
-      points: 10,
-    },
-    submission: {
-      submittedOn: "2024-01-18",
-      files: ["certificate.pdf", "project_report.pdf", "attendance_proof.jpg"],
-      status: "pending",
-    },
-  },
-  {
-    id: 2,
-    student: {
-      name: "Jane Smith",
-      rollNo: "CS19B002",
-      year: "4th Year",
-      department: "Computer Science",
-      email: "jane.smith@college.edu",
-    },
-    activity: {
-      title: "Hackathon - TechFest 2024",
-      type: "Competition",
-      organizer: "IEEE Student Chapter",
-      date: "2024-01-10",
-      duration: "48 hours",
-      description:
-        "Participated in 48-hour coding hackathon focused on sustainable technology solutions. Developed a waste management app.",
-      skills: ["React", "Node.js", "MongoDB", "Problem Solving"],
-      points: 25,
-    },
-    submission: {
-      submittedOn: "2024-01-16",
-      files: ["participation_certificate.pdf", "project_demo.mp4"],
-      status: "pending",
-    },
-  },
-  {
-    id: 3,
-    student: {
-      name: "Mike Johnson",
-      rollNo: "CS19B003",
-      year: "3rd Year",
-      department: "Computer Science",
-      email: "mike.johnson@college.edu",
-    },
-    activity: {
-      title: "Research Paper Publication",
-      type: "Research",
-      organizer: "International Journal of AI",
-      date: "2024-01-03",
-      duration: "6 months",
-      description:
-        'Published research paper on "Machine Learning Applications in Medical Diagnosis" in a peer-reviewed journal.',
-      skills: ["Research", "Academic Writing", "AI/ML", "Data Analysis"],
-      points: 30,
-    },
-    submission: {
-      submittedOn: "2024-01-14",
-      files: ["research_paper.pdf", "publication_proof.pdf", "peer_review.pdf"],
-      status: "pending",
-    },
-  },
-]
+import { Search, Eye, Download, CheckCircle, XCircle, Clock, FileText, Calendar, User, Loader2 } from "lucide-react"
+import { env } from "@/env/config"
+import useAuthContext from "@/hooks/useAuthContext"
+import { toast } from "react-hot-toast"
 
 export default function ApprovalPannel() {
+  const { user } = useAuthContext()
+  const [activities, setActivities] = useState([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
   const [selectedItems, setSelectedItems] = useState([])
   const [reviewingItem, setReviewingItem] = useState(null)
   const [reviewComment, setReviewComment] = useState("")
+  const [processing, setProcessing] = useState(false)
+  const { fetchPending, approve, reject } = useActivityApprovalApi()
 
-  const filteredActivities = pendingActivities.filter((item) => {
+  const fetchActivities = async () => {
+    setLoading(true)
+    try {
+      const res = await axios.get(`${env.SERVER_URL}/api/activities?status=PENDING`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      // The backend returns { data: [], total, ... }
+      setActivities(res.data.data || [])
+    } catch (error) {
+      console.error("Failed to fetch activities", error)
+      toast.error("Failed to load pending approvals")
+      // Set empty array on error to prevent rendering issues
+      setActivities([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (user) {
+      fetchActivities()
+    }
+  }, [user])
+
+  const filteredActivities = activities.filter((item) => {
+    const studentName = item.student?.basicUserDetails?.name || "Unknown"
+    const studentId = item.student?.basicUserDetails?.userId || "Unknown"
+    const activityTitle = item.title || ""
     const matchesSearch =
-      item.student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.student.rollNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.activity.title.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesDepartment =
-      departmentFilter === "all" || item.student.department.toLowerCase().includes(departmentFilter)
-    const matchesType = typeFilter === "all" || item.activity.type.toLowerCase() === typeFilter
+      studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      activityTitle.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    // Note: Department is not currently in the student/user schema populated data. 
+    // We might need to fetch it or ignore for now. Assuming 'all' for now.
+    const matchesDepartment = departmentFilter === "all" 
+    
+    const typeTitle = item.activityType?.title || ""
+    const matchesType = typeFilter === "all" || typeTitle.toLowerCase() === typeFilter.toLowerCase()
 
     return matchesSearch && matchesDepartment && matchesType
   })
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelectedItems(filteredActivities.map((item) => item.id))
+      setSelectedItems(filteredActivities.map((item) => item._id))
     } else {
       setSelectedItems([])
     }
@@ -137,23 +97,58 @@ export default function ApprovalPannel() {
     }
   }
 
-  const handleApprove = (id, comment) => {
-    console.log("Approving activity:", id, "Comment:", comment)
-    // Here you would typically send the approval to your backend
-    setReviewingItem(null)
-    setReviewComment("")
+  const handleApprove = async (id, comment) => {
+    setProcessing(true)
+    try {
+      await approve(id, { creditsEarned: reviewingItem?.suggestedCredits, remarks: comment })
+      toast.success("Activity approved successfully")
+      setReviewingItem(null)
+      setReviewComment("")
+      fetchActivities() // Refresh list
+    } catch (error) {
+      console.error("Approval failed", error)
+      toast.error(error.response?.data?.message || "Failed to approve activity")
+    } finally {
+      setProcessing(false)
+    }
   }
 
-  const handleReject = (id, comment) => {
-    console.log("Rejecting activity:", id, "Comment:", comment)
-    // Here you would typically send the rejection to your backend
-    setReviewingItem(null)
-    setReviewComment("")
+  const handleReject = async (id, comment) => {
+    if (!comment) {
+      toast.error("Please provide a reason for rejection")
+      return
+    }
+    setProcessing(true)
+    try {
+      await reject(id, { reason: comment })
+      toast.success("Activity rejected")
+      setReviewingItem(null)
+      setReviewComment("")
+      fetchActivities()
+    } catch (error) {
+      console.error("Rejection failed", error)
+      toast.error(error.response?.data?.message || "Failed to reject activity")
+    } finally {
+      setProcessing(false)
+    }
   }
 
-  const handleBulkApprove = () => {
-    console.log("Bulk approving activities:", selectedItems)
-    setSelectedItems([])
+  const handleBulkApprove = async () => {
+    // Implement bulk approve if backend supports it, or loop
+    // For now, let's just loop (not ideal for large sets but works for MVP)
+    setProcessing(true)
+    try {
+      await Promise.all(selectedItems.map((id) => approve(id, {})))
+      toast.success(`Approved ${selectedItems.length} activities`)
+      setSelectedItems([])
+      fetchActivities()
+    } catch (error) {
+      console.error("Bulk approval failed", error)
+      toast.error(error.response?.data?.message || "Some approvals failed")
+      fetchActivities()
+    } finally {
+      setProcessing(false)
+    }
   }
 
   return (
@@ -169,7 +164,7 @@ export default function ApprovalPannel() {
           </div>
           {selectedItems.length > 0 && (
             <div className="flex gap-2">
-              <Button onClick={handleBulkApprove} size="sm">
+              <Button onClick={handleBulkApprove} size="sm" disabled={processing}>
                 <CheckCircle className="h-4 w-4 mr-1" />
                 Approve Selected ({selectedItems.length})
               </Button>
@@ -190,28 +185,17 @@ export default function ApprovalPannel() {
             />
           </div>
 
-          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Department" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              <SelectItem value="computer science">Computer Science</SelectItem>
-              <SelectItem value="electronics">Electronics</SelectItem>
-              <SelectItem value="mechanical">Mechanical</SelectItem>
-              <SelectItem value="civil">Civil</SelectItem>
-            </SelectContent>
-          </Select>
-
+          {/* Department filter removed as we don't have that data easily available yet */}
+          
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
+              {/* We could dynamically populate this too */}
+              <SelectItem value="internship">Internship</SelectItem>
               <SelectItem value="workshop">Workshop</SelectItem>
-              <SelectItem value="competition">Competition</SelectItem>
-              <SelectItem value="certification">Certification</SelectItem>
               <SelectItem value="research">Research</SelectItem>
             </SelectContent>
           </Select>
@@ -220,7 +204,10 @@ export default function ApprovalPannel() {
         {/* Bulk Actions */}
         {filteredActivities.length > 0 && (
           <div className="flex items-center gap-4 mb-4 p-3 bg-muted/50 rounded-lg">
-            <Checkbox checked={selectedItems.length === filteredActivities.length} onCheckedChange={handleSelectAll} />
+            <Checkbox 
+                checked={selectedItems.length === filteredActivities.length && filteredActivities.length > 0} 
+                onCheckedChange={handleSelectAll} 
+            />
             <span className="text-sm font-medium">Select All ({filteredActivities.length} items)</span>
           </div>
         )}
@@ -228,63 +215,70 @@ export default function ApprovalPannel() {
         {/* Activities List */}
         <div className="space-y-4">
           {filteredActivities.map((item) => (
-            <div key={item.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+            <div key={item._id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
               <div className="flex items-start gap-4">
                 <Checkbox
-                  checked={selectedItems.includes(item.id)}
-                  onCheckedChange={(checked) => handleSelectItem(item.id, checked )}
+                  checked={selectedItems.includes(item._id)}
+                  onCheckedChange={(checked) => handleSelectItem(item._id, checked )}
                 />
 
                 <div className="flex-1 min-w-0">
                   {/* Student Info */}
                   <div className="flex items-center gap-2 mb-2">
                     <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-semibold">{item.student.name}</span>
-                    <Badge variant="outline">{item.student.rollNo}</Badge>
+                    <span className="font-semibold">{item.student?.basicUserDetails?.name || "Unknown Student"}</span>
+                    <Badge variant="outline">{item.student?.basicUserDetails?.userId || "N/A"}</Badge>
                     <span className="text-sm text-muted-foreground">
-                      {item.student.year} • {item.student.department}
+                      {item.student?.basicUserDetails?.email}
                     </span>
                   </div>
 
                   {/* Activity Info */}
                   <div className="mb-3">
-                    <h3 className="font-medium text-foreground mb-1">{item.activity.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">{item.activity.description}</p>
+                    <h3 className="font-medium text-foreground mb-1">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
 
                     <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mb-2">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        {new Date(item.activity.date).toLocaleDateString()}
+                        {new Date(item.createdAt).toLocaleDateString()}
                       </div>
                       <Badge variant="outline" className="text-xs">
-                        {item.activity.type}
+                        {item.activityType?.title || "Unknown Type"}
                       </Badge>
-                      <span>{item.activity.organizer}</span>
-                      <span className="font-medium text-primary">+{item.activity.points} pts</span>
+                      {item.activityType?.points && (
+                          <span className="font-medium text-primary">+{item.activityType.points} pts</span>
+                      )}
                     </div>
 
-                    {/* Skills */}
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      {item.activity.skills.map((skill) => (
-                        <Badge key={skill} variant="secondary" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
+                    {/* Details */}
+                    {item.details && Object.keys(item.details).length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {Object.entries(item.details).slice(0, 3).map(([key, val]) => (
+                            <Badge key={key} variant="secondary" className="text-xs">
+                              {key}: {String(val)}
+                            </Badge>
+                          ))}
+                        </div>
+                    )}
 
                     {/* Files */}
-                    <div className="flex flex-wrap gap-2">
-                      {item.submission.files.map((file, index) => (
-                        <Button key={index} variant="outline" size="sm" className="text-xs h-7 bg-transparent">
-                          <Download className="h-3 w-3 mr-1" />
-                          {file}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="text-xs text-muted-foreground">
-                    Submitted on {new Date(item.submission.submittedOn).toLocaleDateString()}
+                    {item.attachments && item.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                        {item.attachments.map((file, index) => (
+                            <Button 
+                                key={index} 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-xs h-7 bg-transparent"
+                                onClick={() => window.open(file.url, "_blank")}
+                            >
+                            <Download className="h-3 w-3 mr-1" />
+                            {file.originalFilename || "Attachment"}
+                            </Button>
+                        ))}
+                        </div>
+                    )}
                   </div>
                 </div>
 
@@ -311,10 +305,9 @@ export default function ApprovalPannel() {
                           <div className="p-4 border rounded-lg">
                             <h4 className="font-medium mb-2">Student Information</h4>
                             <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div>Name: {reviewingItem.student.name}</div>
-                              <div>Roll No: {reviewingItem.student.rollNo}</div>
-                              <div>Year: {reviewingItem.student.year}</div>
-                              <div>Department: {reviewingItem.student.department}</div>
+                              <div>Name: {reviewingItem.student?.basicUserDetails?.name}</div>
+                              <div>ID: {reviewingItem.student?.basicUserDetails?.userId}</div>
+                              <div>Email: {reviewingItem.student?.basicUserDetails?.email}</div>
                             </div>
                           </div>
 
@@ -323,60 +316,57 @@ export default function ApprovalPannel() {
                             <h4 className="font-medium mb-2">Activity Details</h4>
                             <div className="space-y-2 text-sm">
                               <div>
-                                <strong>Title:</strong> {reviewingItem.activity.title}
+                                <strong>Title:</strong> {reviewingItem.title}
                               </div>
                               <div>
-                                <strong>Type:</strong> {reviewingItem.activity.type}
+                                <strong>Type:</strong> {reviewingItem.activityType?.title}
                               </div>
                               <div>
-                                <strong>Organizer:</strong> {reviewingItem.activity.organizer}
+                                <strong>Date Submitted:</strong> {new Date(reviewingItem.createdAt).toLocaleDateString()}
                               </div>
                               <div>
-                                <strong>Date:</strong> {new Date(reviewingItem.activity.date).toLocaleDateString()}
+                                <strong>Points:</strong> {reviewingItem.activityType?.points}
                               </div>
                               <div>
-                                <strong>Duration:</strong> {reviewingItem.activity.duration}
+                                <strong>Description:</strong> {reviewingItem.description}
                               </div>
-                              <div>
-                                <strong>Points:</strong> {reviewingItem.activity.points}
-                              </div>
-                              <div>
-                                <strong>Description:</strong> {reviewingItem.activity.description}
-                              </div>
-                              <div>
-                                <strong>Skills:</strong>
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {reviewingItem.activity.skills.map((skill) => (
-                                    <Badge key={skill} variant="secondary" className="text-xs">
-                                      {skill}
-                                    </Badge>
-                                  ))}
+                              
+                              {reviewingItem.details && (
+                                <div>
+                                    <strong>Details:</strong>
+                                    <div className="grid grid-cols-2 gap-2 mt-1">
+                                        {Object.entries(reviewingItem.details).map(([key, val]) => (
+                                            <div key={key}><span className="capitalize">{key}:</span> {String(val)}</div>
+                                        ))}
+                                    </div>
                                 </div>
-                              </div>
+                              )}
                             </div>
                           </div>
 
                           {/* Files */}
-                          <div className="p-4 border rounded-lg">
-                            <h4 className="font-medium mb-2">Supporting Documents</h4>
-                            <div className="space-y-2">
-                              {reviewingItem.submission.files.map((file, index) => (
-                                <div key={index} className="flex items-center justify-between p-2 border rounded">
-                                  <div className="flex items-center gap-2">
-                                    <FileText className="h-4 w-4" />
-                                    <span className="text-sm">{file}</span>
-                                  </div>
-                                  <Button variant="outline" size="sm">
-                                    <Download className="h-4 w-4" />
-                                  </Button>
+                          {reviewingItem.attachments && reviewingItem.attachments.length > 0 && (
+                            <div className="p-4 border rounded-lg">
+                                <h4 className="font-medium mb-2">Supporting Documents</h4>
+                                <div className="space-y-2">
+                                {reviewingItem.attachments.map((file, index) => (
+                                    <div key={index} className="flex items-center justify-between p-2 border rounded">
+                                    <div className="flex items-center gap-2">
+                                        <FileText className="h-4 w-4" />
+                                        <span className="text-sm">{file.originalFilename}</span>
+                                    </div>
+                                    <Button variant="outline" size="sm" onClick={() => window.open(file.url, "_blank")}>
+                                        <Download className="h-4 w-4" />
+                                    </Button>
+                                    </div>
+                                ))}
                                 </div>
-                              ))}
                             </div>
-                          </div>
+                          )}
 
                           {/* Review Comments */}
                           <div className="space-y-2">
-                            <Label htmlFor="review-comment">Review Comments (Optional)</Label>
+                            <Label htmlFor="review-comment">Review Comments (Required for Rejection)</Label>
                             <Textarea
                               id="review-comment"
                               placeholder="Add any comments or feedback for the student..."
@@ -388,15 +378,18 @@ export default function ApprovalPannel() {
 
                           {/* Action Buttons */}
                           <div className="flex gap-3">
-                            <Button onClick={() => handleApprove(reviewingItem.id, reviewComment)} className="flex-1">
+                            <Button onClick={() => handleApprove(reviewingItem._id, reviewComment)} className="flex-1" disabled={processing}>
+                              {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                               <CheckCircle className="h-4 w-4 mr-2" />
                               Approve
                             </Button>
                             <Button
                               variant="destructive"
-                              onClick={() => handleReject(reviewingItem.id, reviewComment)}
+                              onClick={() => handleReject(reviewingItem._id, reviewComment)}
                               className="flex-1"
+                              disabled={processing}
                             >
+                              {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                               <XCircle className="h-4 w-4 mr-2" />
                               Reject
                             </Button>
@@ -406,7 +399,7 @@ export default function ApprovalPannel() {
                     </DialogContent>
                   </Dialog>
 
-                  <Button size="sm" onClick={() => handleApprove(item.id)}>
+                  <Button size="sm" onClick={() => handleApprove(item._id)} disabled={processing}>
                     <CheckCircle className="h-4 w-4 mr-1" />
                     Quick Approve
                   </Button>

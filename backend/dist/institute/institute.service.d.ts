@@ -1,5 +1,5 @@
 import { UpdateInstituteDto } from './dto/update-institute.dto';
-import Institute from './schemas/institute.schema';
+import { Institute } from './schemas/institute.schema';
 import { Model } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
 export declare class InstituteService {

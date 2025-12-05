@@ -1,6 +1,6 @@
+import { useState } from "react";
 import Navbar from "@/components/common/navbar";
 import Sidebar from "@/components/common/sidebar";
-import React from "react";
 import { Outlet } from "react-router";
 import {
   Home,
@@ -23,12 +23,33 @@ const navigationConfig = [
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
+
 const FacultyLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar navigationConfig={navigationConfig} />
-      <div className="flex-1 flex flex-col overflow-auto">
-        <Navbar title={"Faculty Dashboard"} />
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <Sidebar
+        navigationConfig={navigationConfig}
+        mobileOpen={sidebarOpen}
+        onMobileClose={() => setSidebarOpen(false)}
+      />
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-auto min-w-0">
+        <Navbar
+          title={"Faculty Dashboard"}
+          onMenuClick={() => setSidebarOpen(true)}
+        />
         <Outlet />
       </div>
     </div>

@@ -16,10 +16,15 @@ const mongoose_1 = require("@nestjs/mongoose");
 const student_module_1 = require("./student/student.module");
 const institute_module_1 = require("./institute/institute.module");
 const faculty_module_1 = require("./faculty/faculty.module");
-const activity_module_1 = require("./activity/activity.module");
 const admin_module_1 = require("./admin/admin.module");
 const up_docs_module_1 = require("./up-docs/up-docs.module");
 const attachment_module_1 = require("./attachment/attachment.module");
+const program_module_1 = require("./program/program.module");
+const notifications_module_1 = require("./notifications/notifications.module");
+const activity_module_1 = require("./activity/activity.module");
+const activity_type_module_1 = require("./activity-type/activity-type.module");
+const activity_assignment_module_1 = require("./activity-assignment/activity-assignment.module");
+const activity_type_assignment_module_1 = require("./activity-type-assignment/activity-type-assignment.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,6 +44,12 @@ exports.AppModule = AppModule = __decorate([
             admin_module_1.AdminModule,
             up_docs_module_1.UpDocsModule,
             attachment_module_1.AttachmentModule,
+            program_module_1.ProgramModule,
+            notifications_module_1.NotificationsModule,
+            activity_module_1.ActivityModule,
+            activity_type_module_1.ActivityTypeModule,
+            activity_assignment_module_1.ActivityAssignmentModule,
+            activity_type_assignment_module_1.ActivityTypeAssignmentModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

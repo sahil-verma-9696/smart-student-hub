@@ -6,10 +6,10 @@ import * as multer from 'multer';
 export const multerOptions = {
   storage: memoryStorage(), // Use memory storage for processing in memory
   fileFilter: (req: any, file: multer.File, callback: any) => {
-    // Accept only Excel files
-    if (!file.originalname.match(/\.(xlsx|xls)$/)) {
+    // Accept Excel and CSV files
+    if (!file.originalname.match(/\.(xlsx|xls|csv)$/)) {
       return callback(
-        new BadRequestException('Only Excel files (.xlsx, .xls) are allowed'),
+        new BadRequestException('Only Excel files (.xlsx, .xls) and CSV files (.csv) are allowed'),
         false,
       );
     }
@@ -29,10 +29,10 @@ export const multerDiskOptions = {
     },
   }),
   fileFilter: (req: any, file: multer.File, callback: any) => {
-    // Accept only Excel files
-    if (!file.originalname.match(/\.(xlsx|xls)$/)) {
+    // Accept Excel and CSV files
+    if (!file.originalname.match(/\.(xlsx|xls|csv)$/)) {
       return callback(
-        new BadRequestException('Only Excel files (.xlsx, .xls) are allowed'),
+        new BadRequestException('Only Excel files (.xlsx, .xls) and CSV files (.csv) are allowed'),
         false,
       );
     }

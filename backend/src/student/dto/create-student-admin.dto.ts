@@ -4,6 +4,7 @@ import {
   Matches,
   Length,
   IsEnum,
+  IsOptional,
 } from 'class-validator';
 import { IsValidYearForCourse } from '../validators/course-year.validator';
 import { IsValidSemesterForCourse } from '../validators/course-year-semester.validator';
@@ -29,10 +30,8 @@ export class CreateStudentAdminDto {
   name: string;
 
   @IsString()
-  @Matches(/^[a-fA-F0-9]{24}$/, {
-    message: 'Invalid instituteId (must be a MongoDB ObjectId)',
-  })
-  instituteId: string;
+  @IsOptional()
+  institute: string;
 
   @IsEmail({}, { message: 'Invalid email format' })
   email: string;

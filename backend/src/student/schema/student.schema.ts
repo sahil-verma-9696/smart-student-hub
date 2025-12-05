@@ -14,6 +14,9 @@ export class Student {
   
   @Prop({ type: [Types.ObjectId], default: [],ref:"Activity" })
   activities: Types.ObjectId[];
+
+  @Prop({ type: Types.ObjectId, ref: 'Institute', required: true })
+  instituteId: Types.ObjectId;
 }
 
 export type StudentDocument = Student & Document;  // 🔥 IMPORTANT!

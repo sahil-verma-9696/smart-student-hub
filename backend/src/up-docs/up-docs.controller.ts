@@ -18,6 +18,13 @@ export class UpDocsController {
 
   @Post()
   create(@Body() createUpDocDto: CreateUpDocDto) {
+    // Log incoming payload for debugging upload metadata issues
+    try {
+      console.debug('UpDocsController.create payload ->', JSON.stringify(createUpDocDto));
+    } catch (e) {
+      // ignore serialization errors
+    }
+
     return this.upDocsService.create(createUpDocDto);
   }
 

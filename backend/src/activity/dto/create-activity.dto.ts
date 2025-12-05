@@ -1,114 +1,73 @@
-import {
-  IsString,
-  IsOptional,
-  IsEnum,
-  IsMongoId,
-  IsObject,
-  IsNumber,
-  ValidateIf,
-  IsArray,
-} from 'class-validator';
-import { ACTIVITY_TYPES, ACTIVITY_STATUS } from '../types/enum';
+import { IsBoolean, IsDateString, IsMongoId, IsNotEmpty, IsOptional, IsString, IsArray, IsNumber } from 'class-validator';
 
+/**
+ * CreateActivityDto
+ * 
+ * DTO for creating a new Activity (student accomplishment).
+ * 
+ * Key concepts:
+ * - activityTypeId: Links to ActivityType (defines which fields are required)
+ * - details: Dynamic object validated against ActivityType.formSchema
+ * - status: Always starts as PENDING, changed by faculty during review
+ * - creditsEarned: Set by faculty during approval (not by student)
+ */
 export class CreateActivityDto {
-  @IsString()
-  title: string;
-
-  // @IsOptional()
-  // @IsString()
-  // description?: string;
-
   @IsMongoId()
-  student: string;
+  @IsNotEmpty()
+  activityTypeId: string; // Reference to ActivityType
 
-  @IsEnum(ACTIVITY_TYPES)
-  activityType: ACTIVITY_TYPES;
+  @IsString()
+  @IsNotEmpty()
+  title: string; // Activity title (e.g., "Summer Internship at Google")
 
+  @IsString()
   @IsOptional()
-  @IsEnum(ACTIVITY_STATUS)
-  status?: ACTIVITY_STATUS;
+  description?: string; // Detailed description of the activity
 
-  @IsOptional()
   @IsArray()
-  attachments?: string[];
-
-  // -------------------------------------------
-  // CUSTOM
-  // -------------------------------------------
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.CUSTOM,
-  )
-  @IsObject()
-  fields?: Record<string, any>;
-
-  // -------------------------------------------
-  // HACKATHON
-  // -------------------------------------------
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
-  )
-  @IsString()
-  name?: string;
-
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
-  )
+  @IsMongoId({ each: true })
   @IsOptional()
+  attachments?: string[]; // Uploaded certificates, photos, etc.
+
+  @IsString()
+  @IsNotEmpty()
+  location: string; // Where the activity took place
+
+  @IsString()
+  @IsOptional()
+  locationType?: string; // Type of location (e.g., "On-site", "Remote")
+
+  // Dynamic details payload, validated against ActivityType.formSchema in service
+  // Example: { companyName: "Google", duration: 3, role: "SWE Intern" }
+  @IsOptional()
+  details?: Record<string, any>;
+
+  // optional explicit submittedAt (defaults to now if missing)
+  @IsDateString()
+  @IsOptional()
+  submittedAt?: string;
+
+  // allow client to request public visibility
+  @IsBoolean()
+  @IsOptional()
+  isPublic?: boolean;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  skills?: string[];
+
+  // credits are assigned by faculty on approval, not by student
   @IsNumber()
-  teamSize?: number;
-
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
-  )
   @IsOptional()
-  @IsString()
-  rank?: string;
+  creditsEarned?: number;
 
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
-  )
+  @IsString()
   @IsOptional()
-  @IsString()
-  hackDescription?: string;
+  externalUrl?: string;
 
-  // -------------------------------------------
-  // WORKSHOP
-  // -------------------------------------------
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
-  )
-  @IsString()
-  workshopName?: string;
-
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
-  )
+  // faculty to assign for review; if omitted, service may infer from student.assignedFaculty
+  @IsMongoId()
   @IsOptional()
-  @IsString()
-  speaker?: string;
-
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
-  )
-  @IsOptional()
-  @IsString()
-  organizer?: string;
-
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
-  )
-  @IsOptional()
-  @IsString()
-  duration?: string;
-
-  @ValidateIf(
-    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
-  )
-  @IsOptional()
-  @IsString()
-  location?: string;
-
-  /***************************
-   * Conference
-   *****************************************/
+  facultyId?: string;
 }

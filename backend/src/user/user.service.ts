@@ -19,7 +19,7 @@ export class UserService {
   }
 
   async findById(id: string) {
-    return await this.userModel.findById(id).populate('instituteId').exec();
+    return await this.userModel.findById(id).exec();
   }
 
   async remove(id: string, session?: ClientSession) {
@@ -27,5 +27,9 @@ export class UserService {
       return await this.userModel.findByIdAndDelete(id, { session }).exec();
     }
     return await this.userModel.findByIdAndDelete(id).exec();
+  }
+
+  async updateUserProfile(userId: string, profileData: any) {
+    return await this.userModel.findByIdAndUpdate(userId, profileData, { new: true }).exec();
   }
 }

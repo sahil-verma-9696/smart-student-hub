@@ -3,11 +3,12 @@ import { Document, Types } from 'mongoose';
 import { InstituteType } from 'src/auth/types/auth.enum';
 
 @Schema({ timestamps: true })
-export default class Institute extends Document {
+export class Institute extends Document {
   @Prop({ required: true })
   institute_name: string;
 
   @Prop({
+    type: String,
     required: true,
     enum: Object.values(InstituteType),
   })

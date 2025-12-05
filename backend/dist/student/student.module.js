@@ -28,7 +28,7 @@ exports.StudentModule = StudentModule = __decorate([
                 { name: activity_schema_1.Activity.name, schema: activity_schema_1.ActivitySchema }
             ]),
             user_module_1.UserModule,
-            academic_module_1.AcademicModule,
+            (0, common_1.forwardRef)(() => academic_module_1.AcademicModule),
         ],
         controllers: [student_controller_1.StudentController],
         providers: [student_service_1.StudentService],

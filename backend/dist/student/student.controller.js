@@ -60,7 +60,10 @@ let StudentController = class StudentController {
     constructor(studentService) {
         this.studentService = studentService;
     }
-    async createStudent(dto) {
+    async createStudent(dto, req) {
+        if (!req.user)
+            throw new common_1.UnauthorizedException();
+        dto.institute = req.user.instituteId;
         const result = await this.studentService.createStudentFromAdmin(dto);
         return { data: result };
     }
@@ -73,8 +76,7 @@ let StudentController = class StudentController {
         return await this.studentService.uploadBulk(file, req.user);
     }
     async findAll() {
-        const data = await this.studentService.findAll();
-        return { data };
+        return await this.studentService.findAll();
     }
     findOne(id) {
         return this.studentService.findOne(id);
@@ -91,9 +93,11 @@ let StudentController = class StudentController {
 exports.StudentController = StudentController;
 __decorate([
     (0, common_1.Post)('create'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_student_admin_dto_1.CreateStudentAdminDto]),
+    __metadata("design:paramtypes", [create_student_admin_dto_1.CreateStudentAdminDto, Object]),
     __metadata("design:returntype", Promise)
 ], StudentController.prototype, "createStudent", null);
 __decorate([

@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ProgramService } from './program.service';
 import { ProgramController } from './program.controller';
 import { Program, ProgramSchema } from './schema/program.schema';
-import Institute, { InstituteSchema } from 'src/institute/schemas/institute.schema';
+import {Institute, InstituteSchema } from 'src/institute/schemas/institute.schema';
 
 @Module({
   imports: [

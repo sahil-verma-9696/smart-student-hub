@@ -8,14 +8,17 @@ import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 
 import AuthProvider from "./providers/auth-context-provider.jsx";
 import GlobalContextProvider from "./providers/global-context-provider.jsx";
+import { SocketProvider } from "./contexts/SocketContext.jsx";
 
 const App = () => {
   return (
     <>
       <AuthProvider>
-        <GlobalContextProvider>
-          <RouterProvider router={routes} />
-        </GlobalContextProvider>
+        <SocketProvider>
+          <GlobalContextProvider>
+            <RouterProvider router={routes} />
+          </GlobalContextProvider>
+        </SocketProvider>
       </AuthProvider>
     </>
   );

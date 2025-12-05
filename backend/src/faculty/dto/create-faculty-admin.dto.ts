@@ -62,26 +62,16 @@ export class CreateFacultyAdminDto {
   })
   department: string;
 
+
   @IsString()
   @Matches(/^[A-Za-z .,&()-]+$/, {
     message: 'Designation contains invalid characters',
   })
   designation: string;
-
-  @IsString()
-  @Matches(/^[a-fA-F0-9]{24}$/, {
-    message: 'Invalid instituteId (must be a Mongo ObjectId)',
-  })
-  instituteId: string;
-
-  // ------------- ASSIGNED STUDENTS -----------------
+  
 
   @IsOptional()
-  @IsArray({ message: 'assignedStudentIds must be an array' })
-  @ArrayUnique({ message: 'Student IDs must not be duplicated' })
-  @Matches(/^[A-Za-z0-9_-]+$/, {
-    each: true,
-    message: 'Each student ID must contain letters, numbers, hyphens, and underscores only',
-  })
-  assignedStudentIds?: string[];
+  @IsString()
+  institute: string;
+
 }

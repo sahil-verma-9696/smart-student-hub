@@ -8,7 +8,7 @@ export declare class AuthController {
     authService: AuthService;
     constructor(authService: AuthService);
     register(body: InstitueRegistrationDto): Promise<{
-        institute: import("mongoose").Document<unknown, {}, import("../institute/schemas/institute.schema").default, {}, {}> & import("../institute/schemas/institute.schema").default & Required<{
+        institute: import("mongoose").Document<unknown, {}, import("../institute/schemas/institute.schema").Institute, {}, {}> & import("../institute/schemas/institute.schema").Institute & Required<{
             _id: import("mongoose").Types.ObjectId;
         }> & {
             __v: number;
@@ -35,7 +35,6 @@ export declare class AuthController {
             role: string;
             gender: string;
             contactInfo: import("../user/dto/contact-info.dto").ContactInfoDto;
-            instituteId: import("mongoose").Types.ObjectId;
             adminId?: import("mongoose").Types.ObjectId;
             studentId?: import("mongoose").Types.ObjectId;
             facultyId?: import("mongoose").Types.ObjectId;
@@ -65,7 +64,6 @@ export declare class AuthController {
             role: string;
             gender: string;
             contactInfo: import("../user/dto/contact-info.dto").ContactInfoDto;
-            instituteId: import("mongoose").Types.ObjectId;
             adminId?: import("mongoose").Types.ObjectId;
             studentId?: import("mongoose").Types.ObjectId;
             facultyId?: import("mongoose").Types.ObjectId;
@@ -83,7 +81,7 @@ export declare class AuthController {
             comparePassword(plainPassword: string): Promise<boolean>;
             __v: number;
         };
-        studentData: import("mongoose").Document<unknown, {}, import("../student/schema/student.schema").Student, {}, {}> & import("../student/schema/student.schema").Student & {
+        student: import("mongoose").Document<unknown, {}, import("../student/schema/student.schema").Student, {}, {}> & import("../student/schema/student.schema").Student & {
             _id: import("mongoose").Types.ObjectId;
         } & {
             __v: number;
@@ -100,7 +98,6 @@ export declare class AuthController {
             role: string;
             gender: string;
             contactInfo: import("../user/dto/contact-info.dto").ContactInfoDto;
-            instituteId: import("mongoose").Types.ObjectId;
             adminId?: import("mongoose").Types.ObjectId;
             studentId?: import("mongoose").Types.ObjectId;
             facultyId?: import("mongoose").Types.ObjectId;

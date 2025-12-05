@@ -4,22 +4,22 @@ import { UpdateInstituteDto } from './dto/update-institute.dto';
 export declare class InstituteController {
     private readonly instituteService;
     constructor(instituteService: InstituteService);
-    create(createInstituteDto: CreateInstituteDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+    create(createInstituteDto: CreateInstituteDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").Institute, {}, {}> & import("./schemas/institute.schema").Institute & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
         __v: number;
     }>;
-    findAll(): Promise<(import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+    findAll(): Promise<(import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").Institute, {}, {}> & import("./schemas/institute.schema").Institute & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
         __v: number;
     })[]>;
-    findOne(id: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+    findOne(id: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").Institute, {}, {}> & import("./schemas/institute.schema").Institute & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
         __v: number;
     }>;
-    update(id: string, updateInstituteDto: UpdateInstituteDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+    update(id: string, updateInstituteDto: UpdateInstituteDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").Institute, {}, {}> & import("./schemas/institute.schema").Institute & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
         __v: number;
@@ -27,12 +27,12 @@ export declare class InstituteController {
     remove(id: string): Promise<{
         message: string;
     }>;
-    addProgram(id: string, programId: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+    addProgram(id: string, programId: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").Institute, {}, {}> & import("./schemas/institute.schema").Institute & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
         __v: number;
     }>;
-    removeProgram(id: string, programId: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").default, {}, {}> & import("./schemas/institute.schema").default & Required<{
+    removeProgram(id: string, programId: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/institute.schema").Institute, {}, {}> & import("./schemas/institute.schema").Institute & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
         __v: number;

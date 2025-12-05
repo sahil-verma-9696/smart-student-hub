@@ -1,5 +1,5 @@
 // dto/update-faculty.dto.ts
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateFacultyDto } from './create-faculty.dto';
+import { CreateFacultyAdminDto } from './create-faculty-admin.dto';
 
-export class UpdateFacultyDto extends PartialType(CreateFacultyDto) {}
+export class UpdateFacultyDto extends PartialType(CreateFacultyAdminDto) {}

@@ -4,10 +4,14 @@ import { v2 as cloudinary } from 'cloudinary';
 import { AttachmentService } from 'src/attachment/attachment.service';
 import { CreateAttachmentDto } from 'src/attachment/dto/create-attachment.dto';
 import { CreateUpDocDto } from './dto/create-up-doc.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UpDocsService {
-  constructor(private readonly attachmentService: AttachmentService) {}
+  constructor(
+    private readonly attachmentService: AttachmentService,
+    private readonly configService: ConfigService,
+  ) {}
   async create(att: CreateUpDocDto) {
 
     const attachment = await this.attachmentService.upload({
@@ -56,20 +60,39 @@ export class UpDocsService {
   getAccessToken(folderName = 'ssh-up-docs') {
     const timestamp = Math.floor(Date.now() / 1000);
 
-    const signature = cloudinary.utils.api_sign_request(
-      {
-        timestamp,
-        folder: folderName,
-      },
-      process.env.CLOUDINARY_API_SECRET!,
-    );
+    const apiKey = this.configService.get<string>('CLOUDINARY_API_KEY') || process.env.CLOUDINARY_API_KEY;
+    const apiSecret = this.configService.get<string>('CLOUDINARY_API_SECRET') || process.env.CLOUDINARY_API_SECRET;
+    const cloudName = this.configService.get<string>('CLOUDINARY_NAME') || process.env.CLOUDINARY_NAME;
 
-    return {
+    if (!apiKey || !apiSecret || !cloudName) {
+      console.error('Cloudinary env vars missing', { apiKey: !!apiKey, apiSecret: !!apiSecret, cloudName: !!cloudName });
+      throw new Error('Cloudinary not configured on server');
+    }
+
+    // Sign the request (Cloudinary expects the same param ordering used here)
+    let signature: string;
+    try {
+      signature = cloudinary.utils.api_sign_request(
+        {
+          timestamp,
+          folder: folderName,
+        },
+        apiSecret,
+      );
+    } catch (err) {
+      console.error('Error generating Cloudinary signature', err && err.message ? err.message : err);
+      throw new Error('Failed to generate upload signature');
+    }
+
+    const result = {
       timestamp,
       signature,
       folder: folderName,
-      apiKey: process.env.CLOUDINARY_API_KEY,
-      cloudName: process.env.CLOUDINARY_NAME,
+      apiKey,
+      cloudName,
     };
+
+    console.debug('UpDocsService.getAccessToken ->', result);
+    return result;
   }
 }

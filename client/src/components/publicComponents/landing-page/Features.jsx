@@ -1,4 +1,3 @@
-import { Card } from '@/components/ui/card'
 import { BarChart3, Users, Lock, Zap, FileText, CheckCircle } from 'lucide-react'
 
 const features = [
@@ -36,35 +35,49 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="px-4 py-20 sm:px-6 lg:px-8 bg-card">
+    <section id="features" className="px-4 py-20 sm:py-28 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
-        <div className="space-y-4 mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
+        
+        {/* Section Header */}
+        <div className="text-center mb-16 sm:mb-20">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6">
             Powerful Features
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl">
+          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto font-light">
             Everything you need to streamline student activity management across your institution
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
-              <Card 
-                key={index} 
-                className="p-8 hover:shadow-lg transition-shadow duration-300 border-border hover:border-primary/50"
+              <div
+                key={index}
+                className="group relative"
               >
-                <div className="inline-block p-3 rounded-lg bg-primary/10 mb-6">
-                  <Icon className="w-6 h-6 text-primary" />
+                {/* Hover Background */}
+                <div className="absolute inset-0 bg-slate-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                {/* Content */}
+                <div className="relative p-8 space-y-4">
+                  <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  
+                  <h3 className="font-display text-xl text-slate-900">
+                    {feature.title}
+                  </h3>
+                  
+                  <p className="text-slate-600 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
-              </Card>
+
+                {/* Bottom Border */}
+                <div className="absolute bottom-0 left-8 right-8 h-0.5 bg-gradient-to-r from-transparent via-slate-200 to-transparent group-hover:via-slate-900 transition-colors duration-300"></div>
+              </div>
             )
           })}
         </div>

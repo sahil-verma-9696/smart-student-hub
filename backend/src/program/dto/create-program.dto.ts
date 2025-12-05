@@ -27,8 +27,9 @@ export class CreateProgramDto {
   @IsString()
   degree: string; // BTech, BCA, MTech, MBA etc.
 
+  @IsOptional()
   @IsString()
-  branch: string; // CSE, Mechanical, BCA General etc.
+  branch?: string; // CSE, Mechanical, etc. (optional for degrees like BCA, MBA)
 
   @IsOptional()
   @IsString()

@@ -19,22 +19,36 @@ export default function useCheckAuthenticity({
    * Run on reload + page mount + whenever route changes
    ******************************************/
   useEffect(() => {
-    // 1️⃣ No token → redirect to home
+    // 1️⃣ No token → if not on home, redirect; else stay quiet
     if (!accessToken) {
-      if (window.location.pathname !== "/") window.location.href = "/";
+      if (window.location.pathname !== "/") {
+        window.location.href = "/";
+      }
       return;
     }
 
-    // 2️⃣ token expires → redirect to home
+    // 2️⃣ token expired → if not on home, redirect; else stay quiet
     if (!expiresAt || now >= expiresAt) {
-      if (window.location.pathname !== "/") window.location.href = "/";
+      if (window.location.pathname !== "/") {
+        window.location.href = "/";
+      }
       return;
     }
 
     // 3️⃣ Token exists & valid time → verify with backend
     (async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/me`, {
+        // Resolve server URL robustly: prefer VITE_SERVER_URL, then VITE_API_BASE_URL, then fallback to origin
+        const envServer = import.meta.env.VITE_SERVER_URL;
+        const envApiBase = import.meta.env.VITE_API_BASE_URL;
+        const candidate = envServer || envApiBase || window.location.origin;
+        const serverUrl = String(candidate).replace(/"/g, '').trim();
+
+        if (!serverUrl || serverUrl === 'undefined') {
+          console.warn('useCheckAuthenticity: VITE_SERVER_URL not set; defaulting to window.location.origin');
+        }
+
+        const res = await fetch(`${serverUrl.replace(/\/$/, '')}/auth/me`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
@@ -45,8 +59,12 @@ export default function useCheckAuthenticity({
 
         // 4️⃣ Invalid token → redirect to home
         if (!res.ok) {
-          toast.error("Unauthorized access");
-          if (window.location.pathname !== "/") window.location.href = "/";
+          // Avoid noisy toast on landing page; only show when navigating protected routes
+          if (window.location.pathname !== "/") {
+            toast.error("Unauthorized access");
+            window.location.href = "/";
+          }
+          return;
         }
 
         const payload = await res.json();

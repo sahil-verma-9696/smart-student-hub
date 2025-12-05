@@ -10,6 +10,9 @@ export class Admin extends Document {
     required: true,
   })
   basicUserDetails: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Institute', required: true })
+  instituteId: Types.ObjectId;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

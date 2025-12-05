@@ -14,7 +14,9 @@ export default function useAuthantication() {
   /******************************************
    * variables
    ********************************************/
-  const BASE_URL = import.meta.env.VITE_SERVER_URL;
+  const BASE_URL =
+    (typeof import.meta !== "undefined" && import.meta.env && (import.meta.env.VITE_SERVER_URL || import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_BASE)) ||
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
 
   /******************************************
    * hooks invokation
@@ -47,7 +49,7 @@ export default function useAuthantication() {
       }
 
       setLoading(false);
-      toast.success(response?.msg);
+      toast.success(response?.data?.msg || "Login successful");
 
       // Save response data locally
       setData(response?.data);
@@ -82,8 +84,9 @@ export default function useAuthantication() {
     } catch (err) {
       console.log(err);
       setLoading(false);
-      toast.error(err.message);
-      setError(err.message);
+      const msg = (err && err.message) || "Login failed";
+      toast.error(msg);
+      setError(msg);
     }
   }
 

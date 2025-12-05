@@ -1,77 +1,66 @@
-import { Card } from '@/components/ui/card'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export default function ProblemSolution() {
   return (
-    <section id="problem" className="px-4 py-20 sm:px-6 lg:px-8">
+    <section id="about" className="px-4 py-20 sm:py-28 sm:px-6 lg:px-8 bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
 
           {/* Problem */}
-          <Card className="p-8 border-border bg-card">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="p-3 rounded-lg bg-destructive/10">
-                <AlertCircle className="w-6 h-6 text-destructive" />
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="font-display text-3xl text-slate-900">The Challenge</h3>
               </div>
-              <h3 className="text-2xl font-bold text-foreground">The Challenge</h3>
             </div>
 
-            <ul className="space-y-4">
-              <li className="flex gap-3">
-                <span className="text-destructive mt-1">•</span>
-                <span className="text-muted-foreground">Fragmented student records scattered across multiple institutions</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-destructive mt-1">•</span>
-                <span className="text-muted-foreground">Time-consuming manual data entry and verification processes</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-destructive mt-1">•</span>
-                <span className="text-muted-foreground">Lack of real-time visibility into student activities</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-destructive mt-1">•</span>
-                <span className="text-muted-foreground">Data security and compliance concerns with legacy systems</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-destructive mt-1">•</span>
-                <span className="text-muted-foreground">Inefficient reporting and analytics capabilities</span>
-              </li>
+            <ul className="space-y-5">
+              {[
+                'Fragmented student records scattered across multiple institutions',
+                'Time-consuming manual data entry and verification processes',
+                'Lack of real-time visibility into student activities',
+                'Data security and compliance concerns with legacy systems',
+                'Inefficient reporting and analytics capabilities'
+              ].map((item, index) => (
+                <li key={index} className="flex gap-4 items-start">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2.5 flex-shrink-0"></div>
+                  <span className="text-slate-600 leading-relaxed">{item}</span>
+                </li>
+              ))}
             </ul>
-          </Card>
+          </div>
 
           {/* Solution */}
-          <Card className="p-8 border-border bg-primary/5 border-primary/20">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="p-3 rounded-lg bg-primary/10">
-                <CheckCircle2 className="w-6 h-6 text-primary" />
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="font-display text-3xl text-slate-900">Our Solution</h3>
               </div>
-              <h3 className="text-2xl font-bold text-foreground">Our Solution</h3>
             </div>
 
-            <ul className="space-y-4">
-              <li className="flex gap-3">
-                <span className="text-primary font-bold">✓</span>
-                <span className="text-muted-foreground">Unified platform integrating all HEIs under one system</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-primary font-bold">✓</span>
-                <span className="text-muted-foreground">Automated data collection and management workflows</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-primary font-bold">✓</span>
-                <span className="text-muted-foreground">Real-time dashboard for instant activity tracking</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-primary font-bold">✓</span>
-                <span className="text-muted-foreground">Enterprise-grade security with government compliance</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-primary font-bold">✓</span>
-                <span className="text-muted-foreground">Powerful analytics and comprehensive reporting tools</span>
-              </li>
+            <ul className="space-y-5">
+              {[
+                'Unified platform integrating all HEIs under one system',
+                'Automated data collection and management workflows',
+                'Real-time dashboard for instant activity tracking',
+                'Enterprise-grade security with government compliance',
+                'Powerful analytics and comprehensive reporting tools'
+              ].map((item, index) => (
+                <li key={index} className="flex gap-4 items-start">
+                  <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-slate-600 leading-relaxed">{item}</span>
+                </li>
+              ))}
             </ul>
-          </Card>
+          </div>
 
         </div>
       </div>

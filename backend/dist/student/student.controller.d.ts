@@ -6,7 +6,7 @@ import type { AuthenticatedRequest } from 'src/auth/types/auth.type';
 export declare class StudentController {
     private readonly studentService;
     constructor(studentService: StudentService);
-    createStudent(dto: CreateStudentAdminDto): Promise<{
+    createStudent(dto: CreateStudentAdminDto, req: AuthenticatedRequest): Promise<{
         data: (import("mongoose").Document<unknown, {}, import("./schema/student.schema").Student, {}, {}> & import("./schema/student.schema").Student & {
             _id: import("mongoose").Types.ObjectId;
         } & {
@@ -19,13 +19,11 @@ export declare class StudentController {
         errorCount: number;
         errors: import("./student.service").BulkUploadError[];
     }>;
-    findAll(): Promise<{
-        data: (import("mongoose").Document<unknown, {}, import("./schema/student.schema").Student, {}, {}> & import("./schema/student.schema").Student & {
-            _id: import("mongoose").Types.ObjectId;
-        } & {
-            __v: number;
-        })[];
-    }>;
+    findAll(): Promise<(import("mongoose").Document<unknown, {}, import("./schema/student.schema").Student, {}, {}> & import("./schema/student.schema").Student & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    })[]>;
     findOne(id: string): Promise<(import("mongoose").Document<unknown, {}, import("./schema/student.schema").Student, {}, {}> & import("./schema/student.schema").Student & {
         _id: import("mongoose").Types.ObjectId;
     } & {

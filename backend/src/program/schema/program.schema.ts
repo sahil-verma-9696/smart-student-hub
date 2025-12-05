@@ -13,8 +13,8 @@ export class Program extends Document {
   @Prop({ required: true })
   degree: string; // BTech, BCA, MTech etc.
 
-  @Prop({ required: true })
-  branch: string; // CSE, Mechanical, BCA General etc.
+  @Prop({ default: null })
+  branch: string; // CSE, Mechanical, etc. (optional for degrees like BCA, MBA)
 
   @Prop({ default: null })
   specialization: string; // AI & ML, Cyber Security, or null

@@ -29,7 +29,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly studentService: StudentService,
     private readonly facultyService: FacultyService,
-  ) {}
+  ) { }
 
   /*******************************************
    * Register Institute + User + Admin + Token
@@ -63,13 +63,19 @@ export class AuthService {
       role: 'admin',
       contactInfo: admin_contactInfo,
       gender: admin_gender,
-      instituteId: institute._id.toString(),
     });
 
     /**
      *  Create Admin profile
      */
-    const admin = await this.adminService.create(user._id);
+    const admin = await this.adminService.create(user._id, institute._id.toString());
+
+    // Refetch user to get updated adminId
+    const updatedUser = await this.userService.findById(user._id.toString());
+
+    if (!updatedUser) {
+      throw new BadRequestException('Failed to fetch updated user');
+    }
 
     /****** Sanitize User **************/
 
@@ -77,7 +83,7 @@ export class AuthService {
     const { passwordHash, ...sanitizedUser } = user.toObject();
 
     /****** Generate Token **************/
-    const payload = this.buildJwtPayload(user);
+    const payload = await this.buildJwtPayload(updatedUser);
     const token = this.jwtService.sign(payload);
     return {
       institute,
@@ -98,12 +104,11 @@ export class AuthService {
   ) {
     const { password } = data || {};
     /************************************
-     *  Create User (role = admin)
+     *  Create User (role = student)
      *********************************/
     const user = await this.userService.create({
       passwordHash: password,
-      userId: '22CSME017',
-      instituteId,
+      userId: `STU${Date.now()}`, // Generate unique userId
       contactInfo: data.contactInfo,
       email: data.email,
       name: data.name,
@@ -112,20 +117,27 @@ export class AuthService {
     });
 
     /********************************
-     *  Create Student profile
+     *  Create Student Profile
      ********************************/
-    const studentData = await this.studentService.create(user._id.toString());
+    const student = await this.studentService.createProfile(user._id.toString(), instituteId);
+
+    // Refetch user to get updated studentId
+    const updatedUser = await this.userService.findById(user._id.toString());
+
+    if (!updatedUser) {
+      throw new BadRequestException('Failed to fetch updated user');
+    }
 
     /****** Sanitize User **************/
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...sanitizedUser } = user.toObject();
 
     /****** Generate Token **************/
-    const payload = this.buildJwtPayload(user);
+    const payload = await this.buildJwtPayload(updatedUser);
     const token = this.jwtService.sign(payload);
     return {
       user: sanitizedUser,
-      studentData,
+      student,
       token,
       expires_in: process.env.JWT_EXPIRES_IN_MILI,
       msg: 'Student Successfully Registered',
@@ -142,18 +154,24 @@ export class AuthService {
      *  Create User (role = faculty)
      ********************************/
     const user = await this.userService.create({
-      userId: 'FAC001', // or generate automatically
+      userId: `FAC${Date.now()}`, // Generate unique userId
       email: data.email,
       name: data.name,
       gender: data.gender,
       contactInfo: data.contactInfo,
       passwordHash: password,
       role: 'faculty',
-      instituteId,
     });
 
     /** Create Faculty profile */
-    const faculty = await this.facultyService.createProfile(user._id.toString());
+    const faculty = await this.facultyService.createProfile(user._id.toString(), instituteId);
+
+    // Refetch user to get updated facultyId
+    const updatedUser = await this.userService.findById(user._id.toString());
+
+    if (!updatedUser) {
+      throw new BadRequestException('Failed to fetch updated user');
+    }
 
     /********************************
      *  Sanitize User
@@ -162,7 +180,7 @@ export class AuthService {
     const { passwordHash, ...sanitizedUser } = user.toObject();
 
     /****** Generate Token **************/
-    const payload = this.buildJwtPayload(user);
+    const payload = await this.buildJwtPayload(updatedUser);
     const token = this.jwtService.sign(payload);
 
     return {
@@ -204,7 +222,7 @@ export class AuthService {
     const { passwordHash, ...sanitizedUser } = user.toObject();
 
     /****** Generate Token **************/
-    const payload = this.buildJwtPayload(user);
+    const payload = await this.buildJwtPayload(user);
     const token = this.jwtService.sign(payload);
 
     return {
@@ -222,26 +240,47 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    // Convert document → plain object
-    const obj = userData.toObject();
-
-    // Remove password from output
-    const { passwordHash, ...sanitizedUser } = obj;
-
+    // Rebuild the JWT payload with fresh data from the database
+    // This ensures the frontend gets the latest instituteId, studentId, facultyId, adminId
+    const freshPayload = await this.buildJwtPayload(userData);
+    
     return {
-      userData: user,
-      msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
+      userData: freshPayload,
+      msg: `User ${freshPayload.name} (role: ${freshPayload.role}) authenticated successfully`,
     };
   }
 
-  private buildJwtPayload(user: User): JwtPayload {
+  private async buildJwtPayload(user: User): Promise<JwtPayload> {
+    let instituteId = '';
+    let studentId: string | undefined = undefined;
+    let facultyId: string | undefined = undefined;
+    let adminId: string | undefined = undefined;
+
+    // Get instituteId from role-specific profile
+    if (user.role === 'admin' && user.adminId) {
+      const admin = await this.adminService.findById(user.adminId.toString());
+      instituteId = admin?.instituteId?.toString() || '';
+      adminId = user.adminId.toString();
+    } else if (user.role === 'student' && user.studentId) {
+      const student = await this.studentService.findById(user.studentId.toString());
+      instituteId = student?.instituteId?.toString() || '';
+      studentId = user.studentId.toString();
+    } else if (user.role === 'faculty' && user.facultyId) {
+      const faculty = await this.facultyService.findById(user.facultyId.toString());
+      instituteId = faculty?.instituteId?.toString() || '';
+      facultyId = user.facultyId.toString();
+    }
+
     return {
       sub: user._id.toString() as string,
       userId: user.userId,
       email: user.email,
       role: user.role,
-      instituteId: user.instituteId.toString(),
+      instituteId,
       name: user.name,
+      studentId,
+      facultyId,
+      adminId,
     };
   }
 }

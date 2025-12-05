@@ -7,10 +7,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { StudentModule } from './student/student.module';
 import { InstituteModule } from './institute/institute.module';
 import { FacultyModule } from './faculty/faculty.module';
-import { ActivityModule } from './activity/activity.module';
 import { AdminModule } from './admin/admin.module';
 import { UpDocsModule } from './up-docs/up-docs.module';
 import { AttachmentModule } from './attachment/attachment.module';
+import { ProgramModule } from './program/program.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ActivityModule } from './activity/activity.module';
+import { ActivityTypeModule } from './activity-type/activity-type.module';
+import { ActivityAssignmentModule } from './activity-assignment/activity-assignment.module';
+import { ActivityTypeAssignmentModule } from './activity-type-assignment/activity-type-assignment.module';
 
 @Module({
   imports: [
@@ -39,8 +44,18 @@ import { AttachmentModule } from './attachment/attachment.module';
     UpDocsModule,
 
     AttachmentModule,
+
+    ProgramModule,
+
+    NotificationsModule,
+    ActivityModule,
+    ActivityTypeModule,
+
+    ActivityAssignmentModule,
+
+    ActivityTypeAssignmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { FacultyService } from './faculty.service';
 import { CreateFacultyAdminDto } from './dto/create-faculty-admin.dto';
+import { UpdateFacultyDto } from './dto/update-faculty.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../utils/multer.util';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -32,7 +33,10 @@ export class FacultyController {
 
   // POST: Create new faculty (from frontend form)
   @Post('create')
-  async createFaculty(@Body() dto: CreateFacultyAdminDto) {
+  @UseGuards(JwtAuthGuard)
+  async createFaculty(@Body() dto: CreateFacultyAdminDto, @Req() req: AuthenticatedRequest) {
+    if (!req.user) throw new UnauthorizedException();
+    dto.institute = req.user.instituteId;
     return await this.facultyService.create(dto);
   }
 
@@ -55,7 +59,7 @@ export class FacultyController {
 
   // PATCH: Update faculty
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: any) {
+  async update(@Param('id') id: string, @Body() dto: UpdateFacultyDto) {
     return await this.facultyService.update(id, dto);
   }
 

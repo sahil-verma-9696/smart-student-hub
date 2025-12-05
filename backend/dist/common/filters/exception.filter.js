@@ -12,6 +12,11 @@ let GlobalExceptionFilter = class GlobalExceptionFilter {
     catch(exception, host) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse();
+        try {
+            console.error('Unhandled exception caught by GlobalExceptionFilter:', exception && (exception.stack || exception));
+        }
+        catch (logErr) {
+        }
         let status = common_1.HttpStatus.INTERNAL_SERVER_ERROR;
         let errorResponse = {
             status,

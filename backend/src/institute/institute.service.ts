@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import Institute from './schemas/institute.schema';
+import {Institute} from './schemas/institute.schema';
 import { Model, isValidObjectId } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
 

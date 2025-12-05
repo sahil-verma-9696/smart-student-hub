@@ -11,6 +11,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
+    // Log full exception server-side for easier debugging in development
+    try {
+      console.error('Unhandled exception caught by GlobalExceptionFilter:', exception && (exception.stack || exception));
+    } catch (logErr) {
+      // ignore logging errors
+    }
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
 

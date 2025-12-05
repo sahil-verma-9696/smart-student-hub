@@ -1,5 +1,10 @@
-import { CreateBasicStudentDto } from './create-basic-student.dto';
-declare const UpdateStudentDto_base: import("@nestjs/mapped-types").MappedType<Partial<CreateBasicStudentDto>>;
-export declare class UpdateStudentDto extends UpdateStudentDto_base {
+export declare class UpdateStudentDto {
+    name?: string;
+    email?: string;
+    phone?: string;
+    course?: string;
+    branch?: string;
+    year?: number;
+    semester?: number;
+    section?: string;
 }
-export {};

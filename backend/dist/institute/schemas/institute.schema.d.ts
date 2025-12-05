@@ -1,6 +1,6 @@
 import { Document, Types } from 'mongoose';
 import { InstituteType } from 'src/auth/types/auth.enum';
-export default class Institute extends Document {
+export declare class Institute extends Document {
     institute_name: string;
     institute_type: InstituteType;
     official_email: string;

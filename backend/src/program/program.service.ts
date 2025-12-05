@@ -7,7 +7,7 @@ import { UpdateProgramDto } from './dto/update-program.dto';
 import * as xlsx from 'xlsx';
 import { JwtPayload } from 'src/auth/types/auth.type';
 import * as multer from 'multer';
-import Institute from 'src/institute/schemas/institute.schema';
+import {Institute} from 'src/institute/schemas/institute.schema';
 
 export interface BulkUploadError {
   program: any;
@@ -37,21 +37,21 @@ export class ProgramService {
     const existingProgram = await this.programModel.findOne({
       level: dto.level,
       degree: dto.degree,
-      branch: dto.branch,
+      branch: dto.branch || null,
       specialization: dto.specialization || null,
       instituteId: dto.instituteId,
     });
 
     if (existingProgram) {
       throw new BadRequestException(
-        `Program ${dto.degree} - ${dto.branch}${dto.specialization ? ` (${dto.specialization})` : ''} already exists for this institute`,
+        `Program ${dto.degree}${dto.branch ? ` - ${dto.branch}` : ''}${dto.specialization ? ` (${dto.specialization})` : ''} already exists for this institute`,
       );
     }
 
     const program = await this.programModel.create({
       level: dto.level,
       degree: dto.degree,
-      branch: dto.branch,
+      branch: dto.branch || null,
       specialization: dto.specialization || null,
       intake: dto.intake,
       instituteId: dto.instituteId,
@@ -71,10 +71,32 @@ export class ProgramService {
       throw new BadRequestException('No file received');
     }
 
-    const workbook = xlsx.read(file.buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    const data = xlsx.utils.sheet_to_json(worksheet);
+    // Check if user has instituteId
+    if (!user.instituteId) {
+      throw new BadRequestException('Admin must be associated with an institute to upload programs');
+    }
+
+    let data: any[];
+
+    // Handle CSV and Excel files
+    const fileName = file.originalname.toLowerCase();
+    if (fileName.endsWith('.csv')) {
+      // Parse CSV using xlsx library
+      const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      data = xlsx.utils.sheet_to_json(worksheet);
+    } else {
+      // Parse Excel files
+      const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      data = xlsx.utils.sheet_to_json(worksheet);
+    }
+
+    if (!data || data.length === 0) {
+      throw new BadRequestException('No data found in the uploaded file');
+    }
 
     const createdPrograms: any[] = [];
     const errors: BulkUploadError[] = [];
@@ -82,12 +104,17 @@ export class ProgramService {
     for (const row of data as any[]) {
       try {
         const dto = new CreateProgramDto();
-        dto.level = row['Level'] || row['level'];
-        dto.degree = row['Degree'] || row['degree'];
-        dto.branch = row['Branch'] || row['branch'];
-        dto.specialization = row['Specialization'] || row['specialization'] || null;
-        dto.intake = Number(row['Intake'] || row['intake']);
-        dto.instituteId = user.instituteId;
+        dto.level = row['Level'] || row['level'] || row['LEVEL'];
+        dto.degree = row['Degree'] || row['degree'] || row['DEGREE'];
+        dto.branch = row['Branch'] || row['branch'] || row['BRANCH'] || null;
+        dto.specialization = row['Specialization'] || row['specialization'] || row['SPECIALIZATION'] || null;
+        dto.intake = Number(row['Intake'] || row['intake'] || row['INTAKE']);
+        dto.instituteId = user.instituteId; // Always use admin's institute ID
+
+        // Validate required fields (branch is optional)
+        if (!dto.level || !dto.degree || !dto.intake) {
+          throw new Error('Missing required fields: Level, Degree, or Intake');
+        }
 
         const created = await this.create(dto);
         createdPrograms.push(created);

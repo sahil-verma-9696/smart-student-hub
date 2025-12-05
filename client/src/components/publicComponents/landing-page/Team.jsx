@@ -1,89 +1,97 @@
-import { Card } from '@/components/ui/card'
 import { Github, Linkedin, Mail } from 'lucide-react'
 
 const team = [
   {
     name: 'Sahil Verma',
     role: 'Lead Developer',
-    // image: '/professional-developer-headshot.png'
+    initials: 'SV',
+    color: 'from-blue-500 to-cyan-500'
   },
   {
-
-
     name: 'Sonal Verma',
     role: 'Product Manager',
-    // image: '/professional-product-manager-headshot.jpg'
+    initials: 'SV',
+    color: 'from-purple-500 to-pink-500'
   },
   {
     name: 'Krishna Gupta',
     role: 'Backend Engineer',
-    // image: '/professional-backend-engineer-headshot.jpg'
+    initials: 'KG',
+    color: 'from-green-500 to-emerald-500'
   },
   {
     name: 'Prakhar Shukla',
     role: 'Frontend Engineer',
-    // image: '/professional-frontend-engineer-headshot.jpg'
+    initials: 'PS',
+    color: 'from-orange-500 to-red-500'
   },
   {
     name: 'Adarsh Singh',
     role: 'UI/UX Designer',
-    // image: '/professional-designer-headshot.png'
+    initials: 'AS',
+    color: 'from-indigo-500 to-purple-500'
   },
   {
     name: 'Gaurav Sharma',
     role: 'DevOps Engineer',
-    // image: '/professional-devops-engineer-headshot.jpg'
+    initials: 'GS',
+    color: 'from-teal-500 to-blue-500'
   }
 ]
 
 export default function Team() {
   return (
-    <section id="team" className="px-4 py-20 sm:px-6 lg:px-8 bg-card">
+    <section id="team" className="px-4 py-20 sm:py-28 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
-        <div className="space-y-4 mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
+        
+        {/* Section Header */}
+        <div className="text-center mb-16 sm:mb-20">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl text-slate-900 mb-6">
             Meet Our Team
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl">
+          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto font-light">
             Dedicated professionals bringing Smart Student Hub to life with expertise and innovation
           </p>
         </div>
 
+        {/* Team Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {team.map((member, index) => (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-border">
-              <div className="aspect-square overflow-hidden bg-muted">
-                <img
-                  src={member.image || "/placeholder.svg"}
-                  alt={member.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            <div 
+              key={index} 
+              className="group relative bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              {/* Avatar */}
+              <div className="p-8 pb-6">
+                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <span className="font-display text-2xl text-white">{member.initials}</span>
+                </div>
 
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-foreground mb-1">
+                <h3 className="font-display text-xl text-slate-900 mb-1">
                   {member.name}
                 </h3>
 
-                <p className="text-primary font-medium mb-4">
+                <p className="text-slate-600 font-medium mb-6">
                   {member.role}
                 </p>
 
-                <div className="flex gap-3">
-                  <button className="p-2 rounded-lg hover:bg-muted transition-colors">
-                    <Mail className="w-4 h-4 text-muted-foreground" />
+                {/* Social Links */}
+                <div className="flex gap-2">
+                  <button className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white transition-colors duration-200 flex items-center justify-center">
+                    <Mail className="w-4 h-4" />
                   </button>
-
-                  <button className="p-2 rounded-lg hover:bg-muted transition-colors">
-                    <Linkedin className="w-4 h-4 text-muted-foreground" />
+                  <button className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white transition-colors duration-200 flex items-center justify-center">
+                    <Linkedin className="w-4 h-4" />
                   </button>
-
-                  <button className="p-2 rounded-lg hover:bg-muted transition-colors">
-                    <Github className="w-4 h-4 text-muted-foreground" />
+                  <button className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white transition-colors duration-200 flex items-center justify-center">
+                    <Github className="w-4 h-4" />
                   </button>
                 </div>
               </div>
-            </Card>
+
+              {/* Bottom Accent */}
+              <div className={`h-1 bg-gradient-to-r ${member.color}`}></div>
+            </div>
           ))}
         </div>
       </div>

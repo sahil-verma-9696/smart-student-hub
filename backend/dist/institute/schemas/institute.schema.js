@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InstituteSchema = void 0;
+exports.InstituteSchema = exports.Institute = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const auth_enum_1 = require("../../auth/types/auth.enum");
@@ -27,12 +27,14 @@ let Institute = class Institute extends mongoose_2.Document {
     affiliation_id;
     programs;
 };
+exports.Institute = Institute;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Institute.prototype, "institute_name", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
+        type: String,
         required: true,
         enum: Object.values(auth_enum_1.InstituteType),
     }),
@@ -78,9 +80,8 @@ __decorate([
     (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'Program' }], default: [] }),
     __metadata("design:type", Array)
 ], Institute.prototype, "programs", void 0);
-Institute = __decorate([
+exports.Institute = Institute = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Institute);
-exports.default = Institute;
 exports.InstituteSchema = mongoose_1.SchemaFactory.createForClass(Institute);
 //# sourceMappingURL=institute.schema.js.map

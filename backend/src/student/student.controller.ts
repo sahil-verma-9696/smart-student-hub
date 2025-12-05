@@ -27,7 +27,10 @@ export class StudentController {
   constructor(private readonly studentService: StudentService) { }
 
   @Post('create')
-  async createStudent(@Body() dto: CreateStudentAdminDto) {
+  @UseGuards(JwtAuthGuard)
+  async createStudent(@Body() dto: CreateStudentAdminDto, @Req() req: AuthenticatedRequest) {
+    if (!req.user) throw new UnauthorizedException();
+    dto.institute = req.user.instituteId;
     const result = await this.studentService.createStudentFromAdmin(dto);
     return { data: result };    // <-- MUST RETURN { data: ... } for interceptor
   }
@@ -49,8 +52,8 @@ export class StudentController {
 
   @Get()
 async findAll() {
-  const data = await this.studentService.findAll();
-  return { data };
+  return await this.studentService.findAll();
+  
 }
 
 
