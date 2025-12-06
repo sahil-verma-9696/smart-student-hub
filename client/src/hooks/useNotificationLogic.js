@@ -1,10 +1,13 @@
 // src/hooks/useNotificationLogic.js
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
+import useAuthContext from "./useAuthContext";
 
 const SOCKET_URL = "http://localhost:3000";
 
-export default function useNotificationLogic(userId) {
+export default function useNotificationLogic() {
+  const { user } = useAuthContext();
+  const userId = user?._id || null; 
   const [notifications, setNotifications] = useState([
     {
       title: "Welcome!",
@@ -14,7 +17,7 @@ export default function useNotificationLogic(userId) {
     {
       title: "Getting Started",
       message: "Explore the app to discover more features.",
-      isReaded: false,  
+      isReaded: false,
     },
   ]);
   const socketRef = useRef(null);
@@ -42,7 +45,6 @@ export default function useNotificationLogic(userId) {
       const dummy = {
         title: "Dummy Notification",
         message: "This is only for testing!",
-        time: new Date().toISOString(),
       };
       console.log("🔥 Dummy Added:", dummy);
       setNotifications((prev) => [dummy, ...prev]);
