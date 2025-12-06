@@ -1,10 +1,11 @@
-import NotificationContext from "@/contexts/notification-context";
+import GlobalContext from "@/contexts/global-context";
+import useGlobalData from "@/hooks/useGlobalData";
 
-const NotificationContextProvider = ({ children }) => {
-
-  // connect with socket here
-  // write logic for notification 
-  return <NotificationContext.Provider value={{}}>{children}</NotificationContext.Provider>;
-};
-
-export default NotificationContextProvider;
+export default function GlobalContextProvider({ children }) {
+  const contextValue = useGlobalData();
+  return (
+    <GlobalContext.Provider value={contextValue}>
+      {children}
+    </GlobalContext.Provider>
+  );
+}

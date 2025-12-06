@@ -192,8 +192,13 @@ export class AcademicService {
     });
   }
 
-  async getDegrees(programId: string) {
-    return this.degreeModel.find({ program: programId });
+  async getDegrees(programId: string, instituteId: string) {
+    const programObjId = new Types.ObjectId(programId);
+    const instituteObjId = new Types.ObjectId(instituteId);
+    return this.degreeModel.find({
+      program: programObjId,
+      institute: instituteObjId,
+    });
   }
 
   async updateDegree(id: string, dto: any) {
@@ -221,7 +226,8 @@ export class AcademicService {
   }
 
   async getDepartments(instituteId: string) {
-    return this.departmentModel.find({ institute: instituteId });
+    const instituteObjectId = new Types.ObjectId(instituteId);
+    return this.departmentModel.find({ institute: instituteObjectId });
   }
 
   async updateDepartment(id: string, dto: any) {
@@ -650,7 +656,7 @@ export class AcademicService {
   }
 
   async getInstituteDetails(strInstituteId: string): Promise<any> {
-    const instituteId = new Types.ObjectId(strInstituteId)
+    const instituteId = new Types.ObjectId(strInstituteId);
     const institute = await this.instituteModel.findById(instituteId).lean();
 
     if (!institute) {
@@ -660,7 +666,7 @@ export class AcademicService {
     const departments = await this.departmentModel
       .find({ institute: instituteId })
       .lean();
-    console.log(departments,"departments");
+
     const programs = await this.programModel
       .find({ institute: instituteId })
       .lean();
@@ -786,5 +792,108 @@ export class AcademicService {
       // adminEmail: admin.adminEmail,
       // adminPhone: admin.adminPhone,
     };
+  }
+
+  async getInstituteProgramDetials(strInstituteId: string) {
+    const instituteObjId = new Types.ObjectId(strInstituteId);
+
+    const programs = await this.programModel
+      .find({ institute: instituteObjId })
+      .lean();
+
+    const programDetails = await Promise.all(
+      programs.map(async (program) => {
+        const degrees = await this.degreeModel
+          .find({ program: program._id })
+          .lean();
+
+        const degreeDetails = await Promise.all(
+          degrees.map(async (degree) => {
+            const branches = await this.branchModel
+              .find({ degree: degree._id })
+              .lean();
+
+            const branchDetails = await Promise.all(
+              branches.map(async (branch) => {
+                const specializations = await this.specializationModel
+                  .find({ branch: branch._id })
+                  .lean();
+
+                return {
+                  id: branch._id.toString(),
+                  name: branch.name,
+                  degreeId: degree._id.toString(),
+                  departmentId: branch.department.toString(),
+                  specializations: specializations.map((spec) => ({
+                    id: spec._id.toString(),
+                    name: spec.name,
+                    branchId: branch._id.toString(),
+                    sectionIntake: spec.sectionIntake,
+                  })),
+                };
+              }),
+            );
+
+            const yearLevels = await this.yearLevelModel
+              .find({ degree: degree._id })
+              .lean();
+
+            const yearLevelDetails = await Promise.all(
+              yearLevels.map(async (yearLevel) => {
+                const semesters = await this.semesterModel
+                  .find({ year: yearLevel._id })
+                  .lean();
+
+                const semesterDetails = await Promise.all(
+                  semesters.map(async (semester) => {
+                    const sections = await this.sectionModel
+                      .find({ semester: semester._id })
+                      .lean();
+
+                    return {
+                      id: semester._id.toString(),
+                      semNumber: semester.semNumber,
+                      yearId: yearLevel._id.toString(),
+                      sections: sections.map((section) => ({
+                        id: section._id.toString(),
+                        name: section.name,
+                        seatCapacity: section.seatCapacity,
+                        specializationId: section.specialization.toString(),
+                        semesterId: semester._id.toString(),
+                      })),
+                    };
+                  }),
+                );
+
+                return {
+                  id: yearLevel._id.toString(),
+                  year: yearLevel.year,
+                  degreeId: degree._id.toString(),
+                  semesters: semesterDetails,
+                };
+              }),
+            );
+
+            return {
+              id: degree._id.toString(),
+              name: degree.name,
+              programId: program._id.toString(),
+              duration: 4, // Assuming duration is 4 years for UG
+              durationUnit: 'Years',
+              branches: branchDetails,
+              yearLevels: yearLevelDetails,
+            };
+          }),
+        );
+
+        return {
+          id: program._id.toString(),
+          name: program.name,
+          instituteId: strInstituteId,
+          degrees: degreeDetails,
+        };
+      }),
+    );
+    return programDetails;
   }
 }

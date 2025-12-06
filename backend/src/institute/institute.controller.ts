@@ -42,6 +42,10 @@ export class InstituteController {
   getInstitute(@Param('id') id: string) {
     return this.instituteService.getInstituteDetails(id);
   }
+  @Get(':id/programs')
+  getInstituteProgramDetails(@Param('id') id: string) {
+    return this.instituteService.getInstituteProgramsDetails(id);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {

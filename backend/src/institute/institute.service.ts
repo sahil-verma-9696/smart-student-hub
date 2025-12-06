@@ -152,6 +152,10 @@ export class InstituteService implements IInstituteService {
     return this.academicService.getInstituteDetails(instituteId);
   }
 
+  getInstituteProgramsDetails(instituteId: string) {
+    return this.academicService.getInstituteProgramDetials(instituteId);
+  }
+
   // async getInstituteFullStructure(instituteId: string) {
   //   const result = await this.instituteModel.aggregate([
   //     {

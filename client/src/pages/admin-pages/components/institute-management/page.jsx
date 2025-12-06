@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 
 import {
@@ -25,12 +23,10 @@ import {
 import { AcademicHierarchy } from "./academic-hierarchy";
 import { AdminCredentialsSection } from "./admin-credentials-section";
 import { ConfigField } from "./config-field";
-import {
-  instituteFormConfig,
-  academicHierarchyConfig,
-} from "./ui-config";
+import { instituteFormConfig, academicHierarchyConfig } from "./ui-config";
 import { LogoUpload } from "./logo-upload";
 import { initialData } from "./constants";
+import useAuthContext from "@/hooks/useAuthContext";
 
 const iconMap = {
   building: <Building2 className="h-5 w-5" />,
@@ -43,6 +39,25 @@ export function InstituteAdminPage() {
   const [data, setData] = useState(initialData);
   const [verifyingField, setVerifyingField] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  const { user } = useAuthContext();
+  const instituteId = user?.institute?._id;
+  console.log("helllow", user);
+  React.useEffect(() => {
+    (async function getInitialData() {
+      if (instituteId) {
+        const res = await fetch(
+          `http://localhost:3000/institute/${instituteId}/institute-details`
+        );
+        const data = await res.json();
+
+        console.log("res data", data);
+        // setData(data.data);
+      }
+    })();
+  }, [instituteId]);
+
+  if (!data) return null;
 
   const handleFieldChange = (field, value) => {
     setData((prev) => ({ ...prev, [field]: value }));
