@@ -35,7 +35,7 @@ const iconMap = {
   image: <ImageIcon className="h-5 w-5" />,
 };
 
-export function InstituteAdminPage() {
+export function InstituteManagementPage() {
   const [data, setData] = useState(initialData);
   const [verifyingField, setVerifyingField] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -52,7 +52,6 @@ export function InstituteAdminPage() {
         const data = await res.json();
 
         console.log("res data", data);
-        // setData(data.data);
       }
     })();
   }, [instituteId]);

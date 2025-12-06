@@ -33,9 +33,11 @@ export default function AdminDashboardPage() {
   });
 
   const { user } = useAuthContext();
-  const { institutePrograms } = useGlobalContext();
+  const { institutePrograms, instituteDepartments } = useGlobalContext();
 
   if (institutePrograms) console.log(institutePrograms);
+
+  if (instituteDepartments) console.log(instituteDepartments);
 
   return (
     <div className="min-h-screen max-h-screen overflow-y-auto bg-[#f8f9fa]">

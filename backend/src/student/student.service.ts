@@ -432,5 +432,12 @@ export class StudentService {
       .populate('basicUserDetails', '-passwordHash')
       .populate('academicDetails');
   }
+
+  getInstituteStudents(instituteId: string) {
+    const instituteObjId = new Types.ObjectId(instituteId);
+    return this.studentModel
+      .find({ institute: instituteObjId })
+      .populate('basicUserDetails');
+  }
 }
 type StudentFilter = Record<string, unknown>;

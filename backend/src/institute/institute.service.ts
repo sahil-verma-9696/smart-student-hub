@@ -10,6 +10,7 @@ import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 import { AdminService } from 'src/admin/admin.service';
 import { UpdateAdminDto } from 'src/admin/dto/update-admin.dto';
 import { AcademicService } from 'src/academic/academic.service';
+import { StudentService } from 'src/student/student.service';
 // `inst3admin@gmail.com
 @Injectable()
 export class InstituteService implements IInstituteService {
@@ -17,6 +18,7 @@ export class InstituteService implements IInstituteService {
     @InjectModel(Institute.name) private instituteModel: Model<Institute>,
     private readonly adminService: AdminService,
     private readonly academicService: AcademicService,
+    private readonly studentService: StudentService,
   ) {}
 
   async create(createInstituteDto: CreateInstituteDto) {
@@ -154,6 +156,14 @@ export class InstituteService implements IInstituteService {
 
   getInstituteProgramsDetails(instituteId: string) {
     return this.academicService.getInstituteProgramDetials(instituteId);
+  }
+
+  getInstituteDepartmentsDetails(instituteId: string) {
+    return this.academicService.getDepartments(instituteId);
+  }
+
+  getInstituteStudents(instituteId: string) {
+    return this.studentService.getInstituteStudents(instituteId);
   }
 
   // async getInstituteFullStructure(instituteId: string) {

@@ -38,13 +38,25 @@ export class InstituteController {
   ) {
     return this.instituteService.updateInstitute(updateInstituteDto, id);
   }
+
   @Get(':id/institute-details')
   getInstitute(@Param('id') id: string) {
     return this.instituteService.getInstituteDetails(id);
   }
+
   @Get(':id/programs')
   getInstituteProgramDetails(@Param('id') id: string) {
     return this.instituteService.getInstituteProgramsDetails(id);
+  }
+
+  @Get(':id/departments')
+  getInstituteDepartmentDetails(@Param('id') id: string) {
+    return this.instituteService.getInstituteDepartmentsDetails(id);
+  }
+
+  @Get(':id/students')
+  getInstituteStudents(@Param('id') id: string) {
+    return this.instituteService.getInstituteStudents(id);
   }
 
   // @Delete(':id')

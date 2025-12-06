@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import Institute, { InstituteSchema } from './schemas/institute.schema';
 import { AdminModule } from 'src/admin/admin.module';
 import { AcademicModule } from 'src/academic/academic.module';
+import { StudentModule } from 'src/student/student.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AcademicModule } from 'src/academic/academic.module';
     ]),
     AdminModule,
     AcademicModule,
+    StudentModule,
   ],
   controllers: [InstituteController],
   providers: [InstituteService],

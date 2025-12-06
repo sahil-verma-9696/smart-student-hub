@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -17,6 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CheckCircle2 } from "lucide-react";
+import { Cascader } from "antd";
+import { useGlobalContext } from "@/contexts/global-context";
 
 export function AddStudentForm({ onAdd }) {
   const [name, setName] = useState("");
@@ -26,7 +28,44 @@ export function AddStudentForm({ onAdd }) {
   const [phone, setPhone] = useState("");
   const [alternatePhone, setAlternatePhone] = useState("");
   const [address, setAddress] = useState("");
+  const [department, setDepartment] = useState("");
+  const [programPath, setProgramPath] = useState([]); // <-- cascader selected array
   const [success, setSuccess] = useState(false);
+
+  const { instituteDepartments, institutePrograms } = useGlobalContext();
+
+  const departments = instituteDepartments.map((d) => d.name);
+
+  // 🔥 Convert institutePrograms → Cascader options
+  const cascaderOptions = useMemo(() => {
+    if (!institutePrograms) return [];
+
+    return institutePrograms.map((program) => ({
+      value: program.id,
+      label: program.name,
+      children: program.degrees?.map((degree) => ({
+        value: degree.id,
+        label: degree.name,
+        children: degree.branches?.map((branch) => ({
+          value: branch.id,
+          label: branch.name,
+          children: branch.specializations?.map((spec) => ({
+            value: spec.id,
+            label: spec.name,
+            children:
+              degree.yearLevels?.map((year) => ({
+                value: year.id,
+                label: `Year ${year.year}`,
+                children: year.semesters?.map((sem) => ({
+                  value: sem.id,
+                  label: `Semester ${sem.semNumber}`,
+                })),
+              })) ?? [],
+          })),
+        })),
+      })),
+    }));
+  }, [institutePrograms]);
 
   const allRequiredFilled =
     name &&
@@ -35,12 +74,21 @@ export function AddStudentForm({ onAdd }) {
     rollNumber &&
     phone &&
     alternatePhone &&
-    address;
+    address &&
+    programPath.length === 6;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!allRequiredFilled) return;
+
+    const [
+      programId,
+      degreeId,
+      branchId,
+      specializationId,
+      yearId,
+      semesterId,
+    ] = programPath;
 
     onAdd({
       name,
@@ -52,6 +100,14 @@ export function AddStudentForm({ onAdd }) {
         alternatePhone,
         address,
       },
+      programStructure: {
+        programId,
+        degreeId,
+        branchId,
+        specializationId,
+        yearId,
+        semesterId,
+      },
     });
 
     setName("");
@@ -61,6 +117,7 @@ export function AddStudentForm({ onAdd }) {
     setPhone("");
     setAlternatePhone("");
     setAddress("");
+    setProgramPath([]);
     setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
   };
@@ -70,13 +127,13 @@ export function AddStudentForm({ onAdd }) {
       <CardHeader>
         <CardTitle>Add New Student</CardTitle>
         <CardDescription>
-          All fields are required. Password will automatically be the same as
-          the email for the API request, and instituteId is hardcoded on the
-          client.
+          All fields are required. Program selection is hierarchical.
         </CardDescription>
       </CardHeader>
+
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* NAME */}
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <Input
@@ -84,26 +141,26 @@ export function AddStudentForm({ onAdd }) {
               placeholder="Enter student name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
             />
           </div>
 
+          {/* EMAIL */}
           <div className="space-y-2">
-            <Label htmlFor="email">Email (also used as password)</Label>
+            <Label htmlFor="email">Email (also password)</Label>
             <Input
               id="email"
               type="email"
               placeholder="student@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
 
+          {/* GENDER */}
           <div className="space-y-2">
-            <Label htmlFor="gender">Gender</Label>
+            <Label>Gender</Label>
             <Select value={gender} onValueChange={(value) => setGender(value)}>
-              <SelectTrigger id="gender">
+              <SelectTrigger>
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent>
@@ -114,17 +171,53 @@ export function AddStudentForm({ onAdd }) {
             </Select>
           </div>
 
+          {/* DEPARTMENT */}
+          <div className="space-y-2">
+            <Label>Department</Label>
+            <Select
+              value={department}
+              onValueChange={(value) => setDepartment(value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Department" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments?.map((d) => (
+                  <SelectItem key={d} value={d}>
+                    {d}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* PROGRAM CASCADER */}
+          <div className="space-y-2">
+            <Label>
+              Program → Degree → Branch → Specialization → Year → Semester
+            </Label>
+            <Cascader
+              options={cascaderOptions}
+              placeholder="Select complete academic structure"
+              className="w-full"
+              value={programPath}
+              onChange={(value) => setProgramPath(value)}
+              changeOnSelect
+            />
+          </div>
+
+          {/* ROLL NUMBER */}
           <div className="space-y-2">
             <Label htmlFor="roll_number">Roll Number</Label>
             <Input
               id="roll_number"
-              placeholder="Unique roll number (e.g., S1)"
+              placeholder="e.g., S1"
               value={rollNumber}
               onChange={(e) => setRollNumber(e.target.value)}
-              required
             />
           </div>
 
+          {/* PHONE */}
           <div className="space-y-2">
             <Label htmlFor="phone">Phone</Label>
             <Input
@@ -132,10 +225,10 @@ export function AddStudentForm({ onAdd }) {
               placeholder="Primary phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              required
             />
           </div>
 
+          {/* ALT PHONE */}
           <div className="space-y-2">
             <Label htmlFor="alternatePhone">Alternate Phone</Label>
             <Input
@@ -143,10 +236,10 @@ export function AddStudentForm({ onAdd }) {
               placeholder="Alternate phone"
               value={alternatePhone}
               onChange={(e) => setAlternatePhone(e.target.value)}
-              required
             />
           </div>
 
+          {/* ADDRESS */}
           <div className="space-y-2">
             <Label htmlFor="address">Address</Label>
             <Input
@@ -154,16 +247,20 @@ export function AddStudentForm({ onAdd }) {
               placeholder="Full address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              required
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={!allRequiredFilled}>
+          {/* SUBMIT */}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={!allRequiredFilled}
+          >
             Add Student
           </Button>
 
           {success && (
-            <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+            <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
               <CheckCircle2 className="h-4 w-4" />
               Student added successfully!
             </div>

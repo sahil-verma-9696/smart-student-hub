@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 
 const GlobalContext = createContext({
   institutePrograms: null,
+  instituteDepartments: null,
   BACKEND_URL: null,
   INSITITUTE_ID: null,
 });
