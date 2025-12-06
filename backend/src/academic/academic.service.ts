@@ -406,7 +406,7 @@ export class AcademicService {
   ) {
     let program = await this.programModel.findOne({
       institute: instituteId,
-      id: programDto.id,
+      name: programDto.name,
     });
 
     if (!program) {

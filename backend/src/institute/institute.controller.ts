@@ -31,7 +31,7 @@ export class InstituteController {
     return this.instituteService.getInstituteById(id);
   }
 
-  @Patch(':id')
+  @Patch(':id/institute-details')
   update(
     @Param('id') id: string,
     @Body() updateInstituteDto: UpdateInstituteDto,

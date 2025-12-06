@@ -180,10 +180,5 @@ export const initialData = {
   adminEmail: "principal@nit.edu.in",
   adminPhone: "+91 9876543211",
   adminDesignation: "Principal",
-  verification: {
-    email: { verified: true, verifiedAt: "2024-01-15T10:30:00Z" },
-    phone: { verified: false },
-    adminEmail: { verified: true, verifiedAt: "2024-01-15T10:35:00Z" },
-    adminPhone: { verified: false },
-  },
+
 };

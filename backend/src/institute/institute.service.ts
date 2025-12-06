@@ -143,11 +143,9 @@ export class InstituteService implements IInstituteService {
     await this.academicService.upsertFullStructure(programPayload, instituteId);
     // update departments
 
-    return {
-      updatedInstitute,
-      updatedAdmin,
-      message: 'Institute updated successfully',
-    };
+    const instituteDetails = await this.getInstituteDetails(instituteId);
+    
+    return instituteDetails;
   }
 
   getInstituteDetails(instituteId: string) {

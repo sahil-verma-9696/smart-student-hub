@@ -7,7 +7,7 @@ export default function useStudentManagementData() {
 
   React.useEffect(() => {
     if (INSITITUTE_ID) {
-      (async function getStudents() {
+      (async function fetchData() {
         try {
           const res = await fetch(
             `${BACKEND_URL}/institute/${INSITITUTE_ID}/students`

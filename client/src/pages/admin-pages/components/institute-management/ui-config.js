@@ -1,5 +1,21 @@
 export const instituteFormConfig = [
   {
+    id: "branding",
+    title: "Branding",
+    description: "Institute logo and visual identity",
+    icon: "image",
+    fields: [
+      {
+        id: "logo",
+        label: "Institute Logo",
+        type: "image",
+        editable: true,
+        required: true,
+        description: "Upload logo (PNG, JPG, max 2MB, min 200x200px)",
+      },
+    ],
+  },
+  {
     id: "basic-info",
     title: "Basic Information",
     description: "Core institute details (some fields are system-managed)",
@@ -168,22 +184,6 @@ export const instituteFormConfig = [
         validation: {
           pattern: "^[0-9]{6}$",
         },
-      },
-    ],
-  },
-  {
-    id: "branding",
-    title: "Branding",
-    description: "Institute logo and visual identity",
-    icon: "image",
-    fields: [
-      {
-        id: "logo",
-        label: "Institute Logo",
-        type: "image",
-        editable: true,
-        required: true,
-        description: "Upload logo (PNG, JPG, max 2MB, min 200x200px)",
       },
     ],
   },

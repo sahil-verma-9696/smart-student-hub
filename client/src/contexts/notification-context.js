@@ -1,8 +1,8 @@
 import { createContext, useContext } from "react";
 
 const NotificationContext = createContext({
-  user: null,
-  setUser: () => {},
+  notifications: null,
+  socket: null,
 });
 
 export default NotificationContext;

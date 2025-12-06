@@ -371,9 +371,9 @@ export class ActivityService {
   //   status: ACTIVITY_STATUS,
   // ): Promise<ActivityDocument> {}
 
-  async test(): Promise<{ message: string }> {
+  async test(id: string): Promise<{ message: string }> {
     await this.notificationService.createNotification(
-      '123',
+      id,
       'test',
       'test message',
     );

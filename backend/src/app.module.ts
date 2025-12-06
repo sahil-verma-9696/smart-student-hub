@@ -16,6 +16,7 @@ import { AcadmicProgramModule } from './acadmic-program/acadmic-program.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { MindPioletModule } from './mind-piolet/mind-piolet.module';
 import { NotificationModule } from './notification/notification.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -54,6 +55,8 @@ import { NotificationModule } from './notification/notification.module';
     MindPioletModule,
 
     NotificationModule,
+
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

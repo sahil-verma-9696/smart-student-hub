@@ -12,6 +12,7 @@ import {
 import useAuthantication from "@/hooks/useAuthantication";
 import useAuthContext from "@/hooks/useAuthContext";
 import { Badge } from "../ui/badge";
+import { NotificationPopover } from "./notification-popover";
 
 function Navbar() {
   /******************************************
@@ -30,7 +31,7 @@ function Navbar() {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <h2 className="text-xl font-semibold text-card-foreground capitalize  flex items-center justify-center gap-1">
-            {user?.basicUserDetails?.name} 
+            {user?.basicUserDetails?.name}
             <Badge variant={"outlined"}>{user?.basicUserDetails?.role}</Badge>
           </h2>
         </div>
@@ -44,9 +45,7 @@ function Navbar() {
             />
           </div>
 
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
+          <NotificationPopover />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

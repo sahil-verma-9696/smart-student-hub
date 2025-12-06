@@ -16,7 +16,7 @@ export class NotificationGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
-  server: Server;
+  socketServer: Server;
 
   // 🔥 maps to track connections
   private userSockets = new Map<string, Set<string>>(); // userId -> socketIds
@@ -76,13 +76,15 @@ export class NotificationGateway
   sendToUser(userId: string, payload: any) {
     const sockets = this.userSockets.get(userId);
 
+    console.log(sockets, userId);
+
     if (!sockets || sockets.size === 0) {
       console.log(`User ${userId} is offline.`);
       return;
     }
 
     for (const socketId of sockets) {
-      this.server.to(socketId).emit('notification', payload);
+      this.socketServer.to(socketId).emit('notification', payload);
     }
   }
 }

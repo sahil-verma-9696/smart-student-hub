@@ -2,7 +2,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { NotificationGateway } from './notification.gateway';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Notification } from './schema/notification.schema';
 
 @Injectable()
@@ -23,12 +23,21 @@ export class NotificationService {
     });
 
     // Emit in real-time
-    this.gateway.sendToUser(userId, {
-      title,
-      message,
-      // createdAt: notification.createdAt,
-    });
+    this.gateway.sendToUser(userId, notification);
 
     return notification;
+  }
+
+  async getUserNotifications(userId: string) {
+    const userObjId = new Types.ObjectId(userId);
+    const notifications = await this.notificationModel.find({
+      userId: userObjId,
+    });
+
+    if (!notifications.length) {
+      return [];
+    }
+
+    return notifications;
   }
 }

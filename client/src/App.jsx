@@ -13,11 +13,11 @@ const App = () => {
   return (
     <>
       <AuthProvider>
-        <NotificationProvider>
-          <GlobalContextProvider>
+        <GlobalContextProvider>
+          <NotificationProvider>
             <RouterProvider router={routes} />
-          </GlobalContextProvider>
-        </NotificationProvider>
+          </NotificationProvider>
+        </GlobalContextProvider>
       </AuthProvider>
     </>
   );

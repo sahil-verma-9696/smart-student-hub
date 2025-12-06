@@ -1,10 +1,12 @@
 import React from "react";
 
 const InstituteManagementContext = React.createContext({
-  students: null,
+  instituteDetails: null,
+  setInstituteDetails: () => {},
+  updateInstituteDetails: () => {},
 });
 
 export default InstituteManagementContext;
 
-export const useStudentManagementContext = () =>
+export const useInstituteManagementContext = () =>
   React.useContext(InstituteManagementContext);

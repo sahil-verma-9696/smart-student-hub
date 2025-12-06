@@ -27,6 +27,7 @@ import { instituteFormConfig, academicHierarchyConfig } from "./ui-config";
 import { LogoUpload } from "./logo-upload";
 import { initialData } from "./constants";
 import useAuthContext from "@/hooks/useAuthContext";
+import { useInstituteManagementContext } from "../../context/institute-management.context";
 
 const iconMap = {
   building: <Building2 className="h-5 w-5" />,
@@ -36,25 +37,14 @@ const iconMap = {
 };
 
 export function InstituteManagementPage() {
-  const [data, setData] = useState(initialData);
   const [verifyingField, setVerifyingField] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const { user } = useAuthContext();
-  const instituteId = user?.institute?._id;
-  console.log("helllow", user);
-  React.useEffect(() => {
-    (async function getInitialData() {
-      if (instituteId) {
-        const res = await fetch(
-          `http://localhost:3000/institute/${instituteId}/institute-details`
-        );
-        const data = await res.json();
-
-        console.log("res data", data);
-      }
-    })();
-  }, [instituteId]);
+  const {
+    instituteDetails: data,
+    setInstituteDetails: setData,
+    updateInstituteDetails,
+  } = useInstituteManagementContext();
 
   if (!data) return null;
 
@@ -94,7 +84,7 @@ export function InstituteManagementPage() {
   const handleSave = async () => {
     console.log(data, "data");
     setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await updateInstituteDetails(data);
     setIsSaving(false);
   };
 
@@ -177,17 +167,6 @@ export function InstituteManagementPage() {
                             config={field}
                             value={data[field.id]}
                             onChange={(val) => handleFieldChange(field.id, val)}
-                            isVerified={
-                              field.verification?.required
-                                ? data.verification[field.id]?.verified
-                                : undefined
-                            }
-                            onVerify={
-                              field.verification?.required
-                                ? () => handleVerify(field.id)
-                                : undefined
-                            }
-                            isVerifying={verifyingField === field.id}
                           />
                         ))}
                       </div>
