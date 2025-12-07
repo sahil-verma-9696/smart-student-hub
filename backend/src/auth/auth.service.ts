@@ -87,8 +87,6 @@ export class AuthService {
       null;
     const role = user.role as USER_ROLE;
 
-    
-
     switch (role) {
       case USER_ROLE.STUDENT:
         userData = await this.studentService.getByUserId(user.userId);
@@ -135,13 +133,7 @@ export class AuthService {
 
     try {
       /****** 1. Create user + admin profile **************/
-      const createAdminDto: CreateAdminDto = {
-        contactInfo: dto.admin_contactInfo,
-        email: dto.admin_email,
-        gender: dto.admin_gender,
-        name: dto.admin_name,
-        password: dto.admin_password,
-      };
+      const createAdminDto: CreateAdminDto = dto.admin;
 
       const admin = await this.adminService.createAdmin(
         createAdminDto,
@@ -150,17 +142,17 @@ export class AuthService {
 
       /****** 2. Create institute **************/
       const createInstituteDto: CreateInstituteDto = {
-        address_line1: dto.inst_address_line1,
-        city: dto.inst_city,
-        institute_name: dto.inst_name,
-        institute_type: dto.inst_type,
-        official_email: dto.inst_email,
-        official_phone: dto.inst_phone,
-        pincode: dto.inst_pincode,
-        state: dto.inst_state,
-        is_affiliated: dto.inst_is_affiliated,
-        affiliation_id: dto.inst_affiliation_id,
-        affiliation_university: dto.inst_affiliation_university,
+        address_line1: dto.institute.addressLine1,
+        addressLine2: dto.institute.addressLine2,
+        affiliation_id: dto.institute.,
+        affiliation_university: dto.institute.affiliationUniversity,
+        city: dto.institute.city,
+        institute_name: dto.institute.instituteName,
+        institute_type: dto.institute.instituteType,
+        official_email: dto.institute.officialEmail,
+        official_phone: dto.institute.officialPhone,
+        pincode: dto.institute.pincode,
+        state: dto.institute.state,
       };
 
       const institute = await this.instituteService.createInstitute(

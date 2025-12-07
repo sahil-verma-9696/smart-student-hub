@@ -25,11 +25,8 @@ export class User {
   @Prop({ enum: GENDER, required: true })
   gender: string;
 
-  @Prop({ type: Number, default: 12345678 })
-  phone: number;
-
-  @Prop({ type: String, default: 'dummy address' })
-  address: string;
+  @Prop({ type: ContactInfoDto, required: true })
+  contactInfo: ContactInfoDto;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
