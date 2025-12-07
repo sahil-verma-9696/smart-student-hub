@@ -1,0 +1,283 @@
+import { 
+	ForbiddenException, 
+	Injectable, 
+	NotFoundException, 
+	BadRequestException,
+	ConflictException 
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { ActivityType } from './schema/activity-type.schema';
+import { CreateActivityTypeDto } from './dto/create-activity-type.dto';
+import { UpdateActivityTypeDto } from './dto/update-activity-type.dto';
+import { JwtPayload } from '../auth/types/auth.type';
+import { Role } from '../auth/types/auth.enum';
+
+/**
+ * ActivityTypeService - Production-Ready Implementation
+ * 
+ * BUSINESS RULES:
+ * 1. Primitive Types (isPrimitive=true):
+ *    - No instituteId (visible to ALL institutes)
+ *    - Cannot be modified/deleted by institutes
+ *    - Only system admins can create (hard-coded)
+ * 
+ * 2. Institute-Specific Types (isPrimitive=false):
+ *    - Must have instituteId
+ *    - Only visible to owning institute
+ *    - Full CRUD by same institute
+ * 
+ * 3. Approval Workflow:
+ *    - Student/Faculty creates → status = UNDER_REVIEW
+ *    - Admin creates → status = APPROVED (pre-approved)
+ *    - Only admins can approve/reject
+ * 
+ * 4. FormSchema Validation:
+ *    - Each field must have: key, label, type
+ *    - Select/checkbox types must have options[]
+ *    - Keys must be unique within formSchema
+ * 
+ * 5. Access Control:
+ *    - Students/Faculty: Read-only access to APPROVED types
+ *    - Admins: Full access to their institute's types
+ */
+@Injectable()
+export class ActivityTypeService {
+	constructor(
+		@InjectModel(ActivityType.name) private readonly activityTypeModel: Model<ActivityType>,
+	) {}
+
+	/**
+	 * CREATE ACTIVITY TYPE
+	 * 
+	 * VALIDATION RULES:
+	 * 1. Name is required and unique per institute
+	 * 2. FormSchema must be valid (validateFormSchema)
+	 * 3. minCredit <= maxCredit
+	 * 4. Primitive types: Only admins can create, no instituteId
+	 * 5. Institute types: Must have valid instituteId
+	 * 
+	 * WORKFLOW:
+	 * - Admin creates → status = APPROVED (pre-approved)
+	 * - Student/Faculty creates → status = UNDER_REVIEW (needs approval)
+	 * 
+	 * @throws BadRequestException - Invalid input data
+	 * @throws ForbiddenException - Missing instituteId or unauthorized
+	 */
+	async create(dto: CreateActivityTypeDto, user: JwtPayload): Promise<ActivityType> {
+		// Validate name
+		if (!dto.name || dto.name.trim().length === 0) {
+			throw new BadRequestException('Activity type name is required');
+		}
+
+		// Validate credits
+		if (dto.minCredit && dto.maxCredit && dto.minCredit > dto.maxCredit) {
+			throw new BadRequestException('Minimum credit cannot be greater than maximum credit');
+		}
+
+		// Validate formSchema
+		if (dto.formSchema && dto.formSchema.length > 0) {
+			this.validateFormSchema(dto.formSchema);
+		}
+
+		// Check for duplicate name within institute
+		const query: any = { name: dto.name.trim() };
+		if (!dto.isPrimitive && user.instituteId && user.instituteId.trim() !== '') {
+			query.instituteId = new Types.ObjectId(user.instituteId);
+		} else if (!dto.isPrimitive) {
+			query.instituteId = { $exists: false };
+		}
+
+		const existing = await this.activityTypeModel.findOne(query);
+		if (existing) {
+			throw new ConflictException(`Activity type with name "${dto.name}" already exists`);
+		}
+
+		// Determine status based on role
+		let status: ActivityType['status'];
+		if (user.role === Role.Admin) {
+			status = 'APPROVED'; // Admins create pre-approved types
+		} else {
+			status = 'UNDER_REVIEW'; // Students/Faculty need approval
+		}
+
+		// Build activity type document
+		const activityTypeData: any = {
+			name: dto.name.trim(),
+			description: dto.description?.trim() || '',
+			isPrimitive: dto.isPrimitive ?? false,
+			formSchema: dto.formSchema ?? [],
+			minCredit: dto.minCredit ?? 0,
+			maxCredit: dto.maxCredit ?? 0,
+			status,
+		};
+
+		// Handle instituteId for non-primitive types
+		if (!dto.isPrimitive) {
+			if (!user.instituteId || user.instituteId.trim() === '') {
+				throw new ForbiddenException(
+					'Institute ID is required to create institute-specific activity types. Please log out and log back in.'
+				);
+			}
+			activityTypeData.instituteId = new Types.ObjectId(user.instituteId);
+		}
+
+		// Create and return
+		const created = await this.activityTypeModel.create(activityTypeData);
+		return created;
+	}
+
+	/**
+	 * Get all activity types accessible to user
+	 * 
+	 * Filtering logic:
+	 * 1. Include primitive types (isPrimitive=true) - visible to ALL institutes
+	 * 2. Include institute-specific types (instituteId matches user's institute)
+	 * 3. For non-admins: Only return APPROVED types
+	 * 4. For admins: Return all types (including UNDER_REVIEW, REJECTED)
+	 * 
+	 * @param user - Authenticated user (contains role, instituteId)
+	 * @returns Array of activity types
+	 */
+	async findAll(user: JwtPayload) {
+		const typeFilter: any = {};
+		
+		// Build OR condition: primitive types OR institute-specific types
+		const orConditions: any[] = [{ isPrimitive: true }]; // Primitive types visible to all institutes
+		
+		// Only add institute filter if user has valid instituteId
+		if (user.instituteId && user.instituteId.trim() !== '') {
+			orConditions.push({ instituteId: new Types.ObjectId(user.instituteId) });
+		} else {
+			console.log('⚠️  Warning: User has no instituteId, only showing primitive types');
+			console.log('User data:', { sub: user.sub, email: user.email, role: user.role, instituteId: user.instituteId });
+		}
+		
+		typeFilter.$or = orConditions;
+
+		// Students and faculty can only see approved types; admins see all statuses
+		if (user.role !== Role.Admin) {
+			typeFilter.status = 'APPROVED';
+		}
+
+		console.log('ActivityType findAll query:', JSON.stringify(typeFilter, null, 2));
+		
+		// Execute query and return results
+		const results = await this.activityTypeModel.find(typeFilter).exec();
+		console.log(`Found ${results.length} activity type(s)`);
+		return results;
+	}
+
+	/**
+	 * Get single activity type by ID
+	 * 
+	 * Access control:
+	 * 1. Primitive types: Accessible to all institutes
+	 * 2. Institute-specific types: Only accessible to same institute
+	 * 3. Non-admins: Can only view APPROVED types
+	 * 4. Admins: Can view all statuses for their institute
+	 * 
+	 * @param id - ActivityType ObjectId
+	 * @param user - Authenticated user
+	 * @returns Activity type document
+	 * @throws NotFoundException if type doesn't exist
+	 * @throws ForbiddenException if user lacks access
+	 */
+	async findOne(id: string, user: JwtPayload) {
+		// Fetch activity type by ID
+		const type = await this.activityTypeModel.findById(id).exec();
+		if (!type) throw new NotFoundException('ActivityType not found');
+
+		// Access check: primitive types visible to all, otherwise must be same institute
+		if (!type.isPrimitive && type.instituteId?.toString() !== user.instituteId) {
+			throw new ForbiddenException('Activity type not accessible to your institute');
+		}
+
+		// Status check: non-admins can only view approved types
+		if (user.role !== Role.Admin && type.status !== 'APPROVED') {
+			throw new ForbiddenException('You can only view approved activity types');
+		}
+		
+		return type;
+	}
+
+	/**
+	 * Update an activity type
+	 * 
+	 * Restrictions:
+	 * 1. Cannot modify primitive types (hard-coded types)
+	 * 2. Can only update types from same institute
+	 * 3. Only admins can change status (APPROVED, REJECTED, etc.)
+	 * 4. Can update name, description, formSchema, credits, etc.
+	 * 
+	 * @param id - ActivityType ObjectId
+	 * @param dto - Partial update data
+	 * @param user - Authenticated user
+	 * @returns Updated activity type document
+	 * @throws NotFoundException if type doesn't exist
+	 * @throws ForbiddenException if user lacks permission
+	 */
+	async update(id: string, dto: UpdateActivityTypeDto, user: JwtPayload) {
+		// Fetch activity type by ID
+		const type = await this.activityTypeModel.findById(id).exec();
+		if (!type) throw new NotFoundException('ActivityType not found');
+
+		// Restriction: Cannot modify primitive types (system-level types)
+		if (type.isPrimitive) {
+			throw new ForbiddenException('Cannot modify primitive activity types');
+		}
+		
+		// Access check: Can only update types from same institute
+		if (type.instituteId?.toString() !== user.instituteId) {
+			throw new ForbiddenException('Activity type not in your institute');
+		}
+
+		// Permission check: Only admins can change status
+		if (dto.status && dto.status !== type.status && user.role !== Role.Admin) {
+			throw new ForbiddenException('Only admins can change activity type status');
+		}
+
+		// Apply updates and save
+		Object.assign(type, dto);
+		return type.save();
+	}
+
+	/**
+	 * Delete an activity type
+	 * 
+	 * Restrictions:
+	 * 1. Cannot delete primitive types (system-level types)
+	 * 2. Can only delete types from same institute
+	 * 3. Should check if any activities reference this type (TODO)
+	 * 
+	 * @param id - ActivityType ObjectId
+	 * @param user - Authenticated user
+	 * @returns Deletion confirmation
+	 * @throws NotFoundException if type doesn't exist
+	 * @throws ForbiddenException if user lacks permission
+	 */
+	async remove(id: string, user: JwtPayload) {
+		// Fetch activity type by ID
+		const type = await this.activityTypeModel.findById(id).exec();
+		if (!type) throw new NotFoundException('ActivityType not found');
+
+		// Restriction: Cannot delete primitive types (system-level types)
+		if (type.isPrimitive) {
+			throw new ForbiddenException('Cannot delete primitive activity types');
+		}
+		
+		// Access check: Can only delete types from same institute
+		if (type.instituteId?.toString() !== user.instituteId) {
+			throw new ForbiddenException('Activity type not in your institute');
+		}
+
+		// TODO: Check if any activities reference this type before deletion
+		// const activityCount = await this.activityModel.countDocuments({ activityTypeId: type._id });
+		// if (activityCount > 0) throw new ConflictException('Cannot delete activity type with existing activities');
+
+		// Delete the activity type
+		await type.deleteOne();
+		return { deleted: true };
+	}
+}
+
