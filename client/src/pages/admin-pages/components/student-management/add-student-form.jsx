@@ -30,40 +30,107 @@ export function AddStudentForm({ onAdd }) {
   const [address, setAddress] = useState("");
   const [department, setDepartment] = useState("");
   const [programPath, setProgramPath] = useState([]); // <-- cascader selected array
+  const [currentYear, setCurrentYear] = useState("");
+  const [currentSemester, setCurrentSemester] = useState("");
   const [success, setSuccess] = useState(false);
 
   const { instituteDepartments, institutePrograms } = useGlobalContext();
 
-  const departments = instituteDepartments.map((d) => d.name);
+  const departments = instituteDepartments?.map((d) => d.name) || [];
 
-  // 🔥 Convert institutePrograms → Cascader options
+  // 🔥 Get available years and semesters based on selected degree
+  const availableYearsAndSemesters = useMemo(() => {
+    if (!programPath || programPath.length < 2) {
+      return { years: [], semesters: [] };
+    }
+
+    const [programId, degreeId] = programPath;
+    const selectedProgram = institutePrograms?.find(p => p.id === programId);
+    const selectedDegree = selectedProgram?.degrees?.find(d => d.id === degreeId);
+
+    if (!selectedDegree?.yearLevels || selectedDegree.yearLevels.length === 0) {
+      return { years: [], semesters: [] };
+    }
+
+    // Get all years from the degree
+    const years = selectedDegree.yearLevels.map(yl => ({
+      id: yl.id,
+      year: yl.year,
+      label: `Year ${yl.year}`,
+      semesters: yl.semesters || []
+    }));
+
+    // Get semesters for the currently selected year
+    const selectedYearData = years.find(y => y.id === currentYear);
+    const semesters = selectedYearData?.semesters?.map(sem => ({
+      id: sem.id,
+      semNumber: sem.semNumber,
+      label: `Semester ${sem.semNumber}`
+    })) || [];
+
+    return { years, semesters };
+  }, [programPath, institutePrograms, currentYear]);
+
+  // 🔥 Convert institutePrograms → Cascader options (flexible structure)
   const cascaderOptions = useMemo(() => {
     if (!institutePrograms) return [];
 
     return institutePrograms.map((program) => ({
       value: program.id,
       label: program.name,
-      children: program.degrees?.map((degree) => ({
-        value: degree.id,
-        label: degree.name,
-        children: degree.branches?.map((branch) => ({
-          value: branch.id,
-          label: branch.name,
-          children: branch.specializations?.map((spec) => ({
-            value: spec.id,
-            label: spec.name,
-            children:
-              degree.yearLevels?.map((year) => ({
-                value: year.id,
-                label: `Year ${year.year}`,
-                children: year.semesters?.map((sem) => ({
-                  value: sem.id,
-                  label: `Semester ${sem.semNumber}`,
-                })),
-              })) ?? [],
-          })),
-        })),
-      })),
+      children: program.degrees?.map((degree) => {
+        const hasBranches = degree.branches && degree.branches.length > 0;
+        const hasSpecializations = degree.specializations && degree.specializations.length > 0;
+
+        // Case 1: Degree has specializations directly (no branches)
+        if (!hasBranches && hasSpecializations) {
+          return {
+            value: degree.id,
+            label: degree.name,
+            children: degree.specializations.map((spec) => ({
+              value: spec.id,
+              label: spec.name,
+              isLeaf: true,
+            })),
+          };
+        }
+
+        // Case 2: Degree has neither branches nor specializations
+        if (!hasBranches && !hasSpecializations) {
+          return {
+            value: degree.id,
+            label: degree.name,
+            isLeaf: true,
+          };
+        }
+
+        // Case 3: Degree has branches - build branch level
+        return {
+          value: degree.id,
+          label: degree.name,
+          children: degree.branches.map((branch) => {
+            // Check if branch has specializations
+            if (!branch.specializations || branch.specializations.length === 0) {
+              return {
+                value: branch.id,
+                label: branch.name,
+                isLeaf: true,
+              };
+            }
+
+            // Has specializations - build specialization level
+            return {
+              value: branch.id,
+              label: branch.name,
+              children: branch.specializations.map((spec) => ({
+                value: spec.id,
+                label: spec.name,
+                isLeaf: true,
+              })),
+            };
+          }),
+        };
+      }),
     }));
   }, [institutePrograms]);
 
@@ -75,51 +142,86 @@ export function AddStudentForm({ onAdd }) {
     phone &&
     alternatePhone &&
     address &&
-    programPath.length === 6;
+    programPath.length >= 2 && // Require at least program and degree
+    currentYear &&
+    currentSemester;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!allRequiredFilled) return;
 
-    const [
-      programId,
-      degreeId,
-      branchId,
-      specializationId,
-      yearId,
-      semesterId,
-    ] = programPath;
+    // Flexible path handling:
+    // [program, degree] - only degree
+    // [program, degree, specialization] - degree with direct specialization (no branch)
+    // [program, degree, branch] - degree with branch (no specialization)
+    // [program, degree, branch, specialization] - full hierarchy
+    const [programId, degreeId, thirdLevel, fourthLevel] = programPath;
 
-    onAdd({
-      name,
-      email,
-      gender,
-      roll_number: rollNumber,
-      contactInfo: {
-        phone,
-        alternatePhone,
-        address,
-      },
-      programStructure: {
-        programId,
-        degreeId,
-        branchId,
-        specializationId,
-        yearId,
-        semesterId,
-      },
-    });
+    // Determine if thirdLevel is branch or specialization
+    // If we have 4 levels, thirdLevel is branch, fourthLevel is specialization
+    // If we have 3 levels, need to check if degree has branches or direct specializations
+    let branchId = undefined;
+    let specializationId = undefined;
 
-    setName("");
-    setEmail("");
-    setGender("");
-    setRollNumber("");
-    setPhone("");
-    setAlternatePhone("");
-    setAddress("");
-    setProgramPath([]);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
+    if (programPath.length === 4) {
+      // Full hierarchy: program → degree → branch → specialization
+      branchId = thirdLevel;
+      specializationId = fourthLevel;
+    } else if (programPath.length === 3) {
+      // Either: program → degree → branch OR program → degree → specialization
+      // Check if the selected degree has branches
+      const selectedProgram = institutePrograms?.find(p => p.id === programId);
+      const selectedDegree = selectedProgram?.degrees?.find(d => d.id === degreeId);
+      const hasBranches = selectedDegree?.branches && selectedDegree.branches.length > 0;
+
+      if (hasBranches) {
+        branchId = thirdLevel;
+      } else {
+        specializationId = thirdLevel;
+      }
+    }
+
+    // Get the actual year number and semester number from the selected IDs
+    const selectedYearData = availableYearsAndSemesters.years.find(y => y.id === currentYear);
+    const selectedSemesterData = availableYearsAndSemesters.semesters.find(s => s.id === currentSemester);
+
+    try {
+      await onAdd({
+        name,
+        email,
+        gender,
+        roll_number: rollNumber,
+        contactInfo: {
+          phone,
+          alternatePhone,
+          address,
+        },
+        // Send flat fields as backend expects
+        program: programId,
+        degree: degreeId,
+        branch: branchId || undefined, // Only send if exists
+        specialization: specializationId || undefined, // Only send if exists
+        currentYear: selectedYearData?.year, // Send the year number (1, 2, 3, etc.)
+        currentSemester: selectedSemesterData?.semNumber, // Send the semester number (1, 2, 3, etc.)
+      });
+
+      // Only clear form on success
+      setName("");
+      setEmail("");
+      setGender("");
+      setRollNumber("");
+      setPhone("");
+      setAlternatePhone("");
+      setAddress("");
+      setProgramPath([]);
+      setCurrentYear("");
+      setCurrentSemester("");
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (error) {
+      console.error("Failed to add student:", error);
+      // Error is already shown by the parent component via toast
+    }
   };
 
   return (
@@ -194,16 +296,61 @@ export function AddStudentForm({ onAdd }) {
           {/* PROGRAM CASCADER */}
           <div className="space-y-2">
             <Label>
-              Program → Degree → Branch → Specialization → Year → Semester
+              Program → Degree → Branch (optional) → Specialization (optional)
             </Label>
             <Cascader
               options={cascaderOptions}
-              placeholder="Select complete academic structure"
+              placeholder="Select academic structure"
               className="w-full"
               value={programPath}
               onChange={(value) => setProgramPath(value)}
               changeOnSelect
             />
+          </div>
+
+          {/* CURRENT YEAR */}
+          <div className="space-y-2">
+            <Label htmlFor="currentYear">Current Year</Label>
+            <Select 
+              value={currentYear} 
+              onValueChange={(value) => {
+                setCurrentYear(value);
+                setCurrentSemester(""); // Reset semester when year changes
+              }}
+              disabled={!programPath || programPath.length < 2}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={programPath.length < 2 ? "Select degree first" : "Select year"} />
+              </SelectTrigger>
+              <SelectContent>
+                {availableYearsAndSemesters.years.map((year) => (
+                  <SelectItem key={year.id} value={year.id}>
+                    {year.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* CURRENT SEMESTER */}
+          <div className="space-y-2">
+            <Label htmlFor="currentSemester">Current Semester</Label>
+            <Select 
+              value={currentSemester} 
+              onValueChange={(value) => setCurrentSemester(value)}
+              disabled={!currentYear}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={!currentYear ? "Select year first" : "Select semester"} />
+              </SelectTrigger>
+              <SelectContent>
+                {availableYearsAndSemesters.semesters.map((sem) => (
+                  <SelectItem key={sem.id} value={sem.id}>
+                    {sem.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* ROLL NUMBER */}

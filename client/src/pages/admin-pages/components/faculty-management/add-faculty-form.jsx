@@ -17,24 +17,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CheckCircle2 } from "lucide-react";
+import { useGlobalContext } from "@/contexts/global-context";
 
 export function AddFacultyForm({ onAdd }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("");
   const [employeeCode, setEmployeeCode] = useState("");
-  const [department, setDepartment] = useState("");
+  const [department, setDepartment] = useState(""); // This will be department ObjectId
   const [designation, setDesignation] = useState("");
   const [phone, setPhone] = useState("");
   const [alternatePhone, setAlternatePhone] = useState("");
   const [address, setAddress] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const { instituteDepartments } = useGlobalContext();
+
   const allRequiredFilled =
     name &&
     email &&
     gender &&
     employeeCode &&
+    department && // Department is now required
     phone &&
     alternatePhone &&
     address;
@@ -49,7 +53,7 @@ export function AddFacultyForm({ onAdd }) {
       email,
       gender,
       employee_code: employeeCode,
-      department: department || undefined,
+      department: department, // Required department ObjectId
       designation: designation || undefined,
       contactInfo: {
         phone,
@@ -76,8 +80,8 @@ export function AddFacultyForm({ onAdd }) {
       <CardHeader>
         <CardTitle>Add New Faculty</CardTitle>
         <CardDescription>
-          Required fields: name, email, gender, employee_code, phone, alternatePhone, address.
-          Password will automatically be the same as the email for the API request, and instituteId is hardcoded on the client.
+          Required fields: name, email, gender, employee_code, department, phone, alternatePhone, address.
+          Password will automatically be the same as the email.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -131,13 +135,22 @@ export function AddFacultyForm({ onAdd }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="department">Department (Optional)</Label>
-            <Input
-              id="department"
-              placeholder="e.g., Computer Science"
+            <Label htmlFor="department">Department (Required)</Label>
+            <Select
               value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-            />
+              onValueChange={(value) => setDepartment(value)}
+            >
+              <SelectTrigger id="department">
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                {instituteDepartments?.map((dept) => (
+                  <SelectItem key={dept._id || dept.id} value={dept._id || dept.id}>
+                    {dept.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
