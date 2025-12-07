@@ -67,8 +67,8 @@ export default class Institute {
   // @Prop({ type: Types.ObjectId, ref: 'Attachment', default: null })
   // logo?: Attachment;
 
-  @Prop({ type: String })
-  logo?: string;
+  @Prop({ type: Types.ObjectId, ref: 'Attachment', default: null })
+  logo?: Types.ObjectId;
 }
 
 export const InstituteSchema = SchemaFactory.createForClass(Institute);

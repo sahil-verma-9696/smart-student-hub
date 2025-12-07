@@ -55,12 +55,9 @@ export function InstituteManagementPage() {
     setData((prev) => ({ ...prev, programs }));
   };
 
-  const handleLogoUpload = (file) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setData((prev) => ({ ...prev, logo: reader.result }));
-    };
-    reader.readAsDataURL(file);
+  const handleLogoUpload = (filePayload) => {
+    console.log(filePayload, "filePayload");
+    setData((prev) => ({ ...prev, logo: filePayload }));
   };
 
   const handleDepartmentsChange = (departments) => {
@@ -81,7 +78,6 @@ export function InstituteManagementPage() {
   };
 
   const handleSave = async () => {
-    console.log(data, "data");
     setIsSaving(true);
     await updateInstituteDetails(data);
     setIsSaving(false);

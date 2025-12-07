@@ -39,7 +39,7 @@ export default function useActivitiesPageLogic() {
 
     if (!res.ok) throw new Error("Cloudinary upload failed");
 
-    return await res.json();
+    return await res.json(); 
   }
 
   /* ----------------------------------------------------

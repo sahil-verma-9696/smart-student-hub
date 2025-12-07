@@ -20,7 +20,6 @@ export function AdminCredentialsSection({
   //   data.verification.adminEmail.verified &&
   //   data.verification.adminPhone.verified;
 
-  console.log(data, "admindata");
 
   return (
     <Card className="border-border bg-card">

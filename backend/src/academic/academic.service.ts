@@ -660,7 +660,10 @@ export class AcademicService {
 
   async getInstituteDetails(strInstituteId: string): Promise<any> {
     const instituteId = new Types.ObjectId(strInstituteId);
-    const institute = await this.instituteModel.findById(instituteId).lean();
+    const institute = await this.instituteModel
+      .findById(instituteId)
+      .populate('logo')
+      .lean();
 
     if (!institute) {
       throw new NotFoundException('Institute not found');

@@ -104,7 +104,7 @@ export class InstituteService {
       city: dto.city,
       state: dto.state,
       pincode: dto.pincode,
-      logo: dto.logo,
+      logo: new Types.ObjectId(dto.logo),
       establishedYear: dto.establishedYear,
     };
 
