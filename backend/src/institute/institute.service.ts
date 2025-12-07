@@ -4,11 +4,11 @@ import Institute, { InstituteDocument } from './schemas/institute.schema';
 import { Model, Types } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
 import { ClientSession } from 'mongoose';
-import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 import { AdminService } from 'src/admin/admin.service';
 import { UpdateAdminDto } from 'src/admin/dto/update-admin.dto';
 import { AcademicService } from 'src/academic/academic.service';
 import { StudentService } from 'src/student/student.service';
+import UpdateInstituteDetailsDto from './dto/update-insitute-details.dto';
 // `inst3admin@gmail.com
 @Injectable()
 export class InstituteService {
@@ -88,7 +88,10 @@ export class InstituteService {
     return updatedInstitute;
   }
 
-  async updateInstitute(dto: UpdateInstituteDto, instituteId: string) {
+  async updateInstitute(
+    dto: Partial<UpdateInstituteDetailsDto>,
+    instituteId: string,
+  ) {
     const updatedInstitutePayload: Partial<InstituteDocument> = {
       official_email: dto.email,
       official_phone: dto.phone,
@@ -104,7 +107,7 @@ export class InstituteService {
     };
 
     // institute basic details updated
-    const updatedInstitute = await this.instituteModel.findByIdAndUpdate(
+    await this.instituteModel.findByIdAndUpdate(
       new Types.ObjectId(instituteId),
       updatedInstitutePayload,
       {
@@ -114,10 +117,10 @@ export class InstituteService {
 
     // update institue admin details
     const updatedAdminPayload: UpdateAdminDto = {
-      name: dto.adminName as string,
-      email: dto.adminEmail as string,
+      name: dto.adminName,
+      email: dto.adminEmail,
       contactInfo: {
-        phone: dto.adminPhone as string,
+        phone: dto.adminPhone,
       },
     };
 
@@ -128,13 +131,13 @@ export class InstituteService {
       return { message: 'Institute admin not found' };
     }
 
-    const updatedAdmin = await this.adminService.updateAdmin(
+    await this.adminService.updateAdmin(
       instituteAdmins[0]._id.toString(),
       updatedAdminPayload,
     );
 
     // update programs
-    const programPayload: UpdateInstituteDto = {
+    const programPayload: Partial<UpdateInstituteDetailsDto> = {
       programs: dto.programs,
       departments: dto.departments,
     };

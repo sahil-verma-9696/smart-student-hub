@@ -142,15 +142,15 @@ export class AuthService {
 
       /****** 2. Create institute **************/
       const createInstituteDto: CreateInstituteDto = {
-        address_line1: dto.institute.addressLine1,
+        address_line1: dto.institute.address_line1,
         addressLine2: dto.institute.addressLine2,
-        affiliation_id: dto.institute.,
-        affiliation_university: dto.institute.affiliationUniversity,
+        affiliation_id: dto.institute.affiliation_id,
+        affiliation_university: dto.institute.affiliation_university,
         city: dto.institute.city,
-        institute_name: dto.institute.instituteName,
-        institute_type: dto.institute.instituteType,
-        official_email: dto.institute.officialEmail,
-        official_phone: dto.institute.officialPhone,
+        institute_name: dto.institute.institute_name,
+        institute_type: dto.institute.institute_type,
+        official_email: dto.institute.official_email,
+        official_phone: dto.institute.official_phone,
         pincode: dto.institute.pincode,
         state: dto.institute.state,
       };

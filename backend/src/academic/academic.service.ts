@@ -21,12 +21,12 @@ import { UpdateSpecializationDto } from 'src/auth/dto/sub/update-specialization.
 import { UpdateYearLevelDto } from 'src/auth/dto/sub/update-year-level.dto';
 import { UpdateSemesterDto } from 'src/auth/dto/sub/update-semester.dto';
 import { UpdateSectionDto } from 'src/auth/dto/sub/update-section.dto';
-import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 import { UpdateDepartmentDto } from 'src/auth/dto/sub/update-department.dto';
 import Institute, {
   InstituteDocument,
 } from 'src/institute/schemas/institute.schema';
 import { AdminService } from 'src/admin/admin.service';
+import UpdateInstituteDetailsDto from 'src/institute/dto/update-insitute-details.dto';
 
 @Injectable()
 export class AcademicService {
@@ -639,7 +639,10 @@ export class AcademicService {
   // -----------------------------
   // MAIN ENTRY POINT
   // -----------------------------
-  async upsertFullStructure(dto: UpdateInstituteDto, instituteId: string) {
+  async upsertFullStructure(
+    dto: Partial<UpdateInstituteDetailsDto>,
+    instituteId: string,
+  ) {
     const instituteObjectId = new Types.ObjectId(instituteId);
 
     // 🔥 Upsert Departments
