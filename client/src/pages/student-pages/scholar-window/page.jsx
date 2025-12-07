@@ -2,7 +2,7 @@ import { StudentOverview } from "@/pages/student-pages/scholar-window/student-ov
 import { RecentActivities } from "@/pages/student-pages/scholar-window/recent-activities";
 import { AchievementStats } from "@/pages/student-pages/scholar-window/achievement-stats";
 import { AttendanceChart } from "@/pages/student-pages/attendance-chart";
-
+import ShareAchivos from "../components/profile/Social/ShareAchivos";
 export default function ScholarWindowPage() {
   return (
     <main className="flex-1 overflow-y-auto p-6">
@@ -17,7 +17,7 @@ export default function ScholarWindowPage() {
           <div className="lg:col-span-2 space-y-6">
             <StudentOverview />
             <RecentActivities />
-          </div>
+          m</div>
 
           <div className="space-y-6">
             <AchievementStats />

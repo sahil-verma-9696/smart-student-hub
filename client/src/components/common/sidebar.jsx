@@ -14,9 +14,11 @@ import {
   Award,
   Menu,
   X,
+  Share,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import ShareAchivos from "@/pages/student-pages/components/profile/Social/ShareAchivos";
 
 const defaultNavigationConfig = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -26,6 +28,7 @@ const defaultNavigationConfig = [
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Certifications", href: "/certifications", icon: Award },
   { name: "Settings", href: "/settings", icon: Settings },
+  { name: "ShareAchivos", href: "/ShareAchivos", icon: Share },
 ];
 
 export default function Sidebar({

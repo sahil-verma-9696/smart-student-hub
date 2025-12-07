@@ -20,7 +20,7 @@ import { Search, Calendar, Download, CheckCircle, AlertCircle, Hourglass } from 
 import { useActivityPageContext } from "@/hooks/useActivityPageContext";
 
 export function ActivityList() {
-  const { activities, fetchFilteredActivities } = useActivityPageContext();
+  const { activities } = useActivityPageContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -56,7 +56,7 @@ export function ActivityList() {
     if (status) filters.status = status;
     if (type) filters.activityType = type;
 
-    fetchFilteredActivities(filters);
+    // fetchFilteredActivities(filters);
   }, [searchParams]);
 
   // backend already filtered the data

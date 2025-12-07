@@ -6,8 +6,6 @@ import ScholarWindowPage from "@/pages/student-pages/scholar-window/page";
 import FacultyDashboardPage from "@/pages/faculty-pages/faculty-dashboard";
 import AdminDashboardPage from "@/pages/admin-pages/admin-dashboard";
 import ApprovalPannel from "@/pages/faculty-pages/approval-pannel";
-import AdminAddStudentsPage from "@/pages/admin-pages/add-students";
-import AdminAddFacultyPage from "@/pages/admin-pages/add-faculty";
 import ActivitiesFilterPage from "@/pages/admin-pages/student-panel";
 import AdminAnalyticsPage from "@/pages/admin-pages/admin-analytics";
 import AdminSettingsPage from "@/pages/admin-pages/admin-settings";
@@ -21,107 +19,127 @@ import ActivitiesManagement from "@/pages/admin-pages/components/activity-manage
 import AdminInstPageProvider from "@/pages/admin-pages/provider/admin-inst.provider";
 import StudentManagementProvider from "@/pages/admin-pages/provider/student-management.provider";
 import FacultyManagementProvider from "@/pages/admin-pages/provider/faculty-management.provider";
+import FacultyProfilePage from "@/pages/faculty-pages/components/profile/page";
+import StudentProfilePage from "@/pages/student-pages/components/profile/page";
+import FacultySettingsPage from "@/pages/faculty-pages/Settings";
+import PATHS from "@/common/PATHS";
+import ShareAchivos from "@/pages/student-pages/components/profile/Social/ShareAchivos";
 
 export default createBrowserRouter([
+  /********************************************
+   **************** PUBLIC ROUTES *************
+   ********************************************/
   {
-    path: "/",
+    path: PATHS.BASE,
     Component: PublicLayout,
-    /***********************************************************************
-     * *********************** Public Routes *****************************
-     * ***********************************************************************/
     children: [],
   },
+
+  /********************************************
+   **************** STUDENT ROUTES ************
+   ********************************************/
   {
-    path: "/student",
+    path: `/${PATHS.STUDENT.BASE}`,
     Component: StudentLayout,
-    /***********************************************************************
-     * *********************** Student Routes *****************************
-     * ***********************************************************************/
     children: [
       {
         index: true,
         Component: ScholarWindowPage,
       },
       {
-        path: "activities",
+        path: PATHS.STUDENT.ACTIVITIES,
         Component: ActivityPageProvider,
       },
       {
-        path: "mind-piolet",
+        path: PATHS.STUDENT.MINDPILOT,
         Component: MindPilot,
       },
       {
-        path: "fastfolo",
+        path: PATHS.STUDENT.PORTFOLIO,
         Component: PortfolioPreview,
       },
       {
-        path: "private-vault",
+        path: PATHS.STUDENT.PRIVATE_VAULT,
         Component: PrivateVault,
       },
       {
-        path: "setting",
+        path: PATHS.STUDENT.SHAREACHIVOS,
+        Component: ShareAchivos,
+      },
+      {
+        path: PATHS.STUDENT.SETTINGS,
         Component: Settings,
       },
       {
-        path: "profile",
-        Component: Settings,
+        path: PATHS.STUDENT.PROFILE,
+        Component: StudentProfilePage,
       },
     ],
   },
+
+  /********************************************
+   **************** FACULTY ROUTES ************
+   ********************************************/
   {
-    path: "/faculty",
+    path: `/${PATHS.FACULTY.BASE}`,
     Component: FacultyLayout,
-    /***********************************************************************
-     * *********************** Faculty Routes *****************************
-     * ***********************************************************************/
     children: [
       {
         index: true,
         Component: FacultyDashboardPage,
       },
       {
-        path: "approval-pannel",
+        path: PATHS.FACULTY.APPROVAL,
         Component: ApprovalPannel,
+      },
+      {
+        path: PATHS.FACULTY.PROFILE,
+        Component: FacultyProfilePage,
+      },
+      {
+        path: PATHS.FACULTY.SETTINGS,
+        Component: FacultySettingsPage,
       },
     ],
   },
+
+  /********************************************
+   **************** ADMIN ROUTES ***************
+   ********************************************/
   {
-    path: "/admin",
+    path: `/${PATHS.ADMIN.BASE}`,
     Component: AdminLayout,
-    /***********************************************************************
-     * *********************** Admin Routes *****************************
-     * ***********************************************************************/
     children: [
       {
         index: true,
         Component: AdminDashboardPage,
       },
       {
-        path: "student-management",
+        path: PATHS.ADMIN.STUDENT_MGMT,
         Component: StudentManagementProvider,
       },
       {
-        path: "faculty-management",
+        path: PATHS.ADMIN.FACULTY_MGMT,
         Component: FacultyManagementProvider,
       },
       {
-        path: "activities",
+        path: PATHS.ADMIN.ACTIVITIES,
         Component: ActivitiesManagement,
       },
       {
-        path: "students-panel",
+        path: PATHS.ADMIN.ActivitiesFilterPage,
         Component: ActivitiesFilterPage,
       },
       {
-        path: "analytics",
+        path: PATHS.ADMIN.ANALYTICS,
         Component: AdminAnalyticsPage,
       },
       {
-        path: "institue",
+        path: PATHS.ADMIN.INSTITUTE,
         Component: AdminInstPageProvider,
       },
       {
-        path: "settings",
+        path: PATHS.ADMIN.SETTINGS,
         Component: AdminSettingsPage,
       },
     ],

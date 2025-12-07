@@ -16,7 +16,6 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import useUpDocs from "@/hooks/useUpdocs";
-
 registerPlugin(
   FilePondPluginImagePreview,
   FilePondPluginImageExifOrientation,

@@ -14,7 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Building2, Phone, RotateCcw, Save } from "lucide-react";
 
-export default function Settings() {
+export default function FacultySettingsPage() {
   const { user } = useAuthContext();
   const [activeTab, setActiveTab] = useState("personal");
   const [formData, setFormData] = useState({
