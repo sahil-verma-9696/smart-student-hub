@@ -26,7 +26,6 @@ import { ConfigField } from "./config-field";
 import { instituteFormConfig, academicHierarchyConfig } from "./ui-config";
 import { LogoUpload } from "./logo-upload";
 import { initialData } from "./constants";
-import useAuthContext from "@/hooks/useAuthContext";
 import { useInstituteManagementContext } from "../../context/institute-management.context";
 
 const iconMap = {

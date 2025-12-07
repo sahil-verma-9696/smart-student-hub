@@ -1,10 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-// import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import Institute, { InstituteDocument } from './schemas/institute.schema';
 import { Model, Types } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
-import { IInstituteService } from './types/service.interface';
 import { ClientSession } from 'mongoose';
 import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
 import { AdminService } from 'src/admin/admin.service';
@@ -13,7 +11,7 @@ import { AcademicService } from 'src/academic/academic.service';
 import { StudentService } from 'src/student/student.service';
 // `inst3admin@gmail.com
 @Injectable()
-export class InstituteService implements IInstituteService {
+export class InstituteService {
   constructor(
     @InjectModel(Institute.name) private instituteModel: Model<Institute>,
     private readonly adminService: AdminService,
@@ -102,6 +100,7 @@ export class InstituteService implements IInstituteService {
       state: dto.state,
       pincode: dto.pincode,
       logo: dto.logo,
+      establishedYear: dto.establishedYear,
     };
 
     // institute basic details updated
@@ -144,7 +143,7 @@ export class InstituteService implements IInstituteService {
     // update departments
 
     const instituteDetails = await this.getInstituteDetails(instituteId);
-    
+
     return instituteDetails;
   }
 

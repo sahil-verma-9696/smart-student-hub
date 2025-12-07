@@ -21,11 +21,6 @@ export class InstituteController {
     return this.instituteService.create(createInstituteDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.instituteService.findAll();
-  // }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.instituteService.getInstituteById(id);

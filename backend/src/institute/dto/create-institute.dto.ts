@@ -1,14 +1,20 @@
 import {
   IsString,
-  IsEmail,
-  IsBoolean,
   IsOptional,
   IsEnum,
+  IsNumber,
+  IsEmail,
+  IsObject,
+  IsNotEmpty,
 } from 'class-validator';
-import { InstituteType } from 'src/institute/types/enum';
+import { Type } from 'class-transformer';
+import { InstituteType } from 'src/auth/types/auth.enum';
+import { CreateAttachmentDto } from 'src/attachment/dto/create-attachment.dto';
 
 export default class CreateInstituteDto {
+  // ---------------- BASIC ----------------
   @IsString()
+  @IsNotEmpty()
   institute_name: string;
 
   @IsEnum(InstituteType)
@@ -18,10 +24,17 @@ export default class CreateInstituteDto {
   official_email: string;
 
   @IsString()
+  @IsNotEmpty()
   official_phone: string;
 
+  // ---------------- ADDRESS ----------------
   @IsString()
+  @IsNotEmpty()
   address_line1: string;
+
+  @IsOptional()
+  @IsString()
+  addressLine2?: string;
 
   @IsString()
   city: string;
@@ -32,9 +45,7 @@ export default class CreateInstituteDto {
   @IsString()
   pincode: string;
 
-  @IsBoolean()
-  is_affiliated: boolean;
-
+  // ---------------- AFFILIATION ----------------
   @IsOptional()
   @IsString()
   affiliation_university?: string;
@@ -42,4 +53,28 @@ export default class CreateInstituteDto {
   @IsOptional()
   @IsString()
   affiliation_id?: string;
+
+  // ---------------- METADATA ----------------
+  @IsOptional()
+  @IsNumber()
+  establishedYear?: number;
+
+  @IsOptional()
+  @IsString()
+  accreditationStatus?: string;
+
+  // ---------------- CONTACT & SITE ----------------
+  @IsOptional()
+  @IsString()
+  alternatePhone?: string;
+
+  @IsOptional()
+  @IsString()
+  website?: string;
+
+  // ---------------- LOGO (Attachment) ----------------
+  @IsOptional()
+  @IsObject()
+  @Type(() => CreateAttachmentDto)
+  logo?: CreateAttachmentDto;
 }

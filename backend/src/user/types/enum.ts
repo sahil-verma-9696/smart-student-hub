@@ -3,3 +3,9 @@ export enum USER_ROLE {
   FACULTY = 'faculty',
   STUDENT = 'student',
 }
+
+export enum GENDER {
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
+}

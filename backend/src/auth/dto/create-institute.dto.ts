@@ -14,7 +14,7 @@ import { DepartmentDto } from './sub/department.dto';
 import { ProgramDto } from './sub/program.dto';
 import { VerificationDto } from './sub/verification.dto';
 
-export class CreateInstituteDto {
+export default class CreateInstituteDto {
   @IsString()
   @IsOptional()
   instituteId: string;
