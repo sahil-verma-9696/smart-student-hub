@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsNumber,
   IsObject,
   IsOptional,
   // IsEnum,
@@ -36,7 +37,11 @@ export class CreateStudentDto {
 
   @IsString()
   @IsOptional()
-  branch: string;
+  branch?: string;
+
+  @IsString()
+  @IsOptional()
+  specialization?: string;
 
   @IsString()
   @IsOptional()
@@ -45,6 +50,12 @@ export class CreateStudentDto {
   @IsString()
   @IsOptional()
   program: string;
+
+  @IsOptional()
+  currentYear?: number; // Current year of study
+
+  @IsOptional()
+  currentSemester?: number; // Current semester
 }
 
 export class CreateStudentWithoutInstituteDto extends OmitType(
