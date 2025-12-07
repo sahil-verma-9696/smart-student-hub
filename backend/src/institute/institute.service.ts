@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import Institute, { InstituteDocument } from './schemas/institute.schema';
@@ -120,7 +122,7 @@ export class InstituteService {
       name: dto.adminName,
       email: dto.adminEmail,
       contactInfo: {
-        phone: dto.adminPhone,
+        phone: dto.adminPhone as string,
       },
     };
 
@@ -150,8 +152,18 @@ export class InstituteService {
     return instituteDetails;
   }
 
-  getInstituteDetails(instituteId: string) {
-    return this.academicService.getInstituteDetails(instituteId);
+  async getInstituteDetails(instituteId: string) {
+    const details = await this.academicService.getInstituteDetails(instituteId);
+    const admins =
+      await this.adminService.getFullAdminsByInstitute(instituteId);
+
+    const admin = admins[0];
+    return {
+      ...details,
+      adminName: admin.basicUserDetails.name,
+      adminEmail: admin.basicUserDetails.email,
+      adminPhone: admin.basicUserDetails.contactInfo.phone ?? '',
+    };
   }
 
   getInstituteProgramsDetails(instituteId: string) {

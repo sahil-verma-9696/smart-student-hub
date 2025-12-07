@@ -7,18 +7,20 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle2, AlertTriangle } from "lucide-react";
-import {ConfigField} from "./config-field";
+import { ConfigField } from "./config-field";
 import { adminCredentialsConfig } from "./ui-config";
 
 export function AdminCredentialsSection({
   data,
   onChange,
-  onVerify,
-  verifyingField,
+  // onVerify,
+  // verifyingField,
 }) {
   // const allVerified =
   //   data.verification.adminEmail.verified &&
   //   data.verification.adminPhone.verified;
+
+  console.log(data, "admindata");
 
   return (
     <Card className="border-border bg-card">
@@ -30,10 +32,10 @@ export function AdminCredentialsSection({
             </div>
             <div>
               <CardTitle className="text-foreground">
-                {adminCredentialsConfig.title}
+                {adminCredentialsConfig?.title}
               </CardTitle>
               <CardDescription className="text-muted-foreground">
-                {adminCredentialsConfig.description}
+                {adminCredentialsConfig?.description}
               </CardDescription>
             </div>
           </div>
@@ -65,19 +67,19 @@ export function AdminCredentialsSection({
             <ConfigField
               key={field.id}
               config={field}
-              value={data[field.id]}
+              value={data?.[field.id]}
               onChange={(val) => onChange(field.id, val)}
-              isVerified={
-                field.verification?.required
-                  ? data.verification[field.id]?.verified
-                  : undefined
-              }
-              onVerify={
-                field.verification?.required
-                  ? () => onVerify(field.id)
-                  : undefined
-              }
-              isVerifying={verifyingField === field.id}
+              // isVerified={
+              //   field.verification?.required
+              //     ? data.verification[field.id]?.verified
+              //     : undefined
+              // }
+              // onVerify={
+              //   field.verification?.required
+              //     ? () => onVerify(field.id)
+              //     : undefined
+              // }
+              // isVerifying={verifyingField === field.id}
             />
           ))}
         </div>

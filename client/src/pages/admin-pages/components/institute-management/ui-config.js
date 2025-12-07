@@ -270,13 +270,13 @@ export const adminCredentialsConfig = {
         type: "phone",
       },
     },
-    {
-      id: "adminDesignation",
-      label: "Designation",
-      type: "text",
-      placeholder: "e.g., Principal, Director",
-      editable: true,
-      required: true,
-    },
+    // {
+    //   id: "adminDesignation",
+    //   label: "Designation",
+    //   type: "text",
+    //   placeholder: "e.g., Principal, Director",
+    //   editable: true,
+    //   required: true,
+    // },
   ],
 };

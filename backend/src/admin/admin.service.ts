@@ -91,6 +91,15 @@ export class AdminService implements IAdminService {
     return admins;
   }
 
+  async getFullAdminsByInstitute(instituteId: string) {
+    const admins = await this.adminModel
+      .find({ institute: new Types.ObjectId(instituteId) })
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
+      .exec();
+    return admins;
+  }
+
   async getByUserId(userId: string): Promise<AdminDocument> {
     const admin = await this.adminModel
       .findOne({ basicUserDetails: new Types.ObjectId(userId) })
