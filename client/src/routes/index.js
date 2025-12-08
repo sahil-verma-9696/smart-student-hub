@@ -23,6 +23,8 @@ import ActivityTypeManagementPage from "@/pages/admin-pages/components/activity-
 import AdminPageProvider from "@/pages/admin-pages/provider/admin-page.provider";
 import Profile from "@/pages/student-pages/Profile";
 import ProfilePageProvider from "@/pages/student-pages/provider/profile-page-provider";
+import { Share } from "lucide-react";
+import ShareAchivos from "@/pages/student-pages/ShareAchivos";
 
 export default createBrowserRouter([
   {
@@ -68,6 +70,11 @@ export default createBrowserRouter([
         path: "profile/:studentId",
         Component: ProfilePageProvider,
       },
+      {
+        path: "share-achivos",
+        Component: ShareAchivos,
+
+      }
     ],
   },
   {

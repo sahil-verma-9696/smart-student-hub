@@ -41,7 +41,7 @@ export class AuthService {
   /*******************************************
    * User Login
    *******************************************/
-  async userLogin(userLoginDto: LoginDto) {
+  async userLogin(userLoginDto: LoginDto): Promise<AuthResponse> {
     const { email, password } = userLoginDto;
 
     /****** Validate input **************/
@@ -82,7 +82,7 @@ export class AuthService {
     };
   }
 
-  async me(user: JwtPayload) {
+  async me(user: JwtPayload): Promise<AuthResponse> {
     let userData: StudentDocument | AdminDocument | FacultyDocument | null =
       null;
     const role = user.role as USER_ROLE;
@@ -121,6 +121,7 @@ export class AuthService {
 
     return {
       userData,
+      institute,
       token,
       expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
       msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,

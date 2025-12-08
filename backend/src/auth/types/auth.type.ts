@@ -3,6 +3,8 @@ import { Gender, Role } from './auth.enum';
 import { Request } from 'express';
 import { UserDocument } from 'src/user/schema/user.schema';
 import { InstituteDocument } from 'src/institute/schemas/institute.schema';
+import { StudentDocument } from 'src/student/schema/student.schema';
+import { FacultyDocument } from 'src/faculty/schemas/faculty.schema';
 
 export type User = {
   firstName: string;
@@ -40,9 +42,10 @@ export type AuthenticatedRequest = Request & {
 };
 
 export type AuthResponse = {
-  user: AdminDocument | UserDocument;
-  institute: InstituteDocument;
+  user?: AdminDocument | UserDocument;
+  userData?: StudentDocument | AdminDocument | FacultyDocument;
+  institute?: InstituteDocument;
   token: string;
-  expires_in: string;
+  expires_in: string | number;
   msg: string;
 };
