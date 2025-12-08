@@ -1,10 +1,6 @@
 import {
-  UserPlus,
   Users,
-  Bell,
   Activity,
-  User,
-  CalendarDays,
   AlertCircle,
   GraduationCap,
   Building2,
@@ -17,24 +13,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useState } from "react";
 import useAuthContext from "@/hooks/useAuthContext";
 import { formatDistanceToNow } from "date-fns";
-import { useGlobalContext } from "@/contexts/global-context";
 import { useAdminPageContext } from "../../context/admin-page.context";
 import { Link } from "react-router";
 
 export default function AdminDashboardPage() {
-  const [recentItems, setRecentItems] = useState([]);
-  const [recentActivities, setRecentActivities] = useState([]);
-
   const { user } = useAuthContext();
 
-  const { instituteStats } = useAdminPageContext();
-
+  const { instituteStats, recentActivities } = useAdminPageContext();
 
   return (
-    <div className="min-h-screen max-h-screen overflow-y-auto bg-[#f8f9fa]">
+    <div className="min-h-screen max-h-screen  bg-[#f8f9fa]">
       <main className="p-6">
         <div className="max-w-7xl mx-auto space-y-10">
           {/* Header */}
@@ -122,47 +112,7 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Registrations */}
-            <Card className="shadow-sm border">
-              <CardHeader>
-                <CardTitle className="text-lg text-[#111827]">
-                  Recent Registrations
-                </CardTitle>
-                <CardDescription>
-                  Latest users added to the institute
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {recentItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex justify-between items-center p-3 border rounded-lg hover:bg-neutral-100 transition"
-                  >
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-xs text-[#6b7280]">
-                        {item.role} • {item.email}
-                      </p>
-                    </div>
-                    <span className="text-xs text-[#6b7280]">
-                      {item.date
-                        ? formatDistanceToNow(new Date(item.date), {
-                            addSuffix: true,
-                          })
-                        : "N/A"}
-                    </span>
-                  </div>
-                ))}
-                {recentItems.length === 0 && (
-                  <p className="text-sm text-gray-500 text-center py-4">
-                    No recent registrations found.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
+          <div className="grid grid-cols-1">
             {/* Recent Activity */}
             <Card className="shadow-sm border">
               <CardHeader>
@@ -173,7 +123,7 @@ export default function AdminDashboardPage() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                {recentActivities.map((act) => (
+                {recentActivities?.map((act) => (
                   <div
                     key={act.id}
                     className="flex justify-between items-center p-3 border rounded-lg hover:bg-neutral-100 transition"
@@ -196,7 +146,7 @@ export default function AdminDashboardPage() {
                     </p>
                   </div>
                 ))}
-                {recentActivities.length === 0 && (
+                {recentActivities?.length === 0 && (
                   <p className="text-sm text-gray-500 text-center py-4">
                     No recent activities found.
                   </p>
