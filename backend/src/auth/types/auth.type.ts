@@ -42,7 +42,11 @@ export type AuthenticatedRequest = Request & {
 };
 
 export type AuthResponse = {
-  user?: AdminDocument | UserDocument;
+  user?:
+  | AdminDocument
+  | UserDocument
+  | StudentDocument
+  | FacultyDocument;
   userData?: StudentDocument | AdminDocument | FacultyDocument;
   institute?: InstituteDocument;
   token: string;
