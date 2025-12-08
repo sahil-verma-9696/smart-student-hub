@@ -147,7 +147,7 @@ export class AuthService {
       sub: userData._id.toString(),
       role: user.role,
       name: user.name,
-      userId: userId,
+      userId: user.userId,
       instituteId: institute._id.toString(),
     };
 

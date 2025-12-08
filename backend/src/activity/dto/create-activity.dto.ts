@@ -46,7 +46,6 @@ export class CreateActivityDto {
   // -------------------------------------------
   // HACKATHON
   // -------------------------------------------
-
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
   )
@@ -101,15 +100,16 @@ export class CreateActivityDto {
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
   )
+  @IsOptional()
   @IsString()
-  workshopName?: string;
+  speaker?: string; 
 
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
   )
   @IsOptional()
   @IsString()
-  speaker?: string;
+  mode?: string; 
 
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
@@ -125,7 +125,49 @@ export class CreateActivityDto {
   @IsString()
   location?: string;
 
-  /***************************
-   * Conference
+  /****************************************
+   * Internship
    *****************************************/
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  company?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  role?: string;
+  
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  inst_duration?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  inst_startDate?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  inst_endDate?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  inst_paid?: string;
 }

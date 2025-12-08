@@ -1,12 +1,9 @@
 import React from "react";
-import useAuthContext from "../../../hooks/useAuthContext";
 import { useGlobalContext } from "@/contexts/global-context";
 
 export default function useActivitiesPageLogic() {
   const [activities, setActivities] = React.useState(null);
   const [activityStats, setActivityStats] = React.useState(null);
-
-  const { user } = useAuthContext();
 
   const { USER_ID, BACKEND_URL, INSITITUTE_ID } = useGlobalContext();
 
@@ -111,7 +108,7 @@ export default function useActivitiesPageLogic() {
       const dto = {
         ...activity,
         attachments: uploadedResources,
-        student: user?._id,
+        student: USER_ID,
       };
 
       console.log(dto, token, uploadedResources);
@@ -152,7 +149,7 @@ export default function useActivitiesPageLogic() {
         setActivities(responce.data);
       })();
     }
-  }, [user, USER_ID, BACKEND_URL]);
+  }, [USER_ID, BACKEND_URL]);
 
   /* ----------------------------------------------------
     GET ACTIVITIE STATS
@@ -167,7 +164,7 @@ export default function useActivitiesPageLogic() {
         setActivityStats(responce.data);
       })();
     }
-  }, [user, activities, USER_ID, BACKEND_URL]);
+  }, [activities, USER_ID, BACKEND_URL]);
 
   /* ----------------------------------------------------
     FILTER ACTIVITIES
@@ -178,7 +175,7 @@ export default function useActivitiesPageLogic() {
     const params = new URLSearchParams();
 
     // always required
-    params.set("studentId", user?._id);
+    params.set("studentId", USER_ID);
 
     // add ONLY meaningful fields
     if (title && title !== "*") params.set("title", title);

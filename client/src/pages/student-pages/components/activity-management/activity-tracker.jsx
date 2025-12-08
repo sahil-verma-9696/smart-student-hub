@@ -34,95 +34,77 @@ registerPlugin(
   FilePondPluginFileValidateSize
 );
 
-/* ----------------------------------------------------
-  Helper: sanitize payload based on current activity config
------------------------------------------------------*/
-function sanitizePayload(data, cfg) {
-  const allowedFieldNames = new Set(cfg.fields.map((f) => f.name));
-
-  const trimmed = {};
-  Object.entries(data).forEach(([key, value]) => {
-    if (allowedFieldNames.has(key)) {
-      // optional: skip completely empty values
-      if (value !== undefined && value !== null && value !== "") {
-        trimmed[key] = value;
-      }
-    }
-  });
-
-  return trimmed;
-}
-
 export function ActivityTracker() {
-  /***************************************
-   * ******** States ********************
-   **************************************/
   const [open, setOpen] = useState(false);
-  const [ files, setFiles] = useState([]);
+  const [files, setFiles] = useState([]);
   const [activityType, setActivityType] = useState("default");
-  const [customFields, setCustomFields] = useState([]);
+
+  /** CUSTOM key-value fields */
+  const [customKey, setCustomKey] = useState("");
+  const [customValue, setCustomValue] = useState("");
+  const [customPairs, setCustomPairs] = useState([]);
+
   const [submitting, setSubmitting] = useState(false);
 
-  /***************************************
-   * ******** Custom & Helpers hooks *****
-   **************************************/
   const { postActivity } = useActivityPageContext();
 
-  /****************************************************
-   * ********** Form Hooks ********************
-   ****************************************************/
   const form = useForm({
     defaultValues: {},
-    shouldUnregister: true, // let RHF unregister unmounted fields
+    shouldUnregister: true,
   });
 
-  const cfg =
-    activityType === "custom"
-      ? {
-          ...ActivityConfig.custom,
-          fields: [...ActivityConfig.custom.fields, ...customFields],
-        }
-      : ActivityConfig[activityType] || ActivityConfig.default;
+  const cfg = ActivityConfig[activityType] || ActivityConfig.default;
 
-  const addCustomField = () => {
-    const newField = {
-      name: `custom_${customFields.length + 1}`,
-      label: `Custom Field ${customFields.length + 1}`,
-      type: "text",
-    };
-    setCustomFields((p) => [...p, newField]);
+  /** Add a custom key-value pair */
+  const handleAddCustomField = () => {
+    if (!customKey.trim() || !customValue.trim()) return;
+
+    setCustomPairs((prev) => [
+      ...prev,
+      { key: customKey.trim(), value: customValue.trim() },
+    ]);
+
+    setCustomKey("");
+    setCustomValue("");
   };
 
-  /****************************************************
-   * ********** Handlers ********************
-   ****************************************************/
-
-  /** Submit handler */
+  /** SUBMIT HANDLER */
   const handleSubmit = async (data) => {
     try {
       setSubmitting(true);
 
-      // Trim data so only fields belonging to this cfg remain
-      const sanitized = sanitizePayload(data, cfg);
+      // Convert customPairs → object
+      const fieldObj = {};
+      customPairs.forEach((pair) => {
+        fieldObj[pair.key] = pair.value;
+      });
 
-      const payload = {
-        ...sanitized,
-        activityType, // send selected type to backend
-      };
+      const payload =
+        activityType === "custom"
+          ? {
+              title: data.title,
+              description: data.description,
+              activityType: "custom",
+              fields: fieldObj,
+            }
+          : {
+              ...data,
+              activityType,
+            };
 
-      console.log("Final Payload:", payload);
+      console.log("FINAL PAYLOAD:", payload);
 
-      // call backend
       await postActivity(payload, files);
 
-      // reset UI
+      // Reset UI
       form.reset({});
       setFiles([]);
-      setCustomFields([]);
+      setCustomKey("");
+      setCustomValue("");
+      setCustomPairs([]);
       setActivityType("default");
       setOpen(false);
     } catch (err) {
-      // you can integrate toast here
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -136,8 +118,9 @@ export function ActivityTracker() {
 
   const handleActivityTypeChange = (v) => {
     setActivityType(v);
-    setCustomFields([]);
-    // clear form values when switching type so UI also resets
+    setCustomPairs([]);
+    setCustomKey("");
+    setCustomValue("");
     form.reset({});
   };
 
@@ -149,17 +132,14 @@ export function ActivityTracker() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-3xl w-full p-6">
+      <DialogContent className="max-w-3xl w-full p-6 h-[550px] scroll-auto">
         <form onSubmit={form.handleSubmit(handleSubmit)}>
-          {/* GRID SYSTEM */}
           <div className={uiGrid}>
             {/* LEFT PANEL */}
             <div className="space-y-6">
-              <Label className="mb-2 block text-sm">Activity Type</Label>
-              <Select
-                value={activityType}
-                onValueChange={handleActivityTypeChange}
-              >
+              <Label>Activity Type</Label>
+
+              <Select value={activityType} onValueChange={handleActivityTypeChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -173,12 +153,15 @@ export function ActivityTracker() {
               </Select>
 
               {/* BASE FIELDS */}
-              {cfg.fields.slice(0, 2).map((field) => (
-                <div key={field.name} className="space-y-2">
-                  <Label>{field.label}</Label>
-                  {renderField(field, form)}
-                </div>
-              ))}
+              <div className="space-y-2">
+                <Label>Title</Label>
+                <Input {...form.register("title")} />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Description</Label>
+                <Textarea rows={4} {...form.register("description")} />
+              </div>
 
               {/* FILE UPLOAD */}
               <div className="rounded-lg border p-3">
@@ -195,48 +178,80 @@ export function ActivityTracker() {
             </div>
 
             {/* RIGHT PANEL */}
-            <AnimatePresence mode="popLayout">
-              {activityType !== "default" && (
-                <motion.div
-                  key={String(activityType) + customFields.length}
-                  initial={{ opacity: 0, x: 22 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 22 }}
-                  transition={{ duration: 0.25 }}
-                  className="space-y-6 border-l pl-6 h-[450px] overflow-y-auto"
-                >
-                  <h2 className="text-lg font-semibold">
-                    {activityType === "custom"
-                      ? "Custom Activity Fields"
-                      : `${String(activityType).toUpperCase()} Details`}
-                  </h2>
+            <AnimatePresence>
+              <motion.div
+                key={activityType}
+                initial={{ opacity: 0, x: 22 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 22 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-6 border-l pl-6 h-[450px] overflow-y-auto"
+              >
+                {/* NON-CUSTOM TYPES: show fields from config */}
+                {activityType !== "custom" && activityType !== "default" && (
+                  <div className="space-y-6">
+                    <h2 className="text-lg font-semibold">
+                      {activityType.toUpperCase()} Details
+                    </h2>
 
-                  {/* RIGHT PANEL FIELDS */}
-                  {cfg.fields.slice(2).map((field, i) => (
-                    <motion.div
-                      key={field.name}
-                      initial={{ opacity: 0, x: 15 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05, duration: 0.18 }}
-                      className="space-y-2"
-                    >
-                      <Label>{field.label}</Label>
-                      {renderField(field, form)}
-                    </motion.div>
-                  ))}
+                    {cfg.fields.slice(2).map((field, i) => (
+                      <motion.div
+                        key={field.name}
+                        initial={{ opacity: 0, x: 15 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.05, duration: 0.18 }}
+                        className="space-y-2"
+                      >
+                        <Label>{field.label}</Label>
+                        {renderField(field, form)}
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
 
-                  {/* CUSTOM ADD FIELD BUTTON */}
-                  {activityType === "custom" && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={addCustomField}
-                    >
-                      + Add Field
+                {/* CUSTOM TYPE */}
+                {activityType === "custom" && (
+                  <div className="p-4 border rounded-lg bg-muted/20 space-y-4">
+                    <h2 className="text-lg font-semibold">Custom Activity Fields</h2>
+
+                    <div className="space-y-2">
+                      <Label>Field Key</Label>
+                      <Input
+                        placeholder="e.g. github"
+                        value={customKey}
+                        onChange={(e) => setCustomKey(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Field Value</Label>
+                      <Input
+                        placeholder="e.g. https://github.com/me"
+                        value={customValue}
+                        onChange={(e) => setCustomValue(e.target.value)}
+                      />
+                    </div>
+
+                    <Button type="button" onClick={handleAddCustomField}>
+                      + Add Custom Field
                     </Button>
-                  )}
-                </motion.div>
-              )}
+
+                    {customPairs.length > 0 && (
+                      <div className="mt-4 space-y-2">
+                        {customPairs.map((pair, idx) => (
+                          <div
+                            key={idx}
+                            className="flex justify-between bg-white p-2 rounded border"
+                          >
+                            <span className="font-semibold">{pair.key}</span>
+                            <span>{pair.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </motion.div>
             </AnimatePresence>
           </div>
 
@@ -251,23 +266,25 @@ export function ActivityTracker() {
   );
 }
 
-/* ----------------------------------------------------
-  UNIVERSAL FIELD RENDERER
------------------------------------------------------*/
+/* UNIVERSAL FIELD RENDERER */
 function renderField(field, form) {
-  const common = form.register(field.name);
+  const { register } = form;
 
   switch (field.type) {
     case "text":
     case "number":
-      return <Input type={field.type} {...common} />;
+      return <Input type={field.type} {...register(field.name)} />;
+
     case "textarea":
-      return <Textarea rows={4} {...common} />;
+      return <Textarea rows={4} {...register(field.name)} />;
+
+    case "date":
+      return <Input type="date" {...register(field.name)} />;
+
     case "select":
       return (
         <Select
           onValueChange={(v) => form.setValue(field.name, v)}
-          // RHF: ensure value in form state
           defaultValue={form.getValues(field.name)}
         >
           <SelectTrigger>
@@ -282,27 +299,24 @@ function renderField(field, form) {
           </SelectContent>
         </Select>
       );
+
     case "radio":
       return (
         <div className="space-y-1">
           {field.options?.map((opt) => (
             <label key={opt.value} className="flex items-center gap-2">
-              <input type="radio" value={opt.value} {...common} />
+              <input
+                type="radio"
+                value={opt.value}
+                {...register(field.name)}
+              />
               {opt.label}
             </label>
           ))}
         </div>
       );
-    case "checkbox":
-      return (
-        <label className="flex items-center gap-2">
-          <input type="checkbox" {...common} />
-          {field.label}
-        </label>
-      );
-    case "date":
-      return <Input type="date" {...common} />;
+
     default:
-      return <div className="text-red-500">Unknown field</div>;
+      return <div className="text-red-500">Unknown Field</div>;
   }
 }

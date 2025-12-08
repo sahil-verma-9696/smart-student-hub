@@ -25,4 +25,6 @@ export enum ACTIVITY_TYPES {
   WORKSHOP = 'workshop',
   HACKATHON = 'hackathon',
   DEFAULT = 'default',
+  INTERNSHIP = 'internship',
+  PLACEMENT = 'placement',
 }

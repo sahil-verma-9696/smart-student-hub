@@ -6,7 +6,7 @@ export const ActivityConfig = {
       {
         name: "description",
         label: "Description",
-        type: "textarea", 
+        type: "textarea",
         section: "basic",
       },
     ],
@@ -71,6 +71,7 @@ export const ActivityConfig = {
     label: "Workshop",
     fields: [
       // BASIC
+      // { name: "workshopName", label: "Workshop Name", type: "text", section: "basic" },
       { name: "title", label: "Title", type: "text", section: "basic" },
       {
         name: "description",
@@ -92,12 +93,12 @@ export const ActivityConfig = {
           { label: "Offline", value: "offline" },
         ],
       },
-      {
-        name: "certificate",
-        label: "Certificate Provided",
-        type: "checkbox",
-        section: "details",
-      },
+      // {
+      //   name: "certificate",
+      //   label: "Certificate Provided",
+      //   type: "checkbox",
+      //   section: "details",
+      // },
     ],
   },
 
@@ -107,7 +108,7 @@ export const ActivityConfig = {
       // BASIC
       {
         name: "title",
-        label: "Internship Title",
+        label: "Title",
         type: "text",
         section: "basic",
       },
@@ -121,16 +122,26 @@ export const ActivityConfig = {
       // DETAILS
       { name: "company", label: "Company", type: "text", section: "details" },
       { name: "role", label: "Role", type: "text", section: "details" },
-      { name: "duration", label: "Duration", type: "text", section: "details" },
       {
-        name: "startDate",
+        name: "inst_duration",
+        label: "Duration",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "inst_startDate",
         label: "Start Date",
         type: "date",
         section: "details",
       },
-      { name: "endDate", label: "End Date", type: "date", section: "details" },
       {
-        name: "paid",
+        name: "inst_endDate",
+        label: "End Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "inst_paid",
         label: "Paid Internship",
         type: "radio",
         section: "details",
@@ -185,210 +196,6 @@ export const ActivityConfig = {
     ],
   },
 
-  research: {
-    label: "Research",
-    fields: [
-      {
-        name: "title",
-        label: "Research Title",
-        type: "text",
-        section: "basic",
-      },
-      {
-        name: "abstract",
-        label: "Abstract",
-        type: "textarea",
-        section: "basic",
-      },
-
-      {
-        name: "supervisor",
-        label: "Supervisor",
-        type: "text",
-        section: "details",
-      },
-      { name: "domain", label: "Domain", type: "text", section: "details" },
-      {
-        name: "published",
-        label: "Published",
-        type: "checkbox",
-        section: "details",
-      },
-      {
-        name: "publishDate",
-        label: "Publish Date",
-        type: "date",
-        section: "details",
-      },
-    ],
-  },
-
-  publication: {
-    label: "Publication",
-    fields: [
-      { name: "title", label: "Paper Title", type: "text", section: "basic" },
-      {
-        name: "abstract",
-        label: "Abstract",
-        type: "textarea",
-        section: "basic",
-      },
-
-      {
-        name: "journal",
-        label: "Journal/Conference",
-        type: "text",
-        section: "details",
-      },
-      {
-        name: "indexing",
-        label: "Indexing",
-        type: "select",
-        section: "details",
-        options: [
-          { label: "Scopus", value: "scopus" },
-          { label: "SCI", value: "sci" },
-          { label: "UGC", value: "ugc" },
-        ],
-      },
-      { name: "doi", label: "DOI", type: "text", section: "details" },
-      {
-        name: "year",
-        label: "Publication Year",
-        type: "number",
-        section: "details",
-      },
-    ],
-  },
-
-  leadership: {
-    label: "Leadership",
-    fields: [
-      { name: "title", label: "Position", type: "text", section: "basic" },
-      {
-        name: "description",
-        label: "Role Description",
-        type: "textarea",
-        section: "basic",
-      },
-
-      {
-        name: "club",
-        label: "Club / Organization",
-        type: "text",
-        section: "details",
-      },
-      { name: "duration", label: "Duration", type: "text", section: "details" },
-      {
-        name: "responsibilities",
-        label: "Responsibilities",
-        type: "textarea",
-        section: "details",
-      },
-    ],
-  },
-
-  community: {
-    label: "Community Service",
-    fields: [
-      {
-        name: "title",
-        label: "Activity Title",
-        type: "text",
-        section: "basic",
-      },
-      {
-        name: "description",
-        label: "Description",
-        type: "textarea",
-        section: "basic",
-      },
-
-      {
-        name: "hours",
-        label: "Service Hours",
-        type: "number",
-        section: "details",
-      },
-      { name: "location", label: "Location", type: "text", section: "details" },
-      {
-        name: "impact",
-        label: "Impact Summary",
-        type: "textarea",
-        section: "details",
-      },
-    ],
-  },
-
-  conference: {
-    label: "Conference",
-    fields: [
-      {
-        name: "title",
-        label: "Conference Title",
-        type: "text",
-        section: "basic",
-      },
-      {
-        name: "description",
-        label: "Description",
-        type: "textarea",
-        section: "basic",
-      },
-
-      { name: "location", label: "Location", type: "text", section: "details" },
-      {
-        name: "attendedOn",
-        label: "Attended On",
-        type: "date",
-        section: "details",
-      },
-      {
-        name: "participationType",
-        label: "Participation",
-        type: "select",
-        section: "details",
-        options: [
-          { label: "Attendee", value: "attendee" },
-          { label: "Speaker", value: "speaker" },
-          { label: "Panelist", value: "panelist" },
-        ],
-      },
-    ],
-  },
-
-  competition: {
-    label: "Competition",
-    fields: [
-      {
-        name: "title",
-        label: "Competition Name",
-        type: "text",
-        section: "basic",
-      },
-      {
-        name: "description",
-        label: "Description",
-        type: "textarea",
-        section: "basic",
-      },
-
-      {
-        name: "rank",
-        label: "Rank / Position",
-        type: "number",
-        section: "details",
-      },
-      { name: "category", label: "Category", type: "text", section: "details" },
-      {
-        name: "teamSize",
-        label: "Team Size",
-        type: "number",
-        section: "details",
-      },
-    ],
-  },
-
   custom: {
     label: "Custom",
     fields: [
@@ -402,4 +209,54 @@ export const ActivityConfig = {
       // user-added dynamic fields will be appended here
     ],
   },
+
+  // placement: {
+  //   label: "Placement",
+  //   fields: [
+  //     // BASIC
+  //     { name: "title", label: "Title", type: "text", section: "basic" },
+  //     {
+  //       name: "description",
+  //       label: "Description",
+  //       type: "textarea",
+  //       section: "basic",
+  //     },
+
+  //     // DETAILS
+  //     {
+  //       name: "placement_company",
+  //       label: "Company Name",
+  //       type: "text",
+  //       section: "details",
+  //     },
+  //     {
+  //       name: "placement_role",
+  //       label: "Role",
+  //       type: "text",
+  //       section: "details",
+  //     },
+  //     {
+  //       name: "placement_package",
+  //       label: "Package (LPA)",
+  //       type: "number",
+  //       section: "details",
+  //     },
+  //     {
+  //       name: "placement_placementType",
+  //       label: "Placement Type",
+  //       type: "select",
+  //       section: "details",
+  //       options: [
+  //         { label: "On-Campus", value: "on-campus" },
+  //         { label: "Off-Campus", value: "off-campus" },
+  //       ],
+  //     },
+  //     {
+  //       name: "placement_joiningDate",
+  //       label: "Joining Date",
+  //       type: "date",
+  //       section: "details",
+  //     },
+  //   ],
+  // },
 };
