@@ -102,14 +102,14 @@ export class CreateActivityDto {
   )
   @IsOptional()
   @IsString()
-  speaker?: string; 
+  speaker?: string;
 
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
   )
   @IsOptional()
   @IsString()
-  mode?: string; 
+  mode?: string;
 
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
@@ -142,7 +142,7 @@ export class CreateActivityDto {
   @IsOptional()
   @IsString()
   role?: string;
-  
+
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
   )
@@ -170,4 +170,49 @@ export class CreateActivityDto {
   @IsOptional()
   @IsString()
   inst_paid?: string;
+
+  /****************************************
+   * Internship
+   * *****************************************/
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_company?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_role?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_package?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_placementType?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_joiningDate?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_referenceNo?: string;
 }

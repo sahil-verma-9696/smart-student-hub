@@ -81,7 +81,7 @@ export default function AdminDashboardPage() {
             <Card className="shadow-sm border">
               <CardContent className="flex items-center justify-between p-5">
                 <div>
-                  <p className="text-sm text-[#6b7280]">Pending Requests</p>
+                  <p className="text-sm text-[#6b7280]">Total Requests</p>
                   <h2 className="text-2xl font-bold">
                     {instituteStats?.totalActivities}
                   </h2>

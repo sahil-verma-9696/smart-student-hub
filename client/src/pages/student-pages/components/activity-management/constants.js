@@ -210,53 +210,59 @@ export const ActivityConfig = {
     ],
   },
 
-  // placement: {
-  //   label: "Placement",
-  //   fields: [
-  //     // BASIC
-  //     { name: "title", label: "Title", type: "text", section: "basic" },
-  //     {
-  //       name: "description",
-  //       label: "Description",
-  //       type: "textarea",
-  //       section: "basic",
-  //     },
+  placement: {
+    label: "Placement",
+    fields: [
+      // BASIC
+      { name: "title", label: "Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        section: "basic",
+      },
 
-  //     // DETAILS
-  //     {
-  //       name: "placement_company",
-  //       label: "Company Name",
-  //       type: "text",
-  //       section: "details",
-  //     },
-  //     {
-  //       name: "placement_role",
-  //       label: "Role",
-  //       type: "text",
-  //       section: "details",
-  //     },
-  //     {
-  //       name: "placement_package",
-  //       label: "Package (LPA)",
-  //       type: "number",
-  //       section: "details",
-  //     },
-  //     {
-  //       name: "placement_placementType",
-  //       label: "Placement Type",
-  //       type: "select",
-  //       section: "details",
-  //       options: [
-  //         { label: "On-Campus", value: "on-campus" },
-  //         { label: "Off-Campus", value: "off-campus" },
-  //       ],
-  //     },
-  //     {
-  //       name: "placement_joiningDate",
-  //       label: "Joining Date",
-  //       type: "date",
-  //       section: "details",
-  //     },
-  //   ],
-  // },
+      // DETAILS
+      {
+        name: "placement_company",
+        label: "Company Name",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "placement_role",
+        label: "Role",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "placement_package",
+        label: "Package (LPA)",
+        type: "number",
+        section: "details",
+      },
+      {
+        name: "placement_placementType",
+        label: "Placement Type",
+        type: "select",
+        section: "details",
+        options: [
+          { label: "On-Campus", value: "on-campus" },
+          { label: "Off-Campus", value: "off-campus" },
+        ],
+      },
+      {
+        name: "placement_joiningDate",
+        label: "Joining Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "placement_referenceNo",
+        label: "Reference Number",
+        type: "number",
+        section: "details",
+      },
+    ],
+  },
 };
