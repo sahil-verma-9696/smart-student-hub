@@ -233,8 +233,8 @@ export class FacultyService {
       .findOne({ basicUserDetails: new Types.ObjectId(userId) })
       .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
       .populate<{ institute: InstituteDocument }>('institute')
-      .populate<{ department: any }>('department')
       .exec();
+    // .populate<{ department: any }>('department')
 
     if (!faculty) {
       throw new NotFoundException(`Faculty with userId ${userId} not found`);
