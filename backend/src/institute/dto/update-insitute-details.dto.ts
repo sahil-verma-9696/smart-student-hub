@@ -44,7 +44,7 @@ export default class UpdateInstituteDetailsDto {
   alternatePhone?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   website?: string;
 
   @IsString()

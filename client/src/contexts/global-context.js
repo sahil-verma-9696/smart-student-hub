@@ -6,6 +6,7 @@ const GlobalContext = createContext({
   BACKEND_URL: null,
   INSITITUTE_ID: null,
   USER_ID: null,
+  USER_ROLE: null,
 });
 
 export default GlobalContext;

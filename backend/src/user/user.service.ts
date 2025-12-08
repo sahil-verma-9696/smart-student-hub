@@ -101,7 +101,8 @@ export class UserService implements IUserService {
     if (dto.email !== undefined) user.email = dto.email;
     if (dto.gender !== undefined) user.gender = dto.gender;
     if (dto.contactInfo !== undefined) {
-      user.contactInfo = { ...user.contactInfo, ...dto.contactInfo };
+      if (dto.contactInfo.phone !== undefined) user.phone = Number(dto.contactInfo.phone);
+      if (dto.contactInfo.address !== undefined) user.address = dto.contactInfo.address;
     }
 
     await user.save();

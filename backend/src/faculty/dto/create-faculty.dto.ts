@@ -34,7 +34,7 @@ export class CreateFacultyDto {
   employee_code: string;
 
   @IsString()
-  department?: string;
+  department: string; // ObjectId as string - REQUIRED
 
   @IsString()
   designation?: string;

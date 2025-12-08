@@ -54,6 +54,11 @@ export class InstituteController {
     return this.instituteService.getInstituteStudents(id);
   }
 
+  @Get(':id/stats')
+  getInstituteStats(@Param('id') id: string) {
+    return this.instituteService.getInstituteStats(id);
+  }
+
   // @Delete(':id')
   // remove(@Param('id') id: string) {
   //   return this.instituteService.remove(+id);

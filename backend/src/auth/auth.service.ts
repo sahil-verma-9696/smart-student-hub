@@ -37,7 +37,7 @@ export class AuthService {
     private readonly studentService: StudentService,
     private readonly facultyService: FacultyService,
     @InjectConnection() private readonly connection: Connection,
-  ) {}
+  ) { }
   /*******************************************
    * User Login
    *******************************************/
@@ -56,6 +56,34 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    const userId = user._id.toString();
+
+    if (!userId) {
+      throw new BadRequestException('User id is required');
+    }
+
+    let userData: StudentDocument | AdminDocument | FacultyDocument | null =
+      null;
+
+    const role = user.role as USER_ROLE;
+
+    switch (role) {
+      case USER_ROLE.STUDENT:
+        userData = await this.studentService.getByUserId(userId);
+        break;
+      case USER_ROLE.FACULTY:
+        userData = await this.facultyService.getByUserId(userId);
+        break;
+      case USER_ROLE.ADMIN:
+        userData = await this.adminService.getByUserId(userId);
+        break;
+      default:
+        break;
+    }
+    if (!userData) {
+      throw new NotFoundException('User not found');
+    }
+
     /****** Validate Password **************/
     const isValidPassword = await user.comparePassword(password);
 
@@ -63,19 +91,45 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    let userData: StudentDocument | AdminDocument | FacultyDocument | null = null;
+    let instituteId = '';
+
+    /****** Fetch role-specific document (Admin/Student/Faculty) **************/
+    try {
+      if (user.role === USER_ROLE.ADMIN) {
+        userData = await this.adminService.getAdminByBasicUserId(user._id.toString());
+      } else if (user.role === USER_ROLE.STUDENT) {
+        userData = await this.studentService.getStudentByBasicUserId(user._id.toString());
+      } else if (user.role === USER_ROLE.FACULTY) {
+        userData = await this.facultyService.getFacultyByBasicUserId(user._id.toString());
+      }
+
+      if (userData && userData.institute) {
+        const instituteDoc = userData.institute as InstituteDocument;
+        instituteId = instituteDoc._id.toString();
+      }
+    } catch (error) {
+      console.log('Error fetching user profile during login:', error.message);
+      throw new NotFoundException('User profile not found');
+    }
+
+    if (!userData) {
+      throw new NotFoundException('User profile not found');
+    }
+
     const payload: JwtPayload = {
       email: user.email,
-      sub: user._id.toString(),
+      sub: userData._id.toString(),
       role: user.role,
       name: user.name,
-      userId: user._id.toString(),
+      userId: userId,
     };
 
     /****** Generate Token **************/
     const token = this.jwtService.sign(payload);
 
     return {
-      user,
+      user: userData,
       token,
       expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
       msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
@@ -87,15 +141,21 @@ export class AuthService {
       null;
     const role = user.role as USER_ROLE;
 
+    const userId = user.userId;
+
+    if (!userId) {
+      throw new BadRequestException('User id is required');
+    }
+
     switch (role) {
       case USER_ROLE.STUDENT:
-        userData = await this.studentService.getByUserId(user.userId);
+        userData = await this.studentService.getByUserId(userId);
         break;
       case USER_ROLE.FACULTY:
-        userData = await this.facultyService.getByUserId(user.userId);
+        userData = await this.facultyService.getByUserId(userId);
         break;
       case USER_ROLE.ADMIN:
-        userData = await this.adminService.getByUserId(user.userId);
+        userData = await this.adminService.getByUserId(userId);
         break;
       default:
         break;
@@ -112,7 +172,7 @@ export class AuthService {
       sub: userData._id.toString(),
       role: user.role,
       name: user.name,
-      userId: userData._id.toString(),
+      userId: userId,
       instituteId: institute._id.toString(),
     };
 
@@ -121,6 +181,7 @@ export class AuthService {
 
     return {
       userData,
+      institute,
       token,
       expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
       msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,
@@ -136,7 +197,7 @@ export class AuthService {
       const createAdminDto: CreateAdminDto = dto.admin;
 
       const admin = await this.adminService.createAdmin(
-        createAdminDto,
+        dto.admin,
         session,
       );
 
@@ -156,7 +217,7 @@ export class AuthService {
       };
 
       const institute = await this.instituteService.createInstitute(
-        createInstituteDto,
+        dto.institute,
         session,
       );
 

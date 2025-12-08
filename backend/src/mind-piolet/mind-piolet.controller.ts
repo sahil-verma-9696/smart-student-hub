@@ -1,45 +1,31 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common';
 import { MindPioletService } from './mind-piolet.service';
-import { CreateMindPioletDto } from './dto/create-mind-piolet.dto';
-import { UpdateMindPioletDto } from './dto/update-mind-piolet.dto';
+import { AnalysisRequestDto } from './dto/analysis-request.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { AuthenticatedRequest } from '../auth/types/auth.type';
 
 @Controller('mind-piolet')
+@UseGuards(JwtAuthGuard)
 export class MindPioletController {
   constructor(private readonly mindPioletService: MindPioletService) {}
 
-  @Post()
-  create(@Body() createMindPioletDto: CreateMindPioletDto) {
-    return this.mindPioletService.create(createMindPioletDto);
+  @Post('skill')
+  analyzeSkills(@Req() req: AuthenticatedRequest, @Body() dto: AnalysisRequestDto) {
+    return this.mindPioletService.analyzeSkills(req.user!.userId, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.mindPioletService.findAll();
+  @Post('roadmap')
+  generateRoadmap(@Req() req: AuthenticatedRequest, @Body() dto: AnalysisRequestDto) {
+    return this.mindPioletService.generateRoadmap(req.user!.userId, dto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mindPioletService.findOne(+id);
+  @Post('interview')
+  interviewPrep(@Req() req: AuthenticatedRequest, @Body() dto: AnalysisRequestDto) {
+    return this.mindPioletService.interviewPrep(req.user!.userId, dto);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateMindPioletDto: UpdateMindPioletDto,
-  ) {
-    return this.mindPioletService.update(+id, updateMindPioletDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.mindPioletService.remove(+id);
+  @Get('history')
+  getHistory(@Req() req: AuthenticatedRequest) {
+    return this.mindPioletService.getHistory(req.user!.userId);
   }
 }

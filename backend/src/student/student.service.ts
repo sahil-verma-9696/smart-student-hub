@@ -79,6 +79,14 @@ export class StudentService {
     /** STEP 2 — Create AcademicDetails using AcademicService */
     const academic = await this.academicService.create({
       studentId: null,
+      program: new Types.ObjectId(dto.program),
+      degree: new Types.ObjectId(dto.degree),
+      branch: dto.branch ? new Types.ObjectId(dto.branch) : undefined,
+      specialization: dto.specialization
+        ? new Types.ObjectId(dto.specialization)
+        : undefined,
+      currentYear: dto.currentYear,
+      currentSemester: dto.currentSemester,
     });
 
     /** STEP 3 — Create Student with academicDetails ref */
@@ -311,17 +319,34 @@ export class StudentService {
   /***************************************
    * GETTERS
    ***************************************/
+  async getStudentByBasicUserId(basicUserId: string) {
+    const student = await this.studentModel
+      .findOne({ basicUserDetails: new Types.ObjectId(basicUserId) })
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
+      .populate<{ academicDetails: AcademicDocument }>('academicDetails')
+      .exec();
+
+    if (!student) {
+      throw new NotFoundException(
+        `Student with basicUserDetails ${basicUserId} not found`,
+      );
+    }
+
+    return student;
+  }
+
   async getByUserId(userId: string) {
     const student = await this.studentModel
       .findOne({ basicUserDetails: new Types.ObjectId(userId) })
       .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
       .populate<{ institute: InstituteDocument }>('institute')
-      .populate<{ adademicDetails: AcademicDocument }>('academicDetails')
+      .populate<{ academicDetails: AcademicDocument }>('academicDetails')
       .exec();
 
     if (!student) {
       throw new NotFoundException(
-        `Student with basicUserDetails ${userId} not found`,
+        `Student with ID ${userId} not found`,
       );
     }
 
@@ -438,6 +463,29 @@ export class StudentService {
     return this.studentModel
       .find({ institute: instituteObjId })
       .populate('basicUserDetails');
+  }
+
+  getInstituteStudentsCount(instituteId: string) {
+    const instituteObjId = new Types.ObjectId(instituteId);
+    return this.studentModel.countDocuments({ institute: instituteObjId });
+  }
+
+  getStudentDetails(studentId: string) {
+    const studentObjId = new Types.ObjectId(studentId);
+    return this.studentModel
+      .findById(studentObjId)
+      .populate('basicUserDetails', '-passwordHash')
+      .populate({
+        path: 'academicDetails',
+        populate: [
+          { path: 'program', model: 'Program' },
+          { path: 'degree', model: 'Degree' },
+          { path: 'branch', model: 'Branch' },
+          { path: 'specialization', model: 'Specialization' },
+          { path: 'section', model: 'Section' },
+        ],
+      })
+      .exec();
   }
 }
 type StudentFilter = Record<string, unknown>;

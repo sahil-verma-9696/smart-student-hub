@@ -10,6 +10,7 @@ export default function useGlobalData() {
   const BACKEND_URL = import.meta.env.VITE_SERVER_URL;
   const INSITITUTE_ID = user?.institute?._id;
   const USER_ID = user?._id;
+  const USER_ROLE = user?.basicUserDetails?.role;
 
   // GET Institute's Programs
   React.useEffect(() => {
@@ -70,8 +71,9 @@ export default function useGlobalData() {
       instituteDepartments: departments,
       BACKEND_URL,
       INSITITUTE_ID,
-      USER_ID
+      USER_ID,
+      USER_ROLE,
     };
-  }, [programs, departments, BACKEND_URL, INSITITUTE_ID,USER_ID]);
+  }, [programs, departments, BACKEND_URL, INSITITUTE_ID, USER_ID, USER_ROLE]);
   return memoizedGlobalData;
 }

@@ -53,24 +53,31 @@ export default function useAuthantication() {
       setData(response?.data);
 
       /******************************************
+       * Extract user info (handle Admin/Student/Faculty structure)
+       * ******************************************/
+      const userData = response?.data?.user || {};
+      const basicUserDetails = userData?.basicUserDetails || {};
+      const userRole = basicUserDetails?.role || "";
+
+      /******************************************
        * Update Auth Context
        * ******************************************/
       setIsUserAuthenticated(true);
-      setUserRole(response?.data?.user?.role || "");
-      setUser(response?.data?.user || {});
+      setUserRole(userRole);
+      setUser(userData);
 
       localStorage.setItem(
         storageKeys.accessToken,
         response?.data?.token || ""
       );
-      localStorage.setItem("user", JSON.stringify(response?.data?.user || {}));
+      localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem(
         storageKeys.userDetails,
-        JSON.stringify(response?.data?.user || {})
+        JSON.stringify(userData)
       );
       localStorage.setItem(
         storageKeys.userRole,
-        response?.data?.user?.role || ""
+        userRole
       );
 
       const expiresMs = Number(response?.data?.expires_in ?? 0);
@@ -78,7 +85,7 @@ export default function useAuthantication() {
 
       setLoading(false);
 
-      window.location.href = `/${response?.data?.user?.role?.toLowerCase()}`;
+      window.location.href = `/${userRole?.toLowerCase()}`;
     } catch (err) {
       console.log(err);
       setLoading(false);

@@ -71,6 +71,12 @@ export class AcademicService {
     section?: string;
     backlogs?: number; // 🔥 NEW
     studentId?: string | null;
+    program?: Types.ObjectId;
+    degree?: Types.ObjectId;
+    branch?: Types.ObjectId;
+    specialization?: Types.ObjectId;
+    currentYear?: number;
+    currentSemester?: number;
   }): Promise<AcademicDocument> {
     const created = await this.academicModel.create({
       department: details.department,
@@ -79,6 +85,12 @@ export class AcademicService {
       section: details.section,
       backlogs: details.backlogs ?? 0, // 🔥 NEW
       student: details.studentId ? new Types.ObjectId(details.studentId) : null,
+      program: details.program,
+      degree: details.degree,
+      branch: details.branch,
+      specialization: details.specialization,
+      currentYear: details.currentYear ?? 1,
+      currentSemester: details.currentSemester ?? 1,
     });
 
     return created;
@@ -163,6 +175,10 @@ export class AcademicService {
     return this.programModel.find({ institute: instituteId });
   }
 
+  async getInstituteProgramsCount(instituteId: string) {
+    return this.programModel.countDocuments({ institute: instituteId });
+  }
+
   async updateProgram(id: string, dto: any) {
     const program = await this.programModel.findByIdAndUpdate(id, dto, {
       new: true,
@@ -228,6 +244,14 @@ export class AcademicService {
   async getDepartments(instituteId: string) {
     const instituteObjectId = new Types.ObjectId(instituteId);
     return this.departmentModel.find({ institute: instituteObjectId });
+  }
+
+  async getInstituteDepartmentsCount(instituteId: string) {
+    const instituteObjectId = new Types.ObjectId(instituteId);
+
+    return this.departmentModel.countDocuments({
+      institute: instituteObjectId,
+    });
   }
 
   async updateDepartment(id: string, dto: any) {

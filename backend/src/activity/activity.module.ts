@@ -1,38 +1,25 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-
-import { Activity, ActivitySchema } from './schema/activity.schema';
-import { CustomActivitySchema } from './schema/custom.schema';
-import { HackathonActivitySchema } from './schema/hackathon.schemas';
-import { WorkshopActivitySchema } from './schema/workshop.schema';
-
 import { ActivityController } from './activity.controller';
 import { ActivityService } from './activity.service';
-import { ACTIVITY_TYPES } from './types/enum';
-import { DefaultActivitySchema } from './schema/defaulty.schema';
-import { NotificationModule } from 'src/notification/notification.module';
+import { Activity, ActivitySchema } from './schema/acivity.schema';
+import { ActivityType, ActivityTypeSchema } from '../activity-type/schema/activity-type.schema';
+import { Student, StudentSchema } from '../student/schema/student.schema';
+import { Faculty, FacultySchema } from '../faculty/schemas/faculty.schema';
+import { ActivityAssignmentModule } from '../activity-assignment/activity-assignment.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
-      {
-        name: Activity.name,
-        useFactory: () => {
-          const schema = ActivitySchema;
-
-          schema.discriminator('custom', CustomActivitySchema);
-          schema.discriminator(ACTIVITY_TYPES.DEFAULT, DefaultActivitySchema);
-          schema.discriminator('hackathon', HackathonActivitySchema);
-          schema.discriminator('workshop', WorkshopActivitySchema);
-
-          return schema;
-        },
-      },
+    MongooseModule.forFeature([
+      { name: Activity.name, schema: ActivitySchema },
+      { name: ActivityType.name, schema: ActivityTypeSchema },
+      { name: Student.name, schema: StudentSchema },
+      { name: Faculty.name, schema: FacultySchema },
     ]),
-
-    forwardRef(() => NotificationModule),
+    ActivityAssignmentModule, // Import for ActivityAssignmentService
   ],
   controllers: [ActivityController],
   providers: [ActivityService],
+  exports: [ActivityService],
 })
 export class ActivityModule {}

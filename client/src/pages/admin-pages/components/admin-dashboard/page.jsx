@@ -21,6 +21,8 @@ import { useState } from "react";
 import useAuthContext from "@/hooks/useAuthContext";
 import { formatDistanceToNow } from "date-fns";
 import { useGlobalContext } from "@/contexts/global-context";
+import useAdminInstPageContext from "../../hooks/useAdminInst.context";
+import { useAdminPageContext } from "../../context/admin-page.context";
 
 export default function AdminDashboardPage() {
   const [recentItems, setRecentItems] = useState([]);
@@ -35,9 +37,9 @@ export default function AdminDashboardPage() {
   const { user } = useAuthContext();
   const { institutePrograms, instituteDepartments } = useGlobalContext();
 
-  if (institutePrograms) console.log(institutePrograms);
+  const { instituteStats } = useAdminPageContext();
 
-  if (instituteDepartments) console.log(instituteDepartments);
+  if (instituteStats) console.log(instituteStats);
 
   return (
     <div className="min-h-screen max-h-screen overflow-y-auto bg-[#f8f9fa]">
@@ -62,7 +64,9 @@ export default function AdminDashboardPage() {
               <CardContent className="flex items-center justify-between p-5">
                 <div>
                   <p className="text-sm text-[#6b7280]">Total Students</p>
-                  <h2 className="text-2xl font-bold">{stats.totalStudents}</h2>
+                  <h2 className="text-2xl font-bold">
+                    {instituteStats?.totalStudents}
+                  </h2>
                 </div>
                 <GraduationCap className="w-10 h-10 text-black" />
               </CardContent>
@@ -72,7 +76,9 @@ export default function AdminDashboardPage() {
               <CardContent className="flex items-center justify-between p-5">
                 <div>
                   <p className="text-sm text-[#6b7280]">Total Faculty</p>
-                  <h2 className="text-2xl font-bold">{stats.totalFaculty}</h2>
+                  <h2 className="text-2xl font-bold">
+                    {instituteStats?.totalFaculty}
+                  </h2>
                 </div>
                 <Users className="w-10 h-10 text-black" />
               </CardContent>
@@ -82,7 +88,9 @@ export default function AdminDashboardPage() {
               <CardContent className="flex items-center justify-between p-5">
                 <div>
                   <p className="text-sm text-[#6b7280]">Departments</p>
-                  <h2 className="text-2xl font-bold">{stats.departments}</h2>
+                  <h2 className="text-2xl font-bold">
+                    {instituteStats?.totalDepartments}
+                  </h2>
                 </div>
                 <Building2 className="w-10 h-10 text-black" />
               </CardContent>
@@ -93,7 +101,7 @@ export default function AdminDashboardPage() {
                 <div>
                   <p className="text-sm text-[#6b7280]">Pending Requests</p>
                   <h2 className="text-2xl font-bold">
-                    {stats.pendingRequests}
+                    {instituteStats?.totalActivities}
                   </h2>
                 </div>
                 <AlertCircle className="w-10 h-10 text-black" />

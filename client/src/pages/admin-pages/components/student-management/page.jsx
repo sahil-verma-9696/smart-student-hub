@@ -12,7 +12,8 @@ import { useGlobalContext } from "@/contexts/global-context";
 
 export default function StudentManagementPage() {
   const [loading, setLoading] = useState(false);
-  const { INSTITUTE_ID } = useGlobalContext();
+  const { INSITITUTE_ID } = useGlobalContext(); // Note: typo in context (INSITITUTE_ID)
+  const INSTITUTE_ID = INSITITUTE_ID; // Create properly named variable
 
   const { students } = useStudentManagementContext();
 
@@ -22,26 +23,36 @@ export default function StudentManagementPage() {
    * **************** Handle Add Student ********************
    *********************************************************/
   const addStudent = async (studentData) => {
-
     const payload = {
-      ...studentData,
-      instituteId: INSTITUTE_ID,
+      name: studentData.name,
+      email: studentData.email,
       password: studentData.email, // email === password
+      gender: studentData.gender,
+      roll_number: studentData.roll_number,
+      contactInfo: studentData.contactInfo,
+      instituteId: String(INSTITUTE_ID), // Ensure it's a string
+      // Map programStructure to flat fields
+      program: studentData.program,
+      degree: studentData.degree,
+      branch: studentData.branch,
+      specialization: studentData.specialization,
+      currentYear: studentData.currentYear,
+      currentSemester: studentData.currentSemester,
     };
     console.log("add student data", payload);
 
-    // try {
-    //   setLoading(true);
-    //   const response = await studentAPI.createStudent(payload);
-    //   toast.success("Student added successfully!");
-    //   return response;
-    // } catch (error) {
-    //   console.error("Error adding student:", error);
-    //   toast.error(error.response?.data?.message || "Failed to add student");
-    //   throw error;
-    // } finally {
-    //   setLoading(false);
-    // }
+    try {
+      setLoading(true);
+      const response = await studentAPI.createStudent(payload);
+      toast.success("Student added successfully!");
+      return response;
+    } catch (error) {
+      console.error("Error adding student:", error);
+      toast.error(error.response?.data?.message || "Failed to add student");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   /*********************************************************
@@ -54,7 +65,7 @@ export default function StudentManagementPage() {
     }));
 
     const payload = {
-      instituteId: INSTITUTE_ID,
+      instituteId: String(INSTITUTE_ID), // Ensure it's a string
       students: studentsWithPassword,
     };
 

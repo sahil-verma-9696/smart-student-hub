@@ -15,10 +15,16 @@ export class Academic {
   branch?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Specialization', default: null })
-  specialization: Types.ObjectId;
+  specialization?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Section', default: null })
-  section: Types.ObjectId;
+  section?: Types.ObjectId;
+
+  @Prop({ type: Number, default: 1 })
+  currentYear?: number; // Current year of study (1, 2, 3, 4, etc.)
+
+  @Prop({ type: Number, default: 1 })
+  currentSemester?: number; // Current semester (1-8)
 
   @Prop({ type: Number, default: 0 })
   backlogs?: number;

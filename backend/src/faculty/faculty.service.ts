@@ -67,13 +67,18 @@ export class FacultyService {
     const user = await this.userService.createUser(userDto, session);
 
     /** STEP 2 — Create Faculty */
+    // Validate and convert department to ObjectId
+    if (!dto.department || !Types.ObjectId.isValid(dto.department)) {
+      throw new BadRequestException('Valid department ObjectId is required');
+    }
+
     const createdFaculty = await this.facultyModel.create(
       [
         {
           basicUserDetails: new Types.ObjectId(user._id),
           institute: new Types.ObjectId(dto.instituteId),
           employee_code: dto.employee_code,
-          department: dto.department,
+          department: new Types.ObjectId(dto.department),
           designation: dto.designation,
         },
       ],
@@ -228,13 +233,27 @@ export class FacultyService {
     return 'Faculty deleted successfully';
   }
 
+  async getFacultyByBasicUserId(basicUserId: string) {
+    const faculty = await this.facultyModel
+      .findOne({ basicUserDetails: new Types.ObjectId(basicUserId) })
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
+      .exec();
+
+    if (!faculty) {
+      throw new NotFoundException(`Faculty with basicUserDetails ${basicUserId} not found`);
+    }
+
+    return faculty;
+  }
+
   async getByUserId(userId: string) {
     const faculty = await this.facultyModel
       .findOne({ basicUserDetails: new Types.ObjectId(userId) })
       .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
       .populate<{ institute: InstituteDocument }>('institute')
-      .populate<{ department: any }>('department')
       .exec();
+    // .populate<{ department: any }>('department')
 
     if (!faculty) {
       throw new NotFoundException(`Faculty with userId ${userId} not found`);
@@ -333,5 +352,10 @@ export class FacultyService {
     pipeline.push({ $limit: limit });
 
     return this.facultyModel.aggregate(pipeline).exec();
+  }
+
+  async getInstituteFacultiesCount(instituteId: string) {
+    const instituteObjectId = new Types.ObjectId(instituteId);
+    return this.facultyModel.countDocuments({ institute: instituteObjectId });
   }
 }
