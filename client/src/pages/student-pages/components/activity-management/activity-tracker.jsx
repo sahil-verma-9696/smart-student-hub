@@ -39,7 +39,6 @@ export function ActivityTracker() {
   const [files, setFiles] = useState([]);
   const [activityType, setActivityType] = useState("default");
 
-  /** CUSTOM key-value fields */
   const [customKey, setCustomKey] = useState("");
   const [customValue, setCustomValue] = useState("");
   const [customPairs, setCustomPairs] = useState([]);
@@ -55,7 +54,6 @@ export function ActivityTracker() {
 
   const cfg = ActivityConfig[activityType] || ActivityConfig.default;
 
-  /** Add a custom key-value pair */
   const handleAddCustomField = () => {
     if (!customKey.trim() || !customValue.trim()) return;
 
@@ -68,12 +66,10 @@ export function ActivityTracker() {
     setCustomValue("");
   };
 
-  /** SUBMIT HANDLER */
   const handleSubmit = async (data) => {
     try {
       setSubmitting(true);
 
-      // Convert customPairs → object
       const fieldObj = {};
       customPairs.forEach((pair) => {
         fieldObj[pair.key] = pair.value;
@@ -87,16 +83,10 @@ export function ActivityTracker() {
               activityType: "custom",
               fields: fieldObj,
             }
-          : {
-              ...data,
-              activityType,
-            };
-
-      console.log("FINAL PAYLOAD:", payload);
+          : { ...data, activityType };
 
       await postActivity(payload, files);
 
-      // Reset UI
       form.reset({});
       setFiles([]);
       setCustomKey("");
@@ -111,48 +101,44 @@ export function ActivityTracker() {
     }
   };
 
-  const uiGrid =
-    activityType === "default"
-      ? "grid grid-cols-1 gap-8"
-      : "grid grid-cols-1 lg:grid-cols-2 gap-8";
-
-  const handleActivityTypeChange = (v) => {
-    setActivityType(v);
-    setCustomPairs([]);
-    setCustomKey("");
-    setCustomValue("");
-    form.reset({});
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="w-full">
-          Add Activity
-        </Button>
+        <Button size="sm" className="w-full">Add Activity</Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-3xl w-full p-6 h-[550px] scroll-auto">
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className={uiGrid}>
+      <DialogContent className="max-w-4xl w-full p-6 max-h-[85vh] overflow-y-auto">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          
+          {/* HEADER AREA */}
+          <div className="space-y-3">
+            <Label className="font-medium">Activity Type</Label>
+            <Select value={activityType} onValueChange={(v) => {
+              setActivityType(v);
+              setCustomPairs([]);
+              setCustomKey("");
+              setCustomValue("");
+              form.reset({});
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(ActivityConfig).map(([k, v]) => (
+                  <SelectItem key={k} value={k}>
+                    {v.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* LAYOUT */}
+          <div className="flex flex-col lg:flex-row gap-8">
+
             {/* LEFT PANEL */}
-            <div className="space-y-6">
-              <Label>Activity Type</Label>
+            <div className="flex-1 space-y-6">
 
-              <Select value={activityType} onValueChange={handleActivityTypeChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(ActivityConfig).map(([k, v]) => (
-                    <SelectItem key={k} value={k}>
-                      {v.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* BASE FIELDS */}
               <div className="space-y-2">
                 <Label>Title</Label>
                 <Input {...form.register("title")} />
@@ -163,8 +149,7 @@ export function ActivityTracker() {
                 <Textarea rows={4} {...form.register("description")} />
               </div>
 
-              {/* FILE UPLOAD */}
-              <div className="rounded-lg border p-3">
+              <div className="rounded-lg border p-4 bg-muted/30">
                 <FilePond
                   files={files}
                   onupdatefiles={setFiles}
@@ -185,11 +170,11 @@ export function ActivityTracker() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 22 }}
                 transition={{ duration: 0.25 }}
-                className="space-y-6 border-l pl-6 h-[450px] overflow-y-auto"
+                className="flex-1 space-y-6 border-l pl-6 max-h-[60vh] overflow-y-auto"
               >
-                {/* NON-CUSTOM TYPES: show fields from config */}
+                {/* NON-CUSTOM TYPES */}
                 {activityType !== "custom" && activityType !== "default" && (
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <h2 className="text-lg font-semibold">
                       {activityType.toUpperCase()} Details
                     </h2>
@@ -199,7 +184,7 @@ export function ActivityTracker() {
                         key={field.name}
                         initial={{ opacity: 0, x: 15 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05, duration: 0.18 }}
+                        transition={{ delay: i * 0.05 }}
                         className="space-y-2"
                       >
                         <Label>{field.label}</Label>
@@ -241,7 +226,7 @@ export function ActivityTracker() {
                         {customPairs.map((pair, idx) => (
                           <div
                             key={idx}
-                            className="flex justify-between bg-white p-2 rounded border"
+                            className="flex justify-between bg-white p-2 rounded border shadow-sm"
                           >
                             <span className="font-semibold">{pair.key}</span>
                             <span>{pair.value}</span>
@@ -255,8 +240,9 @@ export function ActivityTracker() {
             </AnimatePresence>
           </div>
 
-          <DialogFooter className="mt-6">
-            <Button type="submit" className="w-full" disabled={submitting}>
+          {/* FOOTER */}
+          <DialogFooter>
+            <Button type="submit" disabled={submitting} className="w-full">
               {submitting ? "Posting..." : "Post Activity"}
             </Button>
           </DialogFooter>
@@ -265,6 +251,7 @@ export function ActivityTracker() {
     </Dialog>
   );
 }
+
 
 /* UNIVERSAL FIELD RENDERER */
 function renderField(field, form) {

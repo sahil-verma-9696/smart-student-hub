@@ -1,8 +1,9 @@
 import React from "react";
 import { useGlobalContext } from "@/contexts/global-context";
+import usePersistState from "@/hooks/usePersistState";
 
 export default function useActivitiesPageLogic() {
-  const [activities, setActivities] = React.useState(null);
+  const [activities, setActivities] = usePersistState(null, "activities");
   const [activityStats, setActivityStats] = React.useState(null);
 
   const { USER_ID, BACKEND_URL, INSITITUTE_ID } = useGlobalContext();
