@@ -10,6 +10,8 @@ import { useProfilePageContext } from "./contexts/profile-page-context";
 export default function Profile({ student }) {
   const { profileData: user } = useProfilePageContext();
 
+  if (!user) return null;
+
   return (
     <div className=" max-w-screen   px-4 py-6 space-y-6">
       {/* ---------- PROFILE HEADER ---------- */}
@@ -63,8 +65,14 @@ export default function Profile({ student }) {
             label="Program"
             value={user?.academicDetails?.program?.name || "N/A"}
           />
-          <DetailItem label="Degree" value={user?.academicDetails?.degree?.name  || "N/A"} />
-          <DetailItem label="Branch" value={user?.academicDetails?.branch?.name || "N/A"} />
+          <DetailItem
+            label="Degree"
+            value={user?.academicDetails?.degree?.name || "N/A"}
+          />
+          <DetailItem
+            label="Branch"
+            value={user?.academicDetails?.branch?.name || "N/A"}
+          />
 
           <DetailItem
             label="Specialization"
