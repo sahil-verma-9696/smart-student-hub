@@ -56,7 +56,7 @@ export function InstituteManagementPage() {
   };
 
   const handleLogoUpload = (filePayload) => {
-    console.log(filePayload, "filePayload");
+    if (!filePayload) return;
     setData((prev) => ({ ...prev, logo: filePayload }));
   };
 

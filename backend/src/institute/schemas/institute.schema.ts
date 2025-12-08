@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Attachment } from 'src/attachment/schema/attachment.schema';
 import { InstituteType } from 'src/auth/types/auth.enum';
 
 export type InstituteDocument = Institute & Document;

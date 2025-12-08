@@ -7,7 +7,6 @@ export function LogoUpload({
   onRemove,
   editable = true,
 }) {
-  console.log(currentLogo, "currentLogo");
   return (
     <div className="space-y-3">
       {editable && (
