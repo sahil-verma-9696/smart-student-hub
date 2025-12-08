@@ -31,6 +31,7 @@ export function LogoFilePond({
             file: {
               name: currentLogo.originalFilename || "logo.png",
               type: "image/png", // force preview detection
+              size: currentLogo.bytes,
             },
           },
         },

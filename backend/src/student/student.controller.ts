@@ -94,6 +94,11 @@ export class StudentController {
     return this.studentService.updateStudentAcademicDetails(id, body);
   }
 
+  @Get(':id/profile')
+  getStudentDetails(@Param('id') id: string) {
+    return this.studentService.getStudentDetails(id);
+  }
+
   @Get(':id/portfolio-data')
   getPortfolioData(@Param('id') id: string) {
     return MOCK_STUDENT_DATA;

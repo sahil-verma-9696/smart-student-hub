@@ -21,6 +21,8 @@ import FacultyManagementProvider from "@/pages/admin-pages/provider/faculty-mana
 import InstituteManagementProvider from "@/pages/admin-pages/provider/institute-management.provider";
 import ActivityTypeManagementPage from "@/pages/admin-pages/components/activity-type-management/page";
 import AdminPageProvider from "@/pages/admin-pages/provider/admin-page.provider";
+import Profile from "@/pages/student-pages/Profile";
+import ProfilePageProvider from "@/pages/student-pages/provider/profile-page-provider";
 
 export default createBrowserRouter([
   {
@@ -64,7 +66,7 @@ export default createBrowserRouter([
       },
       {
         path: "profile",
-        Component: Settings,
+        Component: ProfilePageProvider,
       },
     ],
   },

@@ -452,5 +452,23 @@ export class StudentService {
     const instituteObjId = new Types.ObjectId(instituteId);
     return this.studentModel.countDocuments({ institute: instituteObjId });
   }
+
+  getStudentDetails(studentId: string) {
+    const studentObjId = new Types.ObjectId(studentId);
+    return this.studentModel
+      .findById(studentObjId)
+      .populate('basicUserDetails', '-passwordHash')
+      .populate({
+        path: 'academicDetails',
+        populate: [
+          { path: 'program', model: 'Program' },
+          { path: 'degree', model: 'Degree' },
+          { path: 'branch', model: 'Branch' },
+          { path: 'specialization', model: 'Specialization' },
+          { path: 'section', model: 'Section' },
+        ],
+      })
+      .exec();
+  }
 }
 type StudentFilter = Record<string, unknown>;
