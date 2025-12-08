@@ -2,18 +2,24 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
-import { AuthService } from './auth/auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StudentModule } from './student/student.module';
 import { InstituteModule } from './institute/institute.module';
+import { FacultyModule } from './faculty/faculty.module';
+import { ActivityModule } from './activity/activity.module';
+import { AdminModule } from './admin/admin.module';
+import { UpDocsModule } from './up-docs/up-docs.module';
+import { AttachmentModule } from './attachment/attachment.module';
+import { AcademicModule } from './academic/academic.module';
+import { AcadmicProgramModule } from './acadmic-program/acadmic-program.module';
+import { AssignmentModule } from './assignment/assignment.module';
+import { MindPioletModule } from './mind-piolet/mind-piolet.module';
+import { NotificationModule } from './notification/notification.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    /** ****** Authentication Module ****** */
-    AuthModule,
-
     /** ****** Configuring env ******* */
     ConfigModule.forRoot({
       isGlobal: true,
@@ -23,11 +29,36 @@ import { InstituteModule } from './institute/institute.module';
     /** ****** Connecting to MongoDB ******* */
     MongooseModule.forRoot(process.env.MONGO_URI!),
 
+    /** ****** Authentication Module ****** */
+    AuthModule,
+
     StudentModule,
 
     InstituteModule,
+
+    ActivityModule,
+
+    FacultyModule,
+
+    AdminModule,
+
+    UpDocsModule,
+
+    AttachmentModule,
+
+    AcademicModule,
+
+    AcadmicProgramModule,
+
+    AssignmentModule,
+
+    MindPioletModule,
+
+    NotificationModule,
+
+    UserModule,
   ],
-  controllers: [AppController, AuthController],
-  providers: [AppService, AuthService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

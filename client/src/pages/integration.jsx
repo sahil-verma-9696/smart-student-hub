@@ -1,7 +1,7 @@
-import { IntegrationOverview } from "@/components/integrations/integration-overview";
-import { AvailableIntegrations } from "@/components/integrations/available-integrations";
-import { APIManagement } from "@/components/integrations/api-management";
-import { DataSync } from "@/components/integrations/data-sync";
+import { IntegrationOverview } from "@/pages/student-pages/integrations/integration-overview";
+import { AvailableIntegrations } from "@/pages/student-pages/integrations/available-integrations";
+import { APIManagement } from "@/pages/student-pages/integrations/api-management";
+import { DataSync } from "@/pages/student-pages/integrations/data-sync";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 

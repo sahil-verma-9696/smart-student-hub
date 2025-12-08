@@ -1,31 +1,26 @@
-import { LoginForm } from "@/components/auth/login-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import React from "react";
 
-export default function App() {
+import { RouterProvider } from "react-router-dom";
+import routes from "./routes/index.js";
+import "filepond/dist/filepond.min.css";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+
+import AuthProvider from "./providers/auth-context-provider.jsx";
+import NotificationProvider from "./providers/notification-context-provider.jsx";
+import GlobalContextProvider from "./providers/global-context-provider.jsx";
+
+const App = () => {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">Smart Student Hub</h1>
-          <p className="text-muted-foreground">
-            Your centralized platform for academic achievements and portfolio management
-          </p>
-        </div>
+    <>
+      <AuthProvider>
+        <GlobalContextProvider>
+          <NotificationProvider>
+            <RouterProvider router={routes} />
+          </NotificationProvider>
+        </GlobalContextProvider>
+      </AuthProvider>
+    </>
+  );
+};
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome Back</CardTitle>
-            <CardDescription>Sign in to access your student dashboard</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LoginForm />
-          </CardContent>
-        </Card>
-
-        <div className="text-center text-sm text-muted-foreground">
-          <p>For institutions seeking digital transformation in student record management</p>
-        </div>
-      </div>
-    </div>
-  )
-}
+export default App;
