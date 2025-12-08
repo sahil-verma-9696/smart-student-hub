@@ -58,7 +58,7 @@ export function ActivityTracker() {
    * ******** States ********************
    **************************************/
   const [open, setOpen] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [ files, setFiles] = useState([]);
   const [activityType, setActivityType] = useState("default");
   const [customFields, setCustomFields] = useState([]);
   const [submitting, setSubmitting] = useState(false);

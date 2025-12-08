@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { InstituteService } from './institute.service';
 import CreateInstituteDto from './dto/create-institute.dto';
-import { UpdateInstituteDto } from './dto/update-institute.dto';
+import UpdateInstituteDetailsDto from './dto/update-insitute-details.dto';
 
 @Controller('institute')
 export class InstituteController {
@@ -29,7 +29,7 @@ export class InstituteController {
   @Patch(':id/institute-details')
   update(
     @Param('id') id: string,
-    @Body() updateInstituteDto: UpdateInstituteDto,
+    @Body() updateInstituteDto: UpdateInstituteDetailsDto,
   ) {
     return this.instituteService.updateInstitute(updateInstituteDto, id);
   }
@@ -52,6 +52,11 @@ export class InstituteController {
   @Get(':id/students')
   getInstituteStudents(@Param('id') id: string) {
     return this.instituteService.getInstituteStudents(id);
+  }
+
+  @Get(':id/stats')
+  getInstituteStats(@Param('id') id: string) {
+    return this.instituteService.getInstituteStats(id);
   }
 
   // @Delete(':id')

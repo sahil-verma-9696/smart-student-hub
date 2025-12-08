@@ -8,13 +8,10 @@ import {
   IsUrl,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { DepartmentDto } from 'src/auth/dto/sub/department.dto';
+import { ProgramDto } from 'src/auth/dto/sub/program.dto';
 
-// ========== SUB-DTO IMPORTS ==========
-import { DepartmentDto } from './sub/department.dto';
-import { ProgramDto } from './sub/program.dto';
-import { VerificationDto } from './sub/verification.dto';
-
-export default class RegisterInstituteFormDto {
+export default class UpdateInstituteDetailsDto {
   @IsString()
   @IsOptional()
   instituteId: string;
@@ -95,9 +92,4 @@ export default class RegisterInstituteFormDto {
   @IsString()
   @IsOptional()
   adminDesignation: string;
-
-  // Verification
-  @ValidateNested()
-  @Type(() => VerificationDto)
-  verification: VerificationDto;
 }

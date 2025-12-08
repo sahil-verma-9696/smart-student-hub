@@ -4,14 +4,14 @@ import {
   IsEnum,
   IsNumber,
   IsEmail,
-  IsObject,
+  // IsObject,
   IsNotEmpty,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+// import { Type } from 'class-transformer';
 import { InstituteType } from 'src/auth/types/auth.enum';
-import { CreateAttachmentDto } from 'src/attachment/dto/create-attachment.dto';
+// import { CreateAttachmentDto } from 'src/attachment/dto/create-attachment.dto';
 
-export default class CreateInstituteDto {
+export default class CreateInstituteDto { 
   // ---------------- BASIC ----------------
   @IsString()
   @IsNotEmpty()
@@ -73,8 +73,11 @@ export default class CreateInstituteDto {
   website?: string;
 
   // ---------------- LOGO (Attachment) ----------------
-  @IsOptional()
-  @IsObject()
-  @Type(() => CreateAttachmentDto)
-  logo?: CreateAttachmentDto;
+  // @IsOptional()
+  // @IsObject()
+  // @Type(() => CreateAttachmentDto)
+  // logo?: CreateAttachmentDto;
+
+  @IsString()
+  logo?: string;
 }

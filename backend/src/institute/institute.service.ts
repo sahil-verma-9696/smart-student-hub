@@ -1,14 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import Institute, { InstituteDocument } from './schemas/institute.schema';
 import { Model, Types } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
 import { ClientSession } from 'mongoose';
-import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { AdminService } from 'src/admin/admin.service';
 import { UpdateAdminDto } from 'src/admin/dto/update-admin.dto';
 import { AcademicService } from 'src/academic/academic.service';
 import { StudentService } from 'src/student/student.service';
+import UpdateInstituteDetailsDto from './dto/update-insitute-details.dto';
+import { FacultyService } from 'src/faculty/faculty.service';
 // `inst3admin@gmail.com
 @Injectable()
 export class InstituteService {
@@ -17,6 +20,7 @@ export class InstituteService {
     private readonly adminService: AdminService,
     private readonly academicService: AcademicService,
     private readonly studentService: StudentService,
+    private readonly facultyService: FacultyService,
   ) {}
 
   async create(createInstituteDto: CreateInstituteDto) {
@@ -88,7 +92,10 @@ export class InstituteService {
     return updatedInstitute;
   }
 
-  async updateInstitute(dto: UpdateInstituteDto, instituteId: string) {
+  async updateInstitute(
+    dto: Partial<UpdateInstituteDetailsDto>,
+    instituteId: string,
+  ) {
     const updatedInstitutePayload: Partial<InstituteDocument> = {
       official_email: dto.email,
       official_phone: dto.phone,
@@ -99,12 +106,12 @@ export class InstituteService {
       city: dto.city,
       state: dto.state,
       pincode: dto.pincode,
-      logo: dto.logo ? (new Types.ObjectId(dto.logo) as any) : undefined,
+      logo: new Types.ObjectId(dto.logo),
       establishedYear: dto.establishedYear,
     };
 
     // institute basic details updated
-    const updatedInstitute = await this.instituteModel.findByIdAndUpdate(
+    await this.instituteModel.findByIdAndUpdate(
       new Types.ObjectId(instituteId),
       updatedInstitutePayload,
       {
@@ -114,8 +121,8 @@ export class InstituteService {
 
     // update institue admin details
     const updatedAdminPayload: UpdateAdminDto = {
-      name: dto.adminName as string,
-      email: dto.adminEmail as string,
+      name: dto.adminName,
+      email: dto.adminEmail,
       contactInfo: {
         phone: dto.adminPhone as string,
       },
@@ -128,13 +135,13 @@ export class InstituteService {
       return { message: 'Institute admin not found' };
     }
 
-    const updatedAdmin = await this.adminService.updateAdmin(
+    await this.adminService.updateAdmin(
       instituteAdmins[0]._id.toString(),
       updatedAdminPayload,
     );
 
     // update programs
-    const programPayload: UpdateInstituteDto = {
+    const programPayload: Partial<UpdateInstituteDetailsDto> = {
       programs: dto.programs,
       departments: dto.departments,
     };
@@ -147,8 +154,18 @@ export class InstituteService {
     return instituteDetails;
   }
 
-  getInstituteDetails(instituteId: string) {
-    return this.academicService.getInstituteDetails(instituteId);
+  async getInstituteDetails(instituteId: string) {
+    const details = await this.academicService.getInstituteDetails(instituteId);
+    const admins =
+      await this.adminService.getFullAdminsByInstitute(instituteId);
+
+    const admin = admins[0];
+    return {
+      ...details,
+      adminName: admin.basicUserDetails.name,
+      adminEmail: admin.basicUserDetails.email,
+      adminPhone: admin.basicUserDetails.phone ?? '',
+    };
   }
 
   getInstituteProgramsDetails(instituteId: string) {
@@ -161,6 +178,22 @@ export class InstituteService {
 
   getInstituteStudents(instituteId: string) {
     return this.studentService.getInstituteStudents(instituteId);
+  }
+
+  async getInstituteStats(instituteId: string) {
+    const response = {
+      totalStudents:
+        await this.studentService.getInstituteStudentsCount(instituteId),
+      totalPrograms:
+        await this.academicService.getInstituteProgramsCount(instituteId),
+      totalDepartments:
+        await this.academicService.getInstituteDepartmentsCount(instituteId),
+      totalFaculty:
+        await this.facultyService.getInstituteFacultiesCount(instituteId),
+      totalActivities: 0,
+    };
+
+    return response;
   }
 
   // async getInstituteFullStructure(instituteId: string) {

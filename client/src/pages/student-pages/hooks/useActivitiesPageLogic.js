@@ -1,5 +1,6 @@
 import React from "react";
 import useAuthContext from "../../../hooks/useAuthContext";
+import { useGlobalContext } from "@/contexts/global-context";
 
 export default function useActivitiesPageLogic() {
   const [activities, setActivities] = React.useState(null);
@@ -7,12 +8,14 @@ export default function useActivitiesPageLogic() {
 
   const { user } = useAuthContext();
 
+  const { USER_ID, BACKEND_URL, INSITITUTE_ID } = useGlobalContext();
+
   /* ----------------------------------------------------
     STEP 1: GET ACCESS TOKEN
   ---------------------------------------------------- */
   async function getAccessToken() {
     const res = await fetch(
-      "http://localhost:3000/up-docs/access-token?folderName=activities-attachments"
+      `${BACKEND_URL}/up-docs/access-token?folderName=activities-attachments`
     );
     if (!res.ok) throw new Error("Failed to get upload token");
 
@@ -46,7 +49,7 @@ export default function useActivitiesPageLogic() {
     STEP 3: SAVE FILE METADATA TO BACKEND  (/up-docs)
   ---------------------------------------------------- */
   async function saveFileMeta(fileMeta) {
-    const res = await fetch("http://localhost:3000/up-docs", {
+    const res = await fetch(`${BACKEND_URL}/up-docs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -140,31 +143,31 @@ export default function useActivitiesPageLogic() {
     GET ALL ACTIVITIES OF STUDENT
   ---------------------------------------------------- */
   React.useEffect(() => {
-    if (activities === null) {
+    if (USER_ID) {
       (async function getAllActivities() {
         const res = await fetch(
-          `http://localhost:3000/activities?studentId=${user?._id}`
+          `${BACKEND_URL}/activities?studentId=${USER_ID}`
         );
         const responce = await res.json();
         setActivities(responce.data);
       })();
     }
-  }, [user, activities]);
+  }, [user, USER_ID, BACKEND_URL]);
 
   /* ----------------------------------------------------
     GET ACTIVITIE STATS
   ---------------------------------------------------- */
   React.useEffect(() => {
-    if (activities === null) {
+    if (USER_ID) {
       (async function getAllActivities() {
         const res = await fetch(
-          `http://localhost:3000/activities/stats?studentId=${user?._id}`
+          `${BACKEND_URL}/activities/stats?studentId=${USER_ID}`
         );
         const responce = await res.json();
         setActivityStats(responce.data);
       })();
     }
-  }, [user, activities]);
+  }, [user, activities, USER_ID, BACKEND_URL]);
 
   /* ----------------------------------------------------
     FILTER ACTIVITIES

@@ -20,6 +20,7 @@ import StudentManagementProvider from "@/pages/admin-pages/provider/student-mana
 import FacultyManagementProvider from "@/pages/admin-pages/provider/faculty-management.provider";
 import InstituteManagementProvider from "@/pages/admin-pages/provider/institute-management.provider";
 import ActivityTypeManagementPage from "@/pages/admin-pages/components/activity-type-management/page";
+import AdminPageProvider from "@/pages/admin-pages/provider/admin-page.provider";
 
 export default createBrowserRouter([
   {
@@ -93,7 +94,7 @@ export default createBrowserRouter([
     children: [
       {
         index: true,
-        Component: AdminDashboardPage,
+        Component: AdminPageProvider,
       },
       {
         path: "student-management",

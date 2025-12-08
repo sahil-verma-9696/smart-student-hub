@@ -114,8 +114,6 @@ export class AuthService {
       null;
     const role = user.role as USER_ROLE;
 
-    
-
     switch (role) {
       case USER_ROLE.STUDENT:
         userData = await this.studentService.getByUserId(user.userId);
@@ -162,12 +160,28 @@ export class AuthService {
 
     try {
       /****** 1. Create user + admin profile **************/
+      const createAdminDto: CreateAdminDto = dto.admin;
+
       const admin = await this.adminService.createAdmin(
         dto.admin,
         session,
       );
 
       /****** 2. Create institute **************/
+      const createInstituteDto: CreateInstituteDto = {
+        address_line1: dto.institute.address_line1,
+        addressLine2: dto.institute.addressLine2,
+        affiliation_id: dto.institute.affiliation_id,
+        affiliation_university: dto.institute.affiliation_university,
+        city: dto.institute.city,
+        institute_name: dto.institute.institute_name,
+        institute_type: dto.institute.institute_type,
+        official_email: dto.institute.official_email,
+        official_phone: dto.institute.official_phone,
+        pincode: dto.institute.pincode,
+        state: dto.institute.state,
+      };
+
       const institute = await this.instituteService.createInstitute(
         dto.institute,
         session,

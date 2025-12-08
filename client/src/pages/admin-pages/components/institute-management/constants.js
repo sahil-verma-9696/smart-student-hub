@@ -180,5 +180,4 @@ export const initialData = {
   adminEmail: "principal@nit.edu.in",
   adminPhone: "+91 9876543211",
   adminDesignation: "Principal",
-
 };
