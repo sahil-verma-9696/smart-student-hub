@@ -26,6 +26,7 @@ npm start
 ```
 
 
+admin4@nit.edu.in
 
 
 
@@ -56,10 +57,5 @@ npm install
 ```bash
 npm run dev
 ```
-
-4. for production 
-```bash
-npm start
-```
-
-
+admin4@nit.edu.in
+inst3admin@gmail.com

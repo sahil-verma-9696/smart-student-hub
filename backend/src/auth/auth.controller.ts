@@ -1,7 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import AdminRegistrationDto from './dto/adminRegistration.dto';
-import InstitueRegistrationDto from './dto/instituteRegistration.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import * as authType from './types/auth.type';
+import { RegisterInstituteDto } from './dto/register-institute.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,29 +27,33 @@ export class AuthController {
    * desc : Register Institute
    *********************************/
   @Post('institute/register')
-  register(@Body() istituteRegistrationDto: InstitueRegistrationDto) {
-    return this.authService.instituteRegistration(istituteRegistrationDto);
+  async register(@Body() body: RegisterInstituteDto) {
+    return await this.authService.registerInstitute(body);
   }
 
   /**********************************
-   * POST : auth/admin/register
+   * POST : auth/admin/login
    * Body : AdminRegistrationDto
    * Return : AdminRegistrationDto
    * desc : Register Admin
    *********************************/
-  @Post('admin/register')
-  adminRegistration(@Body() adminRegisterDto: AdminRegistrationDto) {
-    return this.authService.adminRegistration(adminRegisterDto);
+  @Post('user/login')
+  userLogin(@Body() userLoginDto: LoginDto) {
+    return this.authService.userLogin(userLoginDto);
   }
 
   /**********************************
-   * POST : auth/student/register
-   * Body : InstitueRegistrationDto
-   * Return : InstitueRegistrationDto
-   * desc : Register Student
+   * POST : auth/admin/login
+   * Body : AdminRegistrationDto
+   * Return : AdminRegistrationDto
+   * desc : Register Admin
    *********************************/
-  @Post('student/register')
-  studentRegistration(@Body() adminRegisterDto: AdminRegistrationDto) {
-    return this.authService.adminRegistration(adminRegisterDto);
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req: authType.AuthenticatedRequest) {
+    if (!req.user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.authService.me(req.user); // comes from JwtStrategy.validate()
   }
 }

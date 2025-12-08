@@ -3,13 +3,14 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  // Patch,
   Param,
-  Delete,
+  Patch,
+  // Delete,
 } from '@nestjs/common';
 import { InstituteService } from './institute.service';
-import { CreateInstituteDto } from './dto/create-institute.dto';
-import { UpdateInstituteDto } from './dto/update-institute.dto';
+import CreateInstituteDto from './dto/create-institute.dto';
+import UpdateInstituteDetailsDto from './dto/update-insitute-details.dto';
 
 @Controller('institute')
 export class InstituteController {
@@ -20,26 +21,41 @@ export class InstituteController {
     return this.instituteService.create(createInstituteDto);
   }
 
-  @Get()
-  findAll() {
-    return this.instituteService.findAll();
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.instituteService.findOne(+id);
+    return this.instituteService.getInstituteById(id);
   }
 
-  @Patch(':id')
+  @Patch(':id/institute-details')
   update(
     @Param('id') id: string,
-    @Body() updateInstituteDto: UpdateInstituteDto,
+    @Body() updateInstituteDto: UpdateInstituteDetailsDto,
   ) {
-    return this.instituteService.update(+id, updateInstituteDto);
+    return this.instituteService.updateInstitute(updateInstituteDto, id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.instituteService.remove(+id);
+  @Get(':id/institute-details')
+  getInstitute(@Param('id') id: string) {
+    return this.instituteService.getInstituteDetails(id);
   }
+
+  @Get(':id/programs')
+  getInstituteProgramDetails(@Param('id') id: string) {
+    return this.instituteService.getInstituteProgramsDetails(id);
+  }
+
+  @Get(':id/departments')
+  getInstituteDepartmentDetails(@Param('id') id: string) {
+    return this.instituteService.getInstituteDepartmentsDetails(id);
+  }
+
+  @Get(':id/students')
+  getInstituteStudents(@Param('id') id: string) {
+    return this.instituteService.getInstituteStudents(id);
+  }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.instituteService.remove(+id);
+  // }
 }
