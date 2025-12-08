@@ -21,5 +21,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "exclude": ["criterion4-nest", "criterion4-nest.backup", "**/*.backup", "node_modules", "dist"]
 }

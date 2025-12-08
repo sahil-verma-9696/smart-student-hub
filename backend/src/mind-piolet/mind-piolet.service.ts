@@ -10,18 +10,23 @@ import { AnalysisRequestDto } from './dto/analysis-request.dto';
 
 @Injectable()
 export class MindPioletService {
-  private model: ChatGroq;
+  private model: ChatGroq | null = null;
 
   constructor(
     @InjectModel(MindPiolet.name) private mindPioletModel: Model<MindPioletDocument>,
     private studentService: StudentService,
     private configService: ConfigService,
   ) {
-    this.model = new ChatGroq({
-      apiKey: this.configService.get<string>('GROQ_API_KEY'),
-      model: 'llama-3.1-8b-instant',
-      temperature: 0.7,
-    });
+    const apiKey = this.configService.get<string>('GROQ_API_KEY');
+    if (apiKey) {
+      this.model = new ChatGroq({
+        apiKey: apiKey,
+        model: 'llama-3.1-8b-instant',
+        temperature: 0.7,
+      });
+    } else {
+      console.warn('GROQ_API_KEY not found. MindPiolet AI features will be disabled.');
+    }
   }
 
   async analyzeSkills(userId: string, dto: AnalysisRequestDto) {
@@ -84,6 +89,10 @@ export class MindPioletService {
   }
 
   private async generateResponse(prompt: string): Promise<string> {
+    if (!this.model) {
+      return 'AI features are currently unavailable. Please configure the GROQ_API_KEY environment variable.';
+    }
+    
     try {
       console.log('--- Sending Request to Groq ---');
       console.log('Prompt Preview:', prompt.substring(0, 200) + '...');

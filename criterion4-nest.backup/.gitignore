@@ -1,0 +1,29 @@
+# Compiled output
+dist/
+*.js
+*.js.map
+*.d.ts
+
+# Exclude specific JS files if needed
+!jest.config.js
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*

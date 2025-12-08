@@ -18,6 +18,7 @@ import { AssignmentModule } from './assignment/assignment.module';
 import { MindPioletModule } from './mind-piolet/mind-piolet.module';
 import { NotificationModule } from './notification/notification.module';
 import { UserModule } from './user/user.module';
+import { Criterion4Module } from './criterion4/criterion4.module';
 
 @Module({
   imports: [
@@ -60,6 +61,8 @@ import { UserModule } from './user/user.module';
     NotificationModule,
 
     UserModule,
+
+    Criterion4Module,
   ],
   controllers: [AppController],
   providers: [AppService],

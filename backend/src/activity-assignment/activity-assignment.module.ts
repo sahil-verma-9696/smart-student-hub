@@ -9,7 +9,7 @@ import {
 import { Student, StudentSchema } from '../student/schema/student.schema';
 import { Faculty, FacultySchema } from '../faculty/schemas/faculty.schema';
 import { Academic, AcademicSchema } from '../academic/schema/academic.schema';
-import { Activity, ActivitySchema } from 'src/activity/schema/activity.schema';
+import { Activity, ActivitySchema } from '../activity/schema/acivity.schema';
 
 @Module({
   imports: [
