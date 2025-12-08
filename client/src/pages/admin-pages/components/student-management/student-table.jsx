@@ -65,11 +65,11 @@ import {
                   const userDetails = student.basicUserDetails || student;
                   return (
                   <TableRow key={student._id || student.id}>
-                    <TableCell className="font-medium">{userDetails.name || student.name}</TableCell>
-                    <TableCell>{userDetails.email || student.email}</TableCell>
+                    <TableCell className="font-medium">{userDetails.name}</TableCell>
+                    <TableCell>{userDetails.email}</TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="capitalize">
-                        {userDetails.gender || student.gender}
+                        {userDetails.gender}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -78,17 +78,17 @@ import {
                       )}
                     </TableCell>
                     <TableCell>
-                      {userDetails.contactInfo?.phone || student.contactInfo?.phone || (
+                      {userDetails.phone || (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {userDetails.contactInfo?.alternatePhone || student.contactInfo?.alternatePhone || (
+                      {userDetails.alternatePhone || (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {userDetails.contactInfo?.address || student.contactInfo?.address || (
+                      {userDetails.address || (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>

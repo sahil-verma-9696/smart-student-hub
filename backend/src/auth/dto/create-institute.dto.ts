@@ -14,7 +14,7 @@ import { DepartmentDto } from './sub/department.dto';
 import { ProgramDto } from './sub/program.dto';
 import { VerificationDto } from './sub/verification.dto';
 
-export default class CreateInstituteDto {
+export default class RegisterInstituteFormDto {
   @IsString()
   @IsOptional()
   instituteId: string;
@@ -47,7 +47,7 @@ export default class CreateInstituteDto {
   alternatePhone?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   website?: string;
 
   @IsString()

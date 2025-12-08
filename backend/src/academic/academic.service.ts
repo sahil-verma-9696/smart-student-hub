@@ -21,7 +21,7 @@ import { UpdateSpecializationDto } from 'src/auth/dto/sub/update-specialization.
 import { UpdateYearLevelDto } from 'src/auth/dto/sub/update-year-level.dto';
 import { UpdateSemesterDto } from 'src/auth/dto/sub/update-semester.dto';
 import { UpdateSectionDto } from 'src/auth/dto/sub/update-section.dto';
-import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
+import { UpdateInstituteDto } from 'src/institute/dto/update-institute.dto';
 import { UpdateDepartmentDto } from 'src/auth/dto/sub/update-department.dto';
 import Institute, {
   InstituteDocument,

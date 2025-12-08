@@ -88,29 +88,34 @@ export function CsvUpload({ onUpload }) {
 
           // Transform rows
           const students = [];
+          const requiredFields = ["name", "email", "gender", "roll_number", "phone", "branch", "degree", "program"];
 
           for (const row of data) {
-            const student = {};
+            const student = { valid: true };
 
             for (const key of CSV_CONFIG.requiredHeaders) {
               const headerKey = findHeaderKey(Object.keys(row), key);
               const value = row[headerKey];
 
-              if (!value) {
+              // Check if required field is missing
+              if (requiredFields.includes(key) && (!value || value.toString().trim() === "")) {
+                console.warn(`Row missing required field '${key}':`, row);
                 student.valid = false;
                 break;
               }
 
               if (key === "gender") {
-                const g = value.toLowerCase();
+                const g = value ? value.toLowerCase().trim() : "";
                 if (!["male", "female", "other"].includes(g)) {
+                  console.warn(`Invalid gender '${value}' in row:`, row);
                   student.valid = false;
+                  break;
                 }
                 student.gender = g;
               } else if (["phone", "alternatePhone"].includes(key)) {
-                student[key] = value.toString();
+                student[key] = value ? value.toString().trim() : "";
               } else {
-                student[key] = value;
+                student[key] = value ? value.toString().trim() : "";
               }
             }
 
@@ -121,11 +126,9 @@ export function CsvUpload({ onUpload }) {
               email: student.email,
               gender: student.gender,
               roll_number: student.roll_number,
-              contactInfo: {
-                phone: student.phone,
-                alternatePhone: student.alternatePhone,
-                address: student.address,
-              },
+              phone: student.phone,
+              alternatePhone: student.alternatePhone || "",
+              address: student.address || "",
               branch: student.branch,
               degree: student.degree,
               program: student.program,

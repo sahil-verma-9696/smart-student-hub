@@ -4,7 +4,7 @@ import Institute, { InstituteDocument } from './schemas/institute.schema';
 import { Model, Types } from 'mongoose';
 import CreateInstituteDto from './dto/create-institute.dto';
 import { ClientSession } from 'mongoose';
-import { UpdateInstituteDto } from 'src/auth/dto/update-institute.dto';
+import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { AdminService } from 'src/admin/admin.service';
 import { UpdateAdminDto } from 'src/admin/dto/update-admin.dto';
 import { AcademicService } from 'src/academic/academic.service';

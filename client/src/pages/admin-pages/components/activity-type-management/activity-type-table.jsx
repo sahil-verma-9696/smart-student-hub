@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, CheckCircle, XCircle, Copy, Eye } from "lucide-react";
+import { Edit, Trash2, CheckCircle, XCircle, Eye } from "lucide-react";
 
 export function ActivityTypeTable({
   activityTypes,
@@ -17,7 +17,6 @@ export function ActivityTypeTable({
   onDelete,
   onApprove,
   onReject,
-  onDuplicate,
   onPreview,
 }) {
   if (loading) {
@@ -89,15 +88,6 @@ export function ActivityTypeTable({
                     title="Preview"
                   >
                     <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDuplicate(type)}
-                    disabled={loading}
-                    title="Duplicate"
-                  >
-                    <Copy className="w-4 h-4" />
                   </Button>
                   {!type.isPrimitive && (
                     <>

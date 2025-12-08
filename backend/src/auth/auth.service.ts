@@ -63,19 +63,46 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    let userData: StudentDocument | AdminDocument | FacultyDocument | null = null;
+    let instituteId = '';
+
+    /****** Fetch role-specific document (Admin/Student/Faculty) **************/
+    try {
+      if (user.role === USER_ROLE.ADMIN) {
+        userData = await this.adminService.getByUserId(user._id.toString());
+      } else if (user.role === USER_ROLE.STUDENT) {
+        userData = await this.studentService.getByUserId(user._id.toString());
+      } else if (user.role === USER_ROLE.FACULTY) {
+        userData = await this.facultyService.getByUserId(user._id.toString());
+      }
+
+      if (userData && userData.institute) {
+        const instituteDoc = userData.institute as InstituteDocument;
+        instituteId = instituteDoc._id.toString();
+      }
+    } catch (error) {
+      console.log('Error fetching user profile during login:', error.message);
+      throw new NotFoundException('User profile not found');
+    }
+
+    if (!userData) {
+      throw new NotFoundException('User profile not found');
+    }
+
     const payload: JwtPayload = {
       email: user.email,
-      sub: user._id.toString(),
+      sub: userData._id.toString(),
       role: user.role,
       name: user.name,
-      userId: user._id.toString(),
+      userId: userData._id.toString(),
+      instituteId,
     };
 
     /****** Generate Token **************/
     const token = this.jwtService.sign(payload);
 
     return {
-      user,
+      user: userData,
       token,
       expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
       msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
@@ -135,36 +162,14 @@ export class AuthService {
 
     try {
       /****** 1. Create user + admin profile **************/
-      const createAdminDto: CreateAdminDto = {
-        contactInfo: dto.admin_contactInfo,
-        email: dto.admin_email,
-        gender: dto.admin_gender,
-        name: dto.admin_name,
-        password: dto.admin_password,
-      };
-
       const admin = await this.adminService.createAdmin(
-        createAdminDto,
+        dto.admin,
         session,
       );
 
       /****** 2. Create institute **************/
-      const createInstituteDto: CreateInstituteDto = {
-        address_line1: dto.inst_address_line1,
-        city: dto.inst_city,
-        institute_name: dto.inst_name,
-        institute_type: dto.inst_type,
-        official_email: dto.inst_email,
-        official_phone: dto.inst_phone,
-        pincode: dto.inst_pincode,
-        state: dto.inst_state,
-        is_affiliated: dto.inst_is_affiliated,
-        affiliation_id: dto.inst_affiliation_id,
-        affiliation_university: dto.inst_affiliation_university,
-      };
-
       const institute = await this.instituteService.createInstitute(
-        createInstituteDto,
+        dto.institute,
         session,
       );
 

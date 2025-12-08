@@ -101,13 +101,19 @@ export class ActivityTypeService {
 			status = 'PENDING'; // Students/Faculty need approval
 		}
 
+		// Sanitize formSchema by removing _id fields from subdocuments
+		const cleanFormSchema = dto.formSchema?.map((field: any) => {
+			const { _id, __v, ...cleanField } = field;
+			return cleanField;
+		}) ?? [];
+
 		// Build activity type document
 		const activityTypeData: any = {
 			name: dto.name.trim(),
 			description: dto.description?.trim() || '',
 			category: dto.category || 'other',
 			isPrimitive: dto.isPrimitive ?? false,
-			formSchema: dto.formSchema ?? [],
+			formSchema: cleanFormSchema,
 			minCredit: dto.minCredit ?? 0,
 			maxCredit: dto.maxCredit ?? 0,
 			status,

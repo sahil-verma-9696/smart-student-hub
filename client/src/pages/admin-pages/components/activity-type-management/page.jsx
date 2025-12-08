@@ -132,18 +132,6 @@ export default function ActivityTypeManagementPage() {
     }
   };
 
-  const handleDuplicate = (type) => {
-    const duplicatedType = {
-      ...type,
-      _id: undefined, // Clear ID so it creates new
-      name: `${type.name} (Copy)`,
-      status: "DRAFT", // Reset status
-      isPrimitive: false, // Duplicates are custom by default
-    };
-    setEditingType(duplicatedType);
-    setShowForm(true);
-  };
-
   const handleEdit = (type) => {
     setEditingType(type);
     setShowForm(true);
@@ -226,7 +214,6 @@ export default function ActivityTypeManagementPage() {
               onDelete={handleDelete}
               onApprove={handleApprove}
               onReject={handleReject}
-              onDuplicate={handleDuplicate}
               onPreview={setPreviewType}
             />
           )}

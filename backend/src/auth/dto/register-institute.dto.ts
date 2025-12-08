@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsObject, ValidateNested } from 'class-validator';
-import CreateInstituteDto from './create-institute.dto';
+import CreateInstituteDto from 'src/institute/dto/create-institute.dto';
 import { CreateAdminDto } from 'src/admin/dto/create-admin.dto';
 
 export class RegisterInstituteDto {
