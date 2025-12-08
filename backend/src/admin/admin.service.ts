@@ -100,6 +100,20 @@ export class AdminService implements IAdminService {
     return admins;
   }
 
+  async getAdminByBasicUserId(basicUserId: string): Promise<AdminDocument> {
+    const admin = await this.adminModel
+      .findOne({ basicUserDetails: new Types.ObjectId(basicUserId) })
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
+      .exec();
+
+    if (!admin) {
+      throw new NotFoundException(`Admin with basicUserDetails ${basicUserId} not found`);
+    }
+
+    return admin;
+  }
+
   async getByUserId(userId: string): Promise<AdminDocument> {
     const admin = await this.adminModel
       .findOne({ _id: new Types.ObjectId(userId) })

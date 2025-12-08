@@ -233,6 +233,20 @@ export class FacultyService {
     return 'Faculty deleted successfully';
   }
 
+  async getFacultyByBasicUserId(basicUserId: string) {
+    const faculty = await this.facultyModel
+      .findOne({ basicUserDetails: new Types.ObjectId(basicUserId) })
+      .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
+      .populate<{ institute: InstituteDocument }>('institute')
+      .exec();
+
+    if (!faculty) {
+      throw new NotFoundException(`Faculty with basicUserDetails ${basicUserId} not found`);
+    }
+
+    return faculty;
+  }
+
   async getByUserId(userId: string) {
     const faculty = await this.facultyModel
       .findOne({ _id: new Types.ObjectId(userId) })

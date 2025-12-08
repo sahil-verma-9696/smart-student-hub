@@ -35,6 +35,34 @@ export class Student {
 
   @Prop({ required: true, unique: true })
   roll_number: string;
+
+  // --- Mind Pilot Fields ---
+  @Prop({ type: [String], default: [] })
+  skills: string[];
+
+  @Prop({ type: [String], default: [] })
+  interests: string[];
+
+  @Prop({ type: [{ title: String, description: String }], default: [] })
+  projects: { title: string; description: string }[];
+
+  @Prop({ type: [String], default: [] })
+  achievements: string[];
+
+  @Prop({ type: [String], default: [] })
+  strengths: string[];
+
+  @Prop({ type: [String], default: [] })
+  weaknesses: string[];
+
+  @Prop({ type: [String], default: [] })
+  languages: string[];
+
+  @Prop({ default: 'Fresher' })
+  experience: string;
+
+  @Prop({ default: 'Software Engineer' })
+  target_role: string;
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);

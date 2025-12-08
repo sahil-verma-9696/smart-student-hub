@@ -69,11 +69,11 @@ export class AuthService {
     /****** Fetch role-specific document (Admin/Student/Faculty) **************/
     try {
       if (user.role === USER_ROLE.ADMIN) {
-        userData = await this.adminService.getByUserId(user._id.toString());
+        userData = await this.adminService.getAdminByBasicUserId(user._id.toString());
       } else if (user.role === USER_ROLE.STUDENT) {
-        userData = await this.studentService.getByUserId(user._id.toString());
+        userData = await this.studentService.getStudentByBasicUserId(user._id.toString());
       } else if (user.role === USER_ROLE.FACULTY) {
-        userData = await this.facultyService.getByUserId(user._id.toString());
+        userData = await this.facultyService.getFacultyByBasicUserId(user._id.toString());
       }
 
       if (userData && userData.institute) {
