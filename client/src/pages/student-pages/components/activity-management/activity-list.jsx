@@ -20,9 +20,11 @@ import {
   CheckCircle,
   AlertCircle,
   Hourglass,
+  Share2,
 } from "lucide-react";
 import { useActivityPageContext } from "@/pages/student-pages/hooks/useActivityPageContext";
 import { Image } from "antd";
+import ShareActivityModal from "./ShareActivityModal";
 
 export function ActivityList() {
   /*************************************************************
@@ -31,6 +33,14 @@ export function ActivityList() {
   const { activities, fetchFilteredActivities } = useActivityPageContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
+  const handleShare = (activity) => {
+    setSelectedActivity(activity);
+    setShareModalOpen(true);
+  };
 
   /************************************************************
    * ************* Activity Filters ***********************
@@ -130,15 +140,25 @@ export function ActivityList() {
         {/* Activities List */}
         <div className="space-y-4">
           {filteredActivities?.map((activity) => (
-            <ActivityCard key={activity._id} activity={activity} />
+            <ActivityCard
+              key={activity._id}
+              activity={activity}
+              onShare={handleShare}
+            />
           ))}
         </div>
+
+        <ShareActivityModal
+          open={shareModalOpen}
+          onOpenChange={setShareModalOpen}
+          activity={selectedActivity}
+        />
       </CardContent>
     </div>
   );
 }
 
-function ActivityCard({ activity }) {
+function ActivityCard({ activity, onShare }) {
   const statusIcon = {
     approved: <CheckCircle className="h-4 w-4 text-green-500" />,
     pending: <Hourglass className="h-4 w-4 text-yellow-500" />,
@@ -147,9 +167,14 @@ function ActivityCard({ activity }) {
 
   return (
     <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-      <div className="flex items-center gap-2">
-        {statusIcon}
-        <h3 className="font-semibold">{activity.title}</h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {statusIcon}
+          <h3 className="font-semibold">{activity.title}</h3>
+        </div>
+        <Button variant="ghost" size="icon" onClick={() => onShare(activity)}>
+          <Share2 className="h-4 w-4" />
+        </Button>
       </div>
 
       <p className="text-sm text-muted-foreground mt-2">

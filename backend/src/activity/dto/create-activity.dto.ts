@@ -1,74 +1,173 @@
-import { 
-  IsString, 
-  IsNotEmpty, 
-  IsOptional, 
-  IsArray, 
-  IsBoolean, 
-  IsObject, 
-  IsNumber, 
-  IsUrl 
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  // IsMongoId,
+  IsObject,
+  IsNumber,
+  ValidateIf,
+  IsArray,
+  IsDate,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { ACTIVITY_TYPES, ACTIVITY_STATUS } from '../types/enum';
 
-/**
- * CreateActivityDto
- * 
- * DTO for creating a new activity submission by a student.
- * 
- * VALIDATION RULES:
- * - activityTypeId: Must be valid and APPROVED (or primitive)
- * - title: Required, meaningful activity name
- * - details: Dynamic fields matching ActivityType.formSchema
- * - location: Required (physical or online location)
- * - attachments: Array of attachment ObjectIds
- * - skills: Array of skills acquired
- * - creditsEarned: Must be within ActivityType's minCredit-maxCredit range
- * - isPublic: Controls visibility (default: false/private)
- */
 export class CreateActivityDto {
   @IsString()
-  @IsNotEmpty()
-  activityTypeId: string; // ActivityType reference
+  title: string;
 
-  @IsString()
-  @IsNotEmpty()
-  title: string; // Short, meaningful title
-
-  @IsString()
   @IsOptional()
-  description?: string; // Detailed description (optional)
+  @IsString()
+  description?: string;
 
+  @IsString()
+  student: string;
+
+  @IsEnum(ACTIVITY_TYPES)
+  @IsOptional()
+  activityType?: ACTIVITY_TYPES;
+
+  @IsOptional()
+  @IsEnum(ACTIVITY_STATUS)
+  status?: ACTIVITY_STATUS;
+
+  @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  attachments?: string[]; // Array of Attachment ObjectIds
+  attachments?: string[];
 
-  @IsString()
-  @IsNotEmpty()
-  location: string; // Activity location
-
-  @IsString()
-  @IsOptional()
-  locationType?: string; // e.g., "Online", "On-Campus", "Off-Campus"
-
+  // -------------------------------------------
+  // CUSTOM
+  // -------------------------------------------
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.CUSTOM,
+  )
   @IsObject()
-  @IsOptional()
-  details?: Record<string, any>; // Dynamic fields based on ActivityType.formSchema
+  fields?: Record<string, any>;
 
-  @IsBoolean()
+  // -------------------------------------------
+  // HACKATHON
+  // -------------------------------------------
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
   @IsOptional()
-  isPublic?: boolean; // Visibility control (default: false)
-
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  skills?: string[]; // Skills acquired from activity
-
   @IsNumber()
-  @IsOptional()
-  creditsEarned?: number; // Credits earned (must be within min-max range)
+  teamSize?: number;
 
-  @IsUrl()
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
   @IsOptional()
-  externalUrl?: string; // External proof link (optional)
+  @IsString()
+  rank?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsString()
+  hackDescription?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsString()
+  level?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsString()
+  participantType?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsDate()
+  deadline?: Date;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsString()
+  organizer?: string;
+  // -------------------------------------------
+  // WORKSHOP
+  // -------------------------------------------
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
+  )
+  @IsOptional()
+  @IsString()
+  speaker?: string; 
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
+  )
+  @IsOptional()
+  @IsString()
+  mode?: string; 
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
+  )
+  @IsOptional()
+  @IsString()
+  duration?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
+  )
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  /****************************************
+   * Internship
+   *****************************************/
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  company?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  role?: string;
+  
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  inst_duration?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  inst_startDate?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  inst_endDate?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsString()
+  inst_paid?: string;
 }

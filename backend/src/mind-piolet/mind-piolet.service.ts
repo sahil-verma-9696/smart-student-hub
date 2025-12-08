@@ -17,25 +17,30 @@ export class MindPioletService {
     private studentService: StudentService,
     private configService: ConfigService,
   ) {
-    this.model = new ChatGroq({
-      apiKey: this.configService.get<string>('GROQ_API_KEY'),
-      model: 'llama-3.1-8b-instant',
-      temperature: 0.7,
-    });
+    const apiKey = this.configService.get<string>('GROQ_API_KEY');
+    if (apiKey) {
+      this.model = new ChatGroq({
+        apiKey: apiKey,
+        model: 'llama-3.1-8b-instant',
+        temperature: 0.7,
+      });
+    } else {
+      console.warn('GROQ_API_KEY not found. MindPiolet AI features will be disabled.');
+    }
   }
 
   async analyzeSkills(userId: string, dto: AnalysisRequestDto) {
     const student = await this.getStudentData(userId);
     const prompt = this.buildSkillAnalysisPrompt(student, dto);
     const response = await this.generateResponse(prompt);
-    
+
     await this.saveInteraction(userId, 'SKILL', dto, response);
     return { result: response };
   }
 
   async generateRoadmap(userId: string, dto: AnalysisRequestDto) {
     if (!dto.role) throw new Error('Role is required for roadmap generation');
-    
+
     const student = await this.getStudentData(userId);
     const prompt = this.buildRoadmapPrompt(student, dto);
     const response = await this.generateResponse(prompt);
@@ -62,11 +67,11 @@ export class MindPioletService {
   private async getStudentData(userId: string) {
     const student = await this.studentService.getByUserId(userId);
     if (!student) throw new NotFoundException('Student not found');
-    
+
     // Map Mongoose document to plain object structure expected by prompts
     const basic = student.basicUserDetails as any;
     const academic = student.academicDetails as any;
-    
+
     return {
       name: basic.name,
       email: basic.email,
@@ -85,6 +90,9 @@ export class MindPioletService {
 
   private async generateResponse(prompt: string): Promise<string> {
     try {
+      if (!this.model) {
+        return "I apologize, but the AI service is currently unavailable (API Key missing). Please contact the administrator.";
+      }
       console.log('--- Sending Request to Groq ---');
       console.log('Prompt Preview:', prompt.substring(0, 200) + '...');
       const response = await this.model.invoke([new HumanMessage(prompt)]);
@@ -110,8 +118,8 @@ export class MindPioletService {
   // --- PROMPT BUILDERS (Ported from Python) ---
 
   private buildSkillAnalysisPrompt(student: any, dto: AnalysisRequestDto): string {
-    const conversationText = dto.conversation 
-      ? dto.conversation.map(m => `${m.role}: ${m.content}`).join('\n') 
+    const conversationText = dto.conversation
+      ? dto.conversation.map(m => `${m.role}: ${m.content}`).join('\n')
       : '';
     const targetRole = dto.role?.trim() || student.target_role || 'Not Specified';
     const hasTargetRole = targetRole.toLowerCase() !== 'not specified';
@@ -188,19 +196,19 @@ ${hasTargetRole ? `- Advice must be relevant to the role "${targetRole}". If a s
   }
 
   private buildRoadmapPrompt(student: any, dto: AnalysisRequestDto): string {
-    const conversationText = dto.conversation 
-      ? dto.conversation.map(m => `${m.role}: ${m.content}`).join('\n') 
+    const conversationText = dto.conversation
+      ? dto.conversation.map(m => `${m.role}: ${m.content}`).join('\n')
       : '';
 
     const targetRole = dto.role?.trim() || student.target_role || 'Not Specified';
     const hasProjects = student.projects.length > 0;
     const projectsSummary = hasProjects
       ? student.projects
-          .map((p: any) => {
-            const details = p.description ? `: ${p.description}` : '';
-            return `- ${p.title}${details}`;
-          })
-          .join('\n')
+        .map((p: any) => {
+          const details = p.description ? `: ${p.description}` : '';
+          return `- ${p.title}${details}`;
+        })
+        .join('\n')
       : '- No projects completed yet';
 
     const lines: string[] = [
@@ -272,9 +280,9 @@ ${hasTargetRole ? `- Advice must be relevant to the role "${targetRole}". If a s
     const hasProjects = student.projects.length > 0;
     const projectsList = hasProjects
       ? student.projects
-          .slice(0, 3)
-          .map((p: any) => `     - ${p.title}: ${p.description || 'No description provided'}`)
-          .join('\n')
+        .slice(0, 3)
+        .map((p: any) => `     - ${p.title}: ${p.description || 'No description provided'}`)
+        .join('\n')
       : '     - No projects yet';
 
     const lines: string[] = [

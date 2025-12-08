@@ -31,8 +31,6 @@ const StudentLayout = () => {
     { name: "Fastfolo", href: "/student/fastfolo", icon: DockIcon },
     { name: "Mind Piolet", href: "/student/mind-piolet", icon: Brain },
     { name: "Private Vault", href: "/student/private-vault", icon: Lock },
-    { name: "Share Achivos", href: "/student/share-achivos", icon: ShareIcon },
-
 
     { name: "Settings", href: "/student/setting", icon: Settings },
     {

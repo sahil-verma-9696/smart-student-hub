@@ -91,7 +91,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    let userData: StudentDocument | AdminDocument | FacultyDocument | null = null;
+    // Re-initialize userData for detailed fetch
+    userData = null;
     let instituteId = '';
 
     /****** Fetch role-specific document (Admin/Student/Faculty) **************/

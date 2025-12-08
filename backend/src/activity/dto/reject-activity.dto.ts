@@ -1,13 +1,7 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-/**
- * RejectActivityDto
- * 
- * DTO for admin to reject an activity.
- * Rejection reason is mandatory.
- */
 export class RejectActivityDto {
+  @IsNotEmpty({ message: 'Remarks are required when rejecting an activity' })
   @IsString()
-  @IsNotEmpty()
-  reason: string; // Mandatory rejection reason
+  remarks: string;
 }
