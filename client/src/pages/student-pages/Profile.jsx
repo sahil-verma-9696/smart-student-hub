@@ -7,8 +7,8 @@ import { Separator } from "@/components/ui/separator";
 import { MapPin, Mail, Phone, User, Landmark } from "lucide-react";
 import { useProfilePageContext } from "./contexts/profile-page-context";
 
-export default function Profile({ student }) {
-  const { profileData: user } = useProfilePageContext();
+export default function Profile() {
+  const { profileData: user, activities } = useProfilePageContext();
 
   if (!user) return null;
 
@@ -94,8 +94,8 @@ export default function Profile({ student }) {
 
         <CardContent>
           <div className="space-y-6 relative">
-            {student?.activities?.length > 0 ? (
-              student?.activities.map((activity, index) => (
+            {activities?.length > 0 ? (
+              activities.map((activity, index) => (
                 <ActivityItem
                   key={index}
                   title={activity.title}

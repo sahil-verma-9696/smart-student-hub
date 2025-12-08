@@ -21,6 +21,8 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { UserDocument } from 'src/user/schema/user.schema';
 import { InstituteDocument } from 'src/institute/schemas/institute.schema';
 import { AcademicDocument } from 'src/academic/schema/academic.schema';
+import { SearchActivityDto } from 'src/activity/dto/search-activity.dto';
+import { ActivityService } from 'src/activity/activity.service';
 
 @Injectable()
 export class StudentService {
@@ -33,6 +35,7 @@ export class StudentService {
     // Services
     private readonly userService: UserService,
     private readonly academicService: AcademicService,
+    private readonly activityService: ActivityService,
   ) {}
 
   /***************************************
@@ -469,6 +472,15 @@ export class StudentService {
         ],
       })
       .exec();
+  }
+
+  getStudentActivities(studentId: string, query: SearchActivityDto) {
+    const filter = {
+      studentId: studentId,
+      ...query,
+    };
+
+    return this.activityService.findAll(filter);
   }
 }
 type StudentFilter = Record<string, unknown>;
