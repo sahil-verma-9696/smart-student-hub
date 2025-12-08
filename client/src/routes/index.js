@@ -65,7 +65,7 @@ export default createBrowserRouter([
         Component: Settings,
       },
       {
-        path: "profile",
+        path: "profile/:studentId",
         Component: ProfilePageProvider,
       },
     ],
@@ -129,6 +129,10 @@ export default createBrowserRouter([
       {
         path: "settings",
         Component: AdminSettingsPage,
+      },
+      {
+        path: "student-profile/:studentId",
+        Component: ProfilePageProvider,
       },
     ],
   },

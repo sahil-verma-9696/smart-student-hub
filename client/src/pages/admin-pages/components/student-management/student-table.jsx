@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Users } from "lucide-react";
+import { Link } from "react-router";
 
 export function StudentTable({ students, onDelete }) {
   if (students.length === 0) {
@@ -66,7 +67,9 @@ export function StudentTable({ students, onDelete }) {
                 return (
                   <TableRow key={student._id || student.id}>
                     <TableCell className="font-medium">
-                      {userDetails.name || student.name}
+                      <Link to={`/admin/student-profile/${student._id || student.id}`}>
+                        {userDetails.name || student.name}
+                      </Link>
                     </TableCell>
                     <TableCell>{userDetails.email || student.email}</TableCell>
                     <TableCell>
@@ -90,10 +93,9 @@ export function StudentTable({ students, onDelete }) {
                       )}
                     </TableCell> */}
                     <TableCell>
-                      {userDetails?.address ||
-                        student.contactInfo?.address || (
-                          <span className="text-muted-foreground">—</span>
-                        )}
+                      {userDetails?.address || student.contactInfo?.address || (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
