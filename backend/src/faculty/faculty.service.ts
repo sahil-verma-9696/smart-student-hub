@@ -67,13 +67,18 @@ export class FacultyService {
     const user = await this.userService.createUser(userDto, session);
 
     /** STEP 2 — Create Faculty */
+    // Validate and convert department to ObjectId
+    if (!dto.department || !Types.ObjectId.isValid(dto.department)) {
+      throw new BadRequestException('Valid department ObjectId is required');
+    }
+
     const createdFaculty = await this.facultyModel.create(
       [
         {
           basicUserDetails: new Types.ObjectId(user._id),
           institute: new Types.ObjectId(dto.instituteId),
           employee_code: dto.employee_code,
-          department: dto.department,
+          department: new Types.ObjectId(dto.department),
           designation: dto.designation,
         },
       ],

@@ -79,6 +79,12 @@ export class StudentService {
     /** STEP 2 — Create AcademicDetails using AcademicService */
     const academic = await this.academicService.create({
       studentId: null,
+      program: new Types.ObjectId(dto.program),
+      degree: new Types.ObjectId(dto.degree),
+      branch: dto.branch ? new Types.ObjectId(dto.branch) : undefined,
+      specialization: dto.specialization ? new Types.ObjectId(dto.specialization) : undefined,
+      currentYear: dto.currentYear,
+      currentSemester: dto.currentSemester,
     });
 
     /** STEP 3 — Create Student with academicDetails ref */

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import storageKeys from "@/common/storage-keys";
 
 const API_BASE_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
 
@@ -6,17 +7,30 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
   },
 });
 
 // Add auth token interceptor if needed
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem(storageKeys.accessToken) || localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+// Log errors for debugging
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.error('401 Unauthorized - Token may be invalid or expired');
+      console.log('Current token:', localStorage.getItem(storageKeys.accessToken) || localStorage.getItem('token'));
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const studentAPI = {
   // Create single student
@@ -189,6 +203,81 @@ export const activityAPI = {
     const response = await apiClient.patch(`/activities/${id}/rejected`, { remarks });
     return response.data;
   },
+};
+
+export const activityTypeAPI = {
+  // Get all activity types
+  getAll: async () => {
+    const response = await apiClient.get('/activity-types');
+    return response.data;
+  },
+
+  // Get single activity type
+  getOne: async (id) => {
+    const response = await apiClient.get(`/activity-types/${id}`);
+    return response.data;
+  },
+
+  // Create activity type
+  create: async (data) => {
+    const response = await apiClient.post('/activity-types', data);
+    return response.data;
+  },
+
+  // Update activity type
+  update: async (id, data) => {
+    const response = await apiClient.patch(`/activity-types/${id}`, data);
+    return response.data;
+  },
+
+  // Delete activity type
+  delete: async (id) => {
+    const response = await apiClient.delete(`/activity-types/${id}`);
+    return response.data;
+  },
+
+  // Approve activity type
+  approve: async (id) => {
+    const response = await apiClient.patch(`/activity-types/${id}/approve`);
+    return response.data;
+  },
+
+  // Reject activity type
+  reject: async (id) => {
+    const response = await apiClient.patch(`/activity-types/${id}/reject`);
+    return response.data;
+  },
+};
+
+export const activityAssignmentAPI = {
+  getAll: async (params) => {
+    const response = await apiClient.get('/activity-assignment', { params });
+    return response.data;
+  },
+  create: async (data) => {
+    const response = await apiClient.post('/activity-assignment', data);
+    return response.data;
+  },
+  update: async (id, data) => {
+    const response = await apiClient.patch(`/activity-assignment/${id}`, data);
+    return response.data;
+  },
+  delete: async (id) => {
+    const response = await apiClient.delete(`/activity-assignment/${id}`);
+    return response.data;
+  },
+  assignFaculty: async (activityId, facultyId) => {
+    const response = await apiClient.patch(`/activity-assignment/${activityId}/assign`, { facultyId });
+    return response.data;
+  },
+  reassignFaculty: async (activityId, newFacultyId) => {
+    const response = await apiClient.patch(`/activity-assignment/${activityId}/reassign`, { newFacultyId });
+    return response.data;
+  },
+  unassignFaculty: async (activityId) => {
+    const response = await apiClient.patch(`/activity-assignment/${activityId}/unassign`);
+    return response.data;
+  }
 };
 
 export default apiClient;

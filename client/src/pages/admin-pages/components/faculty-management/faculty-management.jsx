@@ -44,10 +44,17 @@ export function FacultyManagement() {
    *********************************************************/
   const addFaculty = async (facultyData) => {
     const payload = {
-      ...facultyData,
-      instituteId: INSTITUTE_ID,
+      name: facultyData.name,
+      email: facultyData.email,
       password: facultyData.email, // email === password
+      gender: facultyData.gender,
+      employee_code: facultyData.employee_code,
+      department: facultyData.department, // Required department ObjectId
+      designation: facultyData.designation || undefined,
+      contactInfo: facultyData.contactInfo,
+      instituteId: INSTITUTE_ID,
     };
+    console.log("add faculty data", payload);
 
     try {
       setLoading(true);

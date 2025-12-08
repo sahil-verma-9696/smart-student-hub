@@ -50,6 +50,11 @@ export default function useCheckAuthenticity({
 
         const payload = await res.json();
 
+        // Update token if provided (Token Refresh/Upgrade)
+        if (payload?.data?.token) {
+          localStorage.setItem(storageKeys.accessToken, payload.data.token);
+        }
+
         const user = payload?.data?.userData;
         const userInfo = payload?.data?.userData?.basicUserDetails;
         const userRole = userInfo?.role;

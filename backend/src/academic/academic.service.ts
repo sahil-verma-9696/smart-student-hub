@@ -71,6 +71,12 @@ export class AcademicService {
     section?: string;
     backlogs?: number; // 🔥 NEW
     studentId?: string | null;
+    program?: Types.ObjectId;
+    degree?: Types.ObjectId;
+    branch?: Types.ObjectId;
+    specialization?: Types.ObjectId;
+    currentYear?: number;
+    currentSemester?: number;
   }): Promise<AcademicDocument> {
     const created = await this.academicModel.create({
       department: details.department,
@@ -79,6 +85,12 @@ export class AcademicService {
       section: details.section,
       backlogs: details.backlogs ?? 0, // 🔥 NEW
       student: details.studentId ? new Types.ObjectId(details.studentId) : null,
+      program: details.program,
+      degree: details.degree,
+      branch: details.branch,
+      specialization: details.specialization,
+      currentYear: details.currentYear ?? 1,
+      currentSemester: details.currentSemester ?? 1,
     });
 
     return created;

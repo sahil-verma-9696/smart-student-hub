@@ -8,6 +8,7 @@ import { StudentModule } from './student/student.module';
 import { InstituteModule } from './institute/institute.module';
 import { FacultyModule } from './faculty/faculty.module';
 import { ActivityModule } from './activity/activity.module';
+import { ActivityTypeModule } from './activity-type/activity-type.module';
 import { AdminModule } from './admin/admin.module';
 import { UpDocsModule } from './up-docs/up-docs.module';
 import { AttachmentModule } from './attachment/attachment.module';
@@ -37,6 +38,8 @@ import { UserModule } from './user/user.module';
     InstituteModule,
 
     ActivityModule,
+
+    ActivityTypeModule,
 
     FacultyModule,
 

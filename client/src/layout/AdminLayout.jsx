@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Users,
   Building2,
+  Tag,
 } from "lucide-react";
 
 const adminNavigation = [
@@ -18,6 +19,7 @@ const adminNavigation = [
   { name: "Student Panel", href: "/admin/student-management", icon: Users },
   { name: "Faculty Panel", href: "/admin/faculty-management", icon: Users },
   { name: "Activities", href: "/admin/activities", icon: Trophy },
+  { name: "Activity Types", href: "/admin/activity-types", icon: Tag },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Institue", href: "/admin/institue", icon: Building2 },
   { name: "Settings", href: "/admin/settings", icon: Settings },
