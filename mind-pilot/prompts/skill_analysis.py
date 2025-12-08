@@ -15,15 +15,34 @@ def analyze_skills(student, gap, message="", conversation=None):
     if conversation:
         conversation_text = "\n".join([f"{msg.get('role', 'User')}: {msg.get('content', '')}" for msg in conversation])
 
+    # Extract student details with fallbacks for personalization
+    student_name = student.get("name") or student.get("profile", {}).get("name", "Student")
+    student_email = student.get("email", "")
+    student_education = student.get("education") or student.get("profile", {}).get("education", "N/A")
+    student_skills = student.get("skills") or student.get("profile", {}).get("skills", [])
+    student_interests = student.get("interests") or student.get("profile", {}).get("interests", [])
+    student_projects = student.get("projects", [])
+    student_achievements = student.get("achievements", [])
+    student_strengths = student.get("strengths", [])
+    student_weaknesses = student.get("weaknesses", [])
+    student_languages = student.get("languages", [])
+    student_role = student.get("target_role", "Software Engineer")
+
     prompt = f"""
-You are **MindPilot**, an expert career advisor.
+You are **MindPilot**, an expert career advisor providing HIGHLY PERSONALIZED analysis for {student_name}.
 
 **Student Profile:**
-- Name: {student.get("profile", {}).get("name", "Student")}
-- Age: {student.get("profile", {}).get("age", "N/A")}
-- Education: {student.get("profile", {}).get("education", "N/A")}
-- Current Skills: {student.get("profile", {}).get("skills", [])}
-- Interests: {student.get("profile", {}).get("interests", [])}
+- Name: {student_name}
+- Email: {student_email}
+- Education: {student_education}
+- Target Role: {student_role}
+- Current Skills: {student_skills if student_skills else 'None listed'}
+- Languages: {student_languages if student_languages else 'None listed'}
+- Interests: {student_interests if student_interests else 'None listed'}
+- Projects Completed: {len(student_projects)} projects
+- Achievements: {student_achievements if student_achievements else 'None listed'}
+- Key Strengths: {student_strengths if student_strengths else 'None identified'}
+- Areas for Growth: {student_weaknesses if student_weaknesses else 'None identified'}
 
 **Gap Analysis:**
 {gap}

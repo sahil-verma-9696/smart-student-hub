@@ -15,21 +15,45 @@ def generate_roadmap(student, gap, role, message="", conversation=None):
     conversation_text = ""
     if conversation:
         conversation_text = "\n".join([f"{msg.get('role', 'User')}: {msg.get('content', '')}" for msg in conversation])
+    
+    # Extract detailed student information for personalization
+    student_name = student.get("name", "Student")
+    student_email = student.get("email", "Not Provided")
+    student_education = student.get("education", "Not Provided")
+    student_skills = student.get("skills", [])
+    student_languages = student.get("languages", [])
+    student_projects = student.get("projects", [])
+    student_achievements = student.get("achievements", [])
+    student_strengths = student.get("strengths", [])
+    student_weaknesses = student.get("weaknesses", [])
+    student_experience = student.get("experience", "Fresher")
+    student_job_description = student.get("job_description", "Not Provided")
+    
+    # Format projects with details
+    projects_summary = ""
+    if student_projects:
+        projects_summary = "\n".join([f"  • {p.get('title', 'Project')}: {p.get('description', '')}" for p in student_projects])
+    else:
+        projects_summary = "  • No projects completed yet"
+    
     prompt = f"""
-You are **MindPilot**, an industry-level career mentor who generates **100% role-specific** and **fully personalized** guidance.
+You are **MindPilot**, an industry-level career mentor creating a **100% personalized roadmap** for {student_name}.
 
-Below is the student's profile:
-- Name: {student.get("name", "Student")}
-- Email: {student.get("email", "Not Provided")}
-- Education: {student.get("education", "Not Provided")}
-- Skills: {student.get("skills", [])}
-- Projects: {student.get("projects", [])}
-- Achievements: {student.get("achievements", [])}
-- Strengths: {student.get("strengths", [])}
-- Weaknesses: {student.get("weaknesses", [])}
-- Job Description (target): {student.get("job_description", "Not Provided")}
+**Candidate Profile:**
+- Name: {student_name}
+- Email: {student_email}
+- Education: {student_education}
+- Experience Level: {student_experience}
+- Programming Languages: {student_languages if student_languages else 'None listed'}
+- Current Skills: {student_skills if student_skills else 'None listed'}
+- Projects Completed:
+{projects_summary}
+- Key Achievements: {student_achievements if student_achievements else 'None listed'}
+- Key Strengths: {student_strengths if student_strengths else 'None listed'}
+- Areas for Growth: {student_weaknesses if student_weaknesses else 'None listed'}
+- Target Job Description: {student_job_description}
 
-Target Role: **{role}**
+**Target Role:** {role}
 
 **Conversation History:**
 {conversation_text}

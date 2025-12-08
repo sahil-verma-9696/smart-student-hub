@@ -12,13 +12,45 @@ model = ChatGroq(
 )
 
 def interview_prep(student, role, conversation, message=""):
+    # Extract student details for highly personalized interview prep
+    student_name = student.get("name", "Student")
+    student_education = student.get("education", "Not Provided")
+    student_skills = student.get("skills", [])
+    student_projects = student.get("projects", [])
+    student_achievements = student.get("achievements", [])
+    student_experience = student.get("experience", "Fresher")
+    student_strengths = student.get("strengths", [])
+    
+    # Format projects for reference
+    projects_list = ""
+    if student_projects:
+        projects_list = "\n".join([f"    • {p.get('title', 'Project')}: {p.get('description', '')}" for p in student_projects[:3]])  # Top 3
+    
     prompt = f"""
-You are an **Industry-Level Role-Specific Interview Preparation AI**.
-Generate **ONLY relevant interview preparation content** for the role:
+You are an **Industry-Level Role-Specific Interview Preparation AI** preparing {student_name} for interviews.
+
 🎯 **Target Job Role: {role}**
+👤 **Candidate: {student_name}**
+   - Education: {student_education}
+   - Experience Level: {student_experience}
+   - Skills: {student_skills if student_skills else 'None listed'}
+   - Key Strengths: {student_strengths if student_strengths else 'None identified'}
+
+📋 **Candidate's Portfolio:**
+   - Projects:
+{projects_list if projects_list else '     No projects yet'}
+   - Achievements: {student_achievements if student_achievements else 'None listed'}
 
 **User Request/Context:**
 "{message}"
+
+---
+
+## 📌 PERSONALIZATION RULES
+- Address {student_name} by name when giving advice
+- Reference their specific projects and achievements in examples
+- Consider their experience level ({student_experience}) when suggesting interview difficulty
+- Build confidence by highlighting their strengths: {student_strengths}
 
 ---
 
