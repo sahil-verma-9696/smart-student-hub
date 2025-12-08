@@ -13,10 +13,14 @@ import { CreateAssignmentDto } from '../assignment/dto/create-assignment.dto';
 import { BulkAssignDto } from '../assignment/dto/bulk-assign.dto';
 import { ReassignActivityDto } from '../assignment/dto/reassign-activity.dto';
 import { QueryAssignmentDto } from '../assignment/dto/query-assignment.dto';
+import { AdminService } from './admin.service';
 
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly assignmentService: AssignmentService) {}
+  constructor(
+    private readonly assignmentService: AssignmentService,
+    private readonly adminService: AdminService,
+  ) {}
 
   /**
    * Admin: Assign a single activity to a faculty
@@ -81,4 +85,9 @@ export class AdminController {
   async getFacultyAssignmentCounts(@Param('instituteId') instituteId: string) {
     return this.assignmentService.getFacultyAssignmentCounts(instituteId);
   }
+
+  // @Get(':id/dashboard')
+  // getDashboard(@Param('id') id: string) {
+  //   return this.adminService.getDashboard(id);
+  // }
 }

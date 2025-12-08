@@ -6,11 +6,14 @@ import {
   // Patch,
   Param,
   Patch,
+  Query,
   // Delete,
 } from '@nestjs/common';
 import { InstituteService } from './institute.service';
 import CreateInstituteDto from './dto/create-institute.dto';
 import UpdateInstituteDetailsDto from './dto/update-insitute-details.dto';
+import { InstituteQueryDto } from './dto/query-institute.dto';
+import { SearchActivityDto } from 'src/activity/dto/search-activity.dto';
 
 @Controller('institute')
 export class InstituteController {
@@ -59,8 +62,11 @@ export class InstituteController {
     return this.instituteService.getInstituteStats(id);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.instituteService.remove(+id);
-  // }
+  @Get(':id/activities')
+  getInstituteActivities(
+    @Param('id') id: string,
+    @Query() query: SearchActivityDto,
+  ) {
+    return this.instituteService.getInstituteActivities(id, query);
+  }
 }

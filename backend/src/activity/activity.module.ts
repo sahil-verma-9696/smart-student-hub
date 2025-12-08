@@ -34,5 +34,6 @@ import { NotificationModule } from 'src/notification/notification.module';
   ],
   controllers: [ActivityController],
   providers: [ActivityService],
+  exports: [ActivityService],
 })
 export class ActivityModule {}

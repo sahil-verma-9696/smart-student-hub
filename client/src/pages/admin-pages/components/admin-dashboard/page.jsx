@@ -21,25 +21,17 @@ import { useState } from "react";
 import useAuthContext from "@/hooks/useAuthContext";
 import { formatDistanceToNow } from "date-fns";
 import { useGlobalContext } from "@/contexts/global-context";
-import useAdminInstPageContext from "../../hooks/useAdminInst.context";
 import { useAdminPageContext } from "../../context/admin-page.context";
+import { Link } from "react-router";
 
 export default function AdminDashboardPage() {
   const [recentItems, setRecentItems] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
-  const [stats, setStats] = useState({
-    totalStudents: 0,
-    totalFaculty: 0,
-    departments: 0,
-    pendingRequests: 0,
-  });
 
   const { user } = useAuthContext();
-  const { institutePrograms, instituteDepartments } = useGlobalContext();
 
   const { instituteStats } = useAdminPageContext();
 
-  if (instituteStats) console.log(instituteStats);
 
   return (
     <div className="min-h-screen max-h-screen overflow-y-auto bg-[#f8f9fa]">
@@ -118,24 +110,14 @@ export default function AdminDashboardPage() {
               <CardDescription>Perform common tasks quickly</CardDescription>
             </CardHeader>
 
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button className="w-full bg-black text-white hover:bg-neutral-800">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Register Student
-              </Button>
-
-              <Button className="w-full bg-black text-white hover:bg-neutral-800">
-                <Users className="w-4 h-4 mr-2" />
-                Register Faculty
-              </Button>
-
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
               {/* FIXED BUTTON STYLE */}
               <Button className="w-full bg-black text-white hover:bg-neutral-800">
-                Manage Students
+                <Link to={"/admin/student-management"}>Manage Students</Link>
               </Button>
 
               <Button className="w-full bg-black text-white hover:bg-neutral-800">
-                Manage Faculty
+                <Link to={"/admin/faculty-management"}>Manage Faculty</Link>
               </Button>
             </CardContent>
           </Card>

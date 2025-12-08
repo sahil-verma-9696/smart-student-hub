@@ -1,61 +1,62 @@
-# Smart Student Hub
 
-## Backend_setup
+# Users
 
-1. set terminal to backend directory
-```bash
-cd backend
-```
+POST : /users Create a new user
+PATCH : /users/:id Update an existing user
+DELETE : /users/:id Delete a user
+GET : /users Get all users
+GET : /users/:id Get a user
 
-1. install the dependency that present in package.json (first time and when ever sync with branch)
-```bash
-npm install
-```
+# Admins
 
-### Create .env.production and .env.development 
-and ask those secret from owner or maintainer
-
-3. for development 
-```bash
-npm run dev
-```
-
-4. for production 
-```bash
-npm start
-```
+POST : /admins Create a new admin
+PATCH : /admins/:id Update an existing admin
+DELETE : /admins/:id Delete an admin
+GET : /admins Get all admins
+GET : /admins/:id Get an admin  
 
 
-admin4@nit.edu.in
+# Students
 
+POST : /students Create a new student
+PATCH : /students/:id Update an existing student
+DELETE : /students/:id Delete a student
+GET : /students Get all students
+GET : /students/:id Get a student
+GET : /students/:id/activities Get all activities for a student
 
+# Faculties
 
-## Frontend_setup
+POST : /faculties Create a new faculty
+PATCH : /faculties/:id Update an existing faculty
+DELETE : /faculties/:id Delete a faculty
+GET : /faculties Get all faculties
+GET : /faculties/:id Get a faculty
 
-1. set terminal to frontend directory
-```bash
-cd frontend
-```
+GET : /faculties/:id/
 
-### Run this command only time 
+# Activities
 
-```bash
-mkdir certs
-openssl req -x509 -newkey rsa:2048 -nodes -keyout certs/key.pem -out certs/cert.pem -days 365 -subj "/CN=localhost"
-```
+POST : /activities Create a new activity
+PATCH : /activities/:id Update an existing activity
+DELETE : /activities/:id Delete an activity
+GET : /activities Get all activities
+GET : /activities/:id Get an activity
 
-### Create .env.production and .env.development 
-and ask those secret from owner or maintainer
+# Auth
 
-2. install the dependency that present in package.json (first time and when ever sync with branch)
-```bash
-npm install
-```
+POST : /auth/login login a user using email + password  
+POST : /auth/register-institute register a new institute along with its first admin
 
+# Institutes
 
-3. for development 
-```bash
-npm run dev
-```
-admin4@nit.edu.in
-inst3admin@gmail.com
+POST : /institutes Create a new institute
+PATCH : /institutes/:id Update an existing institute
+DELETE : /institutes/:id Delete an institute
+GET : /institutes Get all institutes
+GET : /institutes/:id Get an institute
+
+GET : /institutes/:id/faculties Get all faculties for an institute
+GET : /institutes/:id/students Get all students for an institute
+GET : /institutes/:id/admins Get all admins for an institute
+GET : /institutes/:id/activities Get all activities for an institute
