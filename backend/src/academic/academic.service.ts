@@ -175,6 +175,10 @@ export class AcademicService {
     return this.programModel.find({ institute: instituteId });
   }
 
+  async getInstituteProgramsCount(instituteId: string) {
+    return this.programModel.countDocuments({ institute: instituteId });
+  }
+
   async updateProgram(id: string, dto: any) {
     const program = await this.programModel.findByIdAndUpdate(id, dto, {
       new: true,
@@ -240,6 +244,14 @@ export class AcademicService {
   async getDepartments(instituteId: string) {
     const instituteObjectId = new Types.ObjectId(instituteId);
     return this.departmentModel.find({ institute: instituteObjectId });
+  }
+
+  async getInstituteDepartmentsCount(instituteId: string) {
+    const instituteObjectId = new Types.ObjectId(instituteId);
+
+    return this.departmentModel.countDocuments({
+      institute: instituteObjectId,
+    });
   }
 
   async updateDepartment(id: string, dto: any) {

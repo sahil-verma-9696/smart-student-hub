@@ -11,6 +11,7 @@ import { UpdateAdminDto } from 'src/admin/dto/update-admin.dto';
 import { AcademicService } from 'src/academic/academic.service';
 import { StudentService } from 'src/student/student.service';
 import UpdateInstituteDetailsDto from './dto/update-insitute-details.dto';
+import { FacultyService } from 'src/faculty/faculty.service';
 // `inst3admin@gmail.com
 @Injectable()
 export class InstituteService {
@@ -19,6 +20,7 @@ export class InstituteService {
     private readonly adminService: AdminService,
     private readonly academicService: AcademicService,
     private readonly studentService: StudentService,
+    private readonly facultyService: FacultyService,
   ) {}
 
   async create(createInstituteDto: CreateInstituteDto) {
@@ -162,7 +164,7 @@ export class InstituteService {
       ...details,
       adminName: admin.basicUserDetails.name,
       adminEmail: admin.basicUserDetails.email,
-      adminPhone: admin.basicUserDetails.contactInfo.phone ?? '',
+      adminPhone: admin.basicUserDetails.phone ?? '',
     };
   }
 
@@ -176,6 +178,22 @@ export class InstituteService {
 
   getInstituteStudents(instituteId: string) {
     return this.studentService.getInstituteStudents(instituteId);
+  }
+
+  async getInstituteStats(instituteId: string) {
+    const response = {
+      totalStudents:
+        await this.studentService.getInstituteStudentsCount(instituteId),
+      totalPrograms:
+        await this.academicService.getInstituteProgramsCount(instituteId),
+      totalDepartments:
+        await this.academicService.getInstituteDepartmentsCount(instituteId),
+      totalFaculty:
+        await this.facultyService.getInstituteFacultiesCount(instituteId),
+      totalActivities: 0,
+    };
+
+    return response;
   }
 
   // async getInstituteFullStructure(instituteId: string) {
