@@ -56,6 +56,34 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    const userId = user._id.toString();
+
+    if (!userId) {
+      throw new BadRequestException('User id is required');
+    }
+
+    let userData: StudentDocument | AdminDocument | FacultyDocument | null =
+      null;
+
+    const role = user.role as USER_ROLE;
+
+    switch (role) {
+      case USER_ROLE.STUDENT:
+        userData = await this.studentService.getByUserId(userId);
+        break;
+      case USER_ROLE.FACULTY:
+        userData = await this.facultyService.getByUserId(userId);
+        break;
+      case USER_ROLE.ADMIN:
+        userData = await this.adminService.getByUserId(userId);
+        break;
+      default:
+        break;
+    }
+    if (!userData) {
+      throw new NotFoundException('User not found');
+    }
+
     /****** Validate Password **************/
     const isValidPassword = await user.comparePassword(password);
 
@@ -68,15 +96,16 @@ export class AuthService {
       sub: user._id.toString(),
       role: user.role,
       name: user.name,
-      userId: user._id.toString(),
+      userId: userId,
     };
 
     /****** Generate Token **************/
     const token = this.jwtService.sign(payload);
 
     return {
-      user,
+      user: userData,
       token,
+      instituteId: userData?.institute?._id.toString(),
       expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
       msg: `User ${user.name} (role: ${user.role}) successfully logged in`,
     };
@@ -87,15 +116,21 @@ export class AuthService {
       null;
     const role = user.role as USER_ROLE;
 
+    const userId = user.userId;
+
+    if (!userId) {
+      throw new BadRequestException('User id is required');
+    }
+
     switch (role) {
       case USER_ROLE.STUDENT:
-        userData = await this.studentService.getByUserId(user.userId);
+        userData = await this.studentService.getByUserId(userId);
         break;
       case USER_ROLE.FACULTY:
-        userData = await this.facultyService.getByUserId(user.userId);
+        userData = await this.facultyService.getByUserId(userId);
         break;
       case USER_ROLE.ADMIN:
-        userData = await this.adminService.getByUserId(user.userId);
+        userData = await this.adminService.getByUserId(userId);
         break;
       default:
         break;
@@ -112,7 +147,7 @@ export class AuthService {
       sub: userData._id.toString(),
       role: user.role,
       name: user.name,
-      userId: userData._id.toString(),
+      userId: userId,
       instituteId: institute._id.toString(),
     };
 

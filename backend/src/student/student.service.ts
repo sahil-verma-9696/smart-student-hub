@@ -321,7 +321,7 @@ export class StudentService {
    ***************************************/
   async getByUserId(userId: string) {
     const student = await this.studentModel
-      .findOne({ _id: new Types.ObjectId(userId) })
+      .findOne({ basicUserDetails: new Types.ObjectId(userId) })
       .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
       .populate<{ institute: InstituteDocument }>('institute')
       .populate<{ adademicDetails: AcademicDocument }>('academicDetails')
