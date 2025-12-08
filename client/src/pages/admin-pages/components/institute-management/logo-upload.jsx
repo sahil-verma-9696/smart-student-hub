@@ -9,6 +9,8 @@ export function LogoUpload({
 }) {
   return (
     <div className="space-y-3">
+      {currentLogo?.url && <Image src={currentLogo.url} width={200} />}
+
       {editable && (
         <LogoFilePond
           folderName="institute-logo"
@@ -17,7 +19,6 @@ export function LogoUpload({
           onRemove={() => onRemove()}
         />
       )}
-      {!editable && <Image src={currentLogo.url} width={200} />}
     </div>
   );
 }

@@ -21,6 +21,10 @@ import FacultyManagementProvider from "@/pages/admin-pages/provider/faculty-mana
 import InstituteManagementProvider from "@/pages/admin-pages/provider/institute-management.provider";
 import ActivityTypeManagementPage from "@/pages/admin-pages/components/activity-type-management/page";
 import AdminPageProvider from "@/pages/admin-pages/provider/admin-page.provider";
+import Profile from "@/pages/student-pages/Profile";
+import ProfilePageProvider from "@/pages/student-pages/provider/profile-page-provider";
+import { Share } from "lucide-react";
+import ShareAchivos from "@/pages/student-pages/ShareAchivos";
 
 export default createBrowserRouter([
   {
@@ -63,9 +67,14 @@ export default createBrowserRouter([
         Component: Settings,
       },
       {
-        path: "profile",
-        Component: Settings,
+        path: "profile/:studentId",
+        Component: ProfilePageProvider,
       },
+      {
+        path: "share-achivos",
+        Component: ShareAchivos,
+
+      }
     ],
   },
   {
@@ -127,6 +136,10 @@ export default createBrowserRouter([
       {
         path: "settings",
         Component: AdminSettingsPage,
+      },
+      {
+        path: "student-profile/:studentId",
+        Component: ProfilePageProvider,
       },
     ],
   },

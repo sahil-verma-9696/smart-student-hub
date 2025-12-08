@@ -249,7 +249,7 @@ export class FacultyService {
 
   async getByUserId(userId: string) {
     const faculty = await this.facultyModel
-      .findOne({ _id: new Types.ObjectId(userId) })
+      .findOne({ basicUserDetails: new Types.ObjectId(userId) })
       .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
       .populate<{ institute: InstituteDocument }>('institute')
       .exec();

@@ -338,7 +338,7 @@ export class StudentService {
 
   async getByUserId(userId: string) {
     const student = await this.studentModel
-      .findOne({ _id: new Types.ObjectId(userId) })
+      .findOne({ basicUserDetails: new Types.ObjectId(userId) })
       .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
       .populate<{ institute: InstituteDocument }>('institute')
       .populate<{ academicDetails: AcademicDocument }>('academicDetails')
@@ -468,6 +468,24 @@ export class StudentService {
   getInstituteStudentsCount(instituteId: string) {
     const instituteObjId = new Types.ObjectId(instituteId);
     return this.studentModel.countDocuments({ institute: instituteObjId });
+  }
+
+  getStudentDetails(studentId: string) {
+    const studentObjId = new Types.ObjectId(studentId);
+    return this.studentModel
+      .findById(studentObjId)
+      .populate('basicUserDetails', '-passwordHash')
+      .populate({
+        path: 'academicDetails',
+        populate: [
+          { path: 'program', model: 'Program' },
+          { path: 'degree', model: 'Degree' },
+          { path: 'branch', model: 'Branch' },
+          { path: 'specialization', model: 'Specialization' },
+          { path: 'section', model: 'Section' },
+        ],
+      })
+      .exec();
   }
 }
 type StudentFilter = Record<string, unknown>;

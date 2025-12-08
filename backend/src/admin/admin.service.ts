@@ -116,7 +116,7 @@ export class AdminService implements IAdminService {
 
   async getByUserId(userId: string): Promise<AdminDocument> {
     const admin = await this.adminModel
-      .findOne({ _id: new Types.ObjectId(userId) })
+      .findOne({ basicUserDetails: new Types.ObjectId(userId) })
       .populate<{ basicUserDetails: UserDocument }>('basicUserDetails')
       .populate<{ institute: InstituteDocument }>('institute')
       .exec();

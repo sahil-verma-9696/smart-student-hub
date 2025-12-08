@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar, Clock, GraduationCap, Target, Plus } from "lucide-react"
 
 export function StudentOverview() {
+  
   return (
     <div className="space-y-6">
       {/* Academic Progress Card */}
@@ -87,40 +88,7 @@ export function StudentOverview() {
       </Card>
 
       {/* Current Semester Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Semester - Fall 2024</CardTitle>
-          <CardDescription>Enrolled courses and progress tracking</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[
-              { code: "CS301", name: "Data Structures & Algorithms", progress: 75, grade: "A-" },
-              { code: "CS302", name: "Database Management Systems", progress: 82, grade: "A" },
-              { code: "CS303", name: "Computer Networks", progress: 68, grade: "B+" },
-              { code: "CS304", name: "Software Engineering", progress: 90, grade: "A+" },
-            ].map((course) => (
-              <div key={course.code} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <Badge variant="secondary" className="text-xs">
-                      {course.code}
-                    </Badge>
-                    <span className="font-medium text-sm">{course.name}</span>
-                  </div>
-                  <div className="mt-2">
-                    <Progress value={course.progress} className="h-1.5" />
-                  </div>
-                </div>
-                <div className="ml-4 text-right">
-                  <Badge variant={course.grade.startsWith("A") ? "default" : "outline"}>{course.grade}</Badge>
-                  <div className="text-xs text-muted-foreground mt-1">{course.progress}%</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+     
     </div>
   )
 }

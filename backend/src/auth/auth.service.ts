@@ -37,7 +37,7 @@ export class AuthService {
     private readonly studentService: StudentService,
     private readonly facultyService: FacultyService,
     @InjectConnection() private readonly connection: Connection,
-  ) {}
+  ) { }
   /*******************************************
    * User Login
    *******************************************/
@@ -53,6 +53,34 @@ export class AuthService {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const userId = user._id.toString();
+
+    if (!userId) {
+      throw new BadRequestException('User id is required');
+    }
+
+    let userData: StudentDocument | AdminDocument | FacultyDocument | null =
+      null;
+
+    const role = user.role as USER_ROLE;
+
+    switch (role) {
+      case USER_ROLE.STUDENT:
+        userData = await this.studentService.getByUserId(userId);
+        break;
+      case USER_ROLE.FACULTY:
+        userData = await this.facultyService.getByUserId(userId);
+        break;
+      case USER_ROLE.ADMIN:
+        userData = await this.adminService.getByUserId(userId);
+        break;
+      default:
+        break;
+    }
+    if (!userData) {
       throw new NotFoundException('User not found');
     }
 
@@ -94,8 +122,7 @@ export class AuthService {
       sub: userData._id.toString(),
       role: user.role,
       name: user.name,
-      userId: userData._id.toString(),
-      instituteId,
+      userId: userId,
     };
 
     /****** Generate Token **************/
@@ -114,15 +141,21 @@ export class AuthService {
       null;
     const role = user.role as USER_ROLE;
 
+    const userId = user.userId;
+
+    if (!userId) {
+      throw new BadRequestException('User id is required');
+    }
+
     switch (role) {
       case USER_ROLE.STUDENT:
-        userData = await this.studentService.getByUserId(user.userId);
+        userData = await this.studentService.getByUserId(userId);
         break;
       case USER_ROLE.FACULTY:
-        userData = await this.facultyService.getByUserId(user.userId);
+        userData = await this.facultyService.getByUserId(userId);
         break;
       case USER_ROLE.ADMIN:
-        userData = await this.adminService.getByUserId(user.userId);
+        userData = await this.adminService.getByUserId(userId);
         break;
       default:
         break;
@@ -139,7 +172,7 @@ export class AuthService {
       sub: userData._id.toString(),
       role: user.role,
       name: user.name,
-      userId: userData._id.toString(),
+      userId: userId,
       instituteId: institute._id.toString(),
     };
 
@@ -148,6 +181,7 @@ export class AuthService {
 
     return {
       userData,
+      institute,
       token,
       expires_in: Number(process.env.JWT_EXPIRES_IN_MILI),
       msg: `User ${user.name} (role: ${user.role}) authenticated successfully`,

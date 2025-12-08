@@ -2,11 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ActivityAssignmentController } from './activity-assignment.controller';
 import { ActivityAssignmentService } from './activity-assignment.service';
-import { ActivityAssignment, ActivityAssignmentSchema } from './schema/activity-assignment.schema';
-import { Activity, ActivitySchema } from '../activity/schema/acivity.schema';
+import {
+  ActivityAssignment,
+  ActivityAssignmentSchema,
+} from './schema/activity-assignment.schema';
 import { Student, StudentSchema } from '../student/schema/student.schema';
 import { Faculty, FacultySchema } from '../faculty/schemas/faculty.schema';
 import { Academic, AcademicSchema } from '../academic/schema/academic.schema';
+import { Activity, ActivitySchema } from 'src/activity/schema/activity.schema';
 
 @Module({
   imports: [

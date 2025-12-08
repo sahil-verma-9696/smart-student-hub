@@ -20,9 +20,9 @@ const adminNavigation = [
   { name: "Faculty Panel", href: "/admin/faculty-management", icon: Users },
   { name: "Activities", href: "/admin/activities", icon: Trophy },
   { name: "Activity Types", href: "/admin/activity-types", icon: Tag },
-  { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { name: "Institue", href: "/admin/institue", icon: Building2 },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+  // { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { name: "Settings", href: "/admin/institue", icon: Settings },
+  // { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 const AdminLayout = () => {
   return (
