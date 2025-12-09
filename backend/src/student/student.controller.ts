@@ -114,6 +114,6 @@ export class StudentController {
   }
   @Get(':id/mind-piolet-data')
   getMindPioletData(@Param('id') id: string) {
-    return mindPioletData;
+    return this.studentService.getMindPioletData(id);
   }
 }

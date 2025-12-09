@@ -612,6 +612,218 @@ export const ActivityConfig = {
         section: 'status'
       }
     ],
-  }
+  },
 
+   // ---------------------------------------------------
+  //  P R O J E C T
+  // ---------------------------------------------------
+  project: {
+    label: "Project",
+    fields: [
+      // BASIC
+      { name: "title", label: "Project Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Project Description",
+        type: "textarea",
+        section: "basic",
+      },
+
+      // DETAILS
+      {
+        name: "techStack",
+        label: "Tech Stack",
+        type: "tags",
+        section: "details",
+        placeholder: "e.g. React, Node.js, MongoDB",
+      },
+      {
+        name: "duration",
+        label: "Duration",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "startDate",
+        label: "Start Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "endDate",
+        label: "End Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "teamSize",
+        label: "Team Size",
+        type: "number",
+        section: "details",
+      },
+      {
+        name: "role",
+        label: "Role",
+        type: "text",
+        section: "details",
+      },
+    ],
+  },
+
+  // ---------------------------------------------------
+  //  R E S E A R C H
+  // ---------------------------------------------------
+  research: {
+    label: "Research",
+    fields: [
+      // BASIC
+      { name: "title", label: "Research Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Research Description",
+        type: "textarea",
+        section: "basic",
+      },
+
+      // DETAILS
+      {
+        name: "field",
+        label: "Field of Research",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "duration",
+        label: "Duration",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "startDate",
+        label: "Start Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "endDate",
+        label: "End Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "published",
+        label: "Published",
+        type: "radio",
+        section: "details",
+        options: [
+          { label: "Yes", value: "yes" },
+          { label: "No", value: "no" },
+        ],
+      },
+      {
+        name: "publicationLink",
+        label: "Publication Link",
+        type: "text",
+        section: "details",
+      },
+    ],
+  },
+
+  // ---------------------------------------------------
+  //  V O L U N T E E R I N G
+  // ---------------------------------------------------
+  volunteering: {
+    label: "Volunteering",
+    fields: [
+      // BASIC
+      { name: "title", label: "Activity Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Activity Description",
+        type: "textarea",
+        section: "basic",
+      },
+
+      // DETAILS
+      {
+        name: "organization",
+        label: "Organization",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "duration",
+        label: "Duration",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "startDate",
+        label: "Start Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "endDate",
+        label: "End Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "role",
+        label: "Role",
+        type: "text",
+        section: "details",
+      },
+    ],
+  },
+
+  // ---------------------------------------------------
+  //  C O M P E T I T I O N
+  // ---------------------------------------------------
+  competition: {
+    label: "Competition",
+    fields: [
+      // BASIC
+      { name: "title", label: "Competition Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Competition Description",
+        type: "textarea",
+        section: "basic",
+      },
+
+      // DETAILS
+      {
+        name: "level",
+        label: "Level",
+        type: "select",
+        section: "details",
+        options: [
+          { label: "College Level", value: "college" },
+          { label: "State Level", value: "state" },
+          { label: "National Level", value: "national" },
+          { label: "International Level", value: "international" },
+        ],
+      },
+      {
+        name: "organizer",
+        label: "Organizer",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "date",
+        label: "Date",
+        type: "date",
+        section: "details",
+      },
+      {
+        name: "rank",
+        label: "Rank",
+        type: "text",
+        section: "details",
+      },
+    ],
+  },
 };

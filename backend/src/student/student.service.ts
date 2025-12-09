@@ -485,5 +485,9 @@ export class StudentService {
     console.log(filter, studentId, 'filter');
     return this.activityService.findAll(filter);
   }
+
+  getMindPioletData(studentId: string) {
+    return this.activityService.getActivitiesByStudentId(studentId);
+  }
 }
 type StudentFilter = Record<string, unknown>;

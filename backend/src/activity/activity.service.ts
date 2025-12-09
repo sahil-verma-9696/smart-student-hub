@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PipelineStage, Types } from 'mongoose';
 
 import { Activity, ActivityDocument } from './schema/activity.schema';
-import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { SearchActivityDto } from './dto/search-activity.dto';
 import { ApproveActivityDto } from './dto/approve-activity.dto';
@@ -434,5 +433,10 @@ export class ActivityService {
       .find({ institute: instituteObjId })
       .sort({ createdAt: -1 })
       .limit(10);
+  }
+
+  getActivitiesByStudentId(studentId: string) {
+    const studentObjId = new Types.ObjectId(studentId);
+    return this.activityModel.find({ student: studentObjId });
   }
 }
