@@ -61,7 +61,7 @@ export function ActivityList() {
     params.activityType = typeFilter;
 
     setSearchParams(params);
-  }, [searchTerm, setSearchParams, statusFilter, typeFilter]);
+  }, [searchTerm, statusFilter, typeFilter]);
 
   // 2. Fetch backend-filtered data when URL changes
   useEffect(() => {
@@ -78,7 +78,7 @@ export function ActivityList() {
     console.log(filters);
 
     fetchFilteredActivities(filters);
-  }, [fetchFilteredActivities, searchParams]);
+  }, [searchParams]);
 
   // backend already filtered the data
   const filteredActivities = activities;

@@ -119,6 +119,8 @@ export class StudentService {
   async bulkCreateStudents(dto: BulkCreateStudentDto) {
     const { instituteId, students } = dto;
 
+    this.studentModel.syncIndexes();
+
     if (!Array.isArray(students)) {
       throw new Error('Invalid students array');
     }

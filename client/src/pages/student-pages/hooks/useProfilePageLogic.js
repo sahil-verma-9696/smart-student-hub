@@ -1,4 +1,3 @@
-import { USER_ROLE } from "@/common/enum";
 import { useGlobalContext } from "@/contexts/global-context";
 import React from "react";
 import toast from "react-hot-toast";
@@ -14,7 +13,7 @@ export default function useProfilePageLogic() {
 
   // GET : PROFILE DATA
   React.useEffect(() => {
-    if (USER_ID) {
+    if (USER_ID && !profileData) {
       (async function getProfileData() {
         try {
           const res = await fetch(`${BACKEND_URL}/student/${studentId}`, {
@@ -37,11 +36,11 @@ export default function useProfilePageLogic() {
         }
       })();
     }
-  }, [USER_ID, BACKEND_URL, userRole, studentId]);
+  }, [USER_ID, BACKEND_URL, userRole]);
 
   // GET : Student Activities
   React.useEffect(() => {
-    if (USER_ID) {
+    if (USER_ID && !activities) {
       (async function getProfileData() {
         try {
           const res = await fetch(
@@ -67,9 +66,9 @@ export default function useProfilePageLogic() {
         }
       })();
     }
-  }, [USER_ID, BACKEND_URL, userRole, studentId]);
+  }, [USER_ID, BACKEND_URL, userRole]);
   return {
     profileData,
-    activities
+    activities,
   };
 }

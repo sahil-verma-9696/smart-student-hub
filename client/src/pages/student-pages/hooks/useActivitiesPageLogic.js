@@ -165,7 +165,7 @@ export default function useActivitiesPageLogic() {
         setActivityStats(responce.data);
       })();
     }
-  }, [activities, USER_ID, BACKEND_URL]);
+  }, [USER_ID, BACKEND_URL]);
 
   /* ----------------------------------------------------
     FILTER ACTIVITIES
