@@ -476,10 +476,11 @@ export class StudentService {
 
   getStudentActivities(studentId: string, query: SearchActivityDto) {
     const filter = {
-      studentId: studentId,
       ...query,
+      studentId: studentId,
     };
 
+    console.log(filter, studentId, 'filter');
     return this.activityService.findAll(filter);
   }
 }

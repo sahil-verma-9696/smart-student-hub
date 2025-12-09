@@ -206,8 +206,8 @@ export class InstituteService {
 
   getInstituteActivities(instituteId: string, query: SearchActivityDto) {
     const filter = {
-      instituteId: instituteId,
       ...query,
+      instituteId: instituteId,
     };
     return this.activityService.findAll(filter);
   }

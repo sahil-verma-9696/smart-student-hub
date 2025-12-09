@@ -23,6 +23,7 @@ import ActivityTypeManagementPage from "@/pages/admin-pages/components/activity-
 import AdminPageProvider from "@/pages/admin-pages/provider/admin-page.provider";
 import Profile from "@/pages/student-pages/Profile";
 import ProfilePageProvider from "@/pages/student-pages/provider/profile-page-provider";
+import ActivityDetailsPageProvider from "@/providers/activity-details-page-provider";
 
 export default createBrowserRouter([
   {
@@ -32,6 +33,10 @@ export default createBrowserRouter([
      * *********************** Public Routes *****************************
      * ***********************************************************************/
     children: [],
+  },
+  {
+    path: "/activities/:activityId",
+    Component: ActivityDetailsPageProvider,
   },
   {
     path: "/student",

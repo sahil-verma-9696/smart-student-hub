@@ -47,6 +47,8 @@ export class ActivityService {
   async findAll(query: SearchActivityDto) {
     const filter: FilterQuery<ActivityDocument> = {};
 
+    console.log(query);
+
     // --- normal filters on Activity fields ---
     if (query.activityType) {
       filter.activityType = query.activityType;

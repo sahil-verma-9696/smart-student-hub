@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { CardContent, Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -61,7 +61,7 @@ export function ActivityList() {
     params.activityType = typeFilter;
 
     setSearchParams(params);
-  }, [searchTerm, statusFilter, typeFilter]);
+  }, [searchTerm, setSearchParams, statusFilter, typeFilter]);
 
   // 2. Fetch backend-filtered data when URL changes
   useEffect(() => {
@@ -78,7 +78,7 @@ export function ActivityList() {
     console.log(filters);
 
     fetchFilteredActivities(filters);
-  }, [searchParams]);
+  }, [fetchFilteredActivities, searchParams]);
 
   // backend already filtered the data
   const filteredActivities = activities;
@@ -149,7 +149,9 @@ function ActivityCard({ activity }) {
     <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
       <div className="flex items-center gap-2">
         {statusIcon}
-        <h3 className="font-semibold">{activity.title}</h3>
+        <Link to={`/activities/${activity?._id}`}>
+          <h3 className="font-semibold">{activity.title}</h3>
+        </Link>
       </div>
 
       <p className="text-sm text-muted-foreground mt-2">
