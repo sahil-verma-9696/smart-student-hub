@@ -30,7 +30,7 @@ export default function AdminAnalyticsPage() {
           </CardContent>
         </Card>
 
-        
+
 
         {/* BAR – Year-wise Strength */}
         <Card className="shadow-lg rounded-2xl p-4">

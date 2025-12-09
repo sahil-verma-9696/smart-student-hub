@@ -35,4 +35,4 @@ import { NotificationModule } from 'src/notification/notification.module';
   controllers: [ActivityController],
   providers: [ActivityService],
 })
-export class ActivityModule {}
+export class ActivityModule { }

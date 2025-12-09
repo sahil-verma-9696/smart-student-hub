@@ -6,6 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { MapPin, Mail, Phone, User, Landmark } from "lucide-react";
 import { useProfilePageContext } from "./contexts/profile-page-context";
+import { RecentActivities } from "./scholar-window/recent-activities";
 
 export default function Profile({ student }) {
   const { profileData: user } = useProfilePageContext();
@@ -87,31 +88,7 @@ export default function Profile({ student }) {
       </Card>
 
       {/* ---------- ACTIVITIES SECTION ---------- */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Student Activities</CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          <div className="space-y-6 relative">
-            {student?.activities?.length > 0 ? (
-              student?.activities.map((activity, index) => (
-                <ActivityItem
-                  key={index}
-                  title={activity.title}
-                  description={activity.description}
-                  date={activity.date}
-                  icon={<Landmark className="h-4 w-4" />}
-                />
-              ))
-            ) : (
-              <p className="text-muted-foreground text-center py-4">
-                No activities recorded.
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <RecentActivities showAll={true} hideNavigation={true} studentId={user?._id} />
     </div>
   );
 }

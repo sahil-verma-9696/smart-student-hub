@@ -5,25 +5,27 @@ import { useGlobalContext } from "@/contexts/global-context";
 /**
  * Custom hook for fetching and managing student activities
  */
-export default function useStudentActivities() {
+export default function useStudentActivities(studentId) {
   const [activities, setActivities] = useState([]);
   const [activityStats, setActivityStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const { user } = useAuthContext();
   const { BACKEND_URL } = useGlobalContext();
 
+  const targetId = studentId || user?._id;
+
   // Fetch all activities for the student
   const fetchActivities = async (filters = {}) => {
-    if (!user?._id || !BACKEND_URL) return;
+    if (!targetId || !BACKEND_URL) return;
 
     try {
       setLoading(true);
       setError(null);
 
       const params = new URLSearchParams();
-      params.set("studentId", user._id);
+      params.set("studentId", targetId);
 
       // Add filters if provided
       if (filters.title && filters.title !== "*") {
@@ -56,11 +58,11 @@ export default function useStudentActivities() {
 
   // Fetch activity statistics
   const fetchActivityStats = async () => {
-    if (!user?._id || !BACKEND_URL) return;
+    if (!targetId || !BACKEND_URL) return;
 
     try {
       const res = await fetch(
-        `${BACKEND_URL}/activities/stats?studentId=${user._id}`,
+        `${BACKEND_URL}/activities/stats?studentId=${targetId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access-token")}`,
@@ -93,10 +95,10 @@ export default function useStudentActivities() {
 
       // Remove from local state
       setActivities((prev) => prev.filter((a) => a._id !== activityId));
-      
+
       // Refresh stats
       fetchActivityStats();
-      
+
       return true;
     } catch (err) {
       console.error("Error deleting activity:", err);
@@ -121,12 +123,12 @@ export default function useStudentActivities() {
       if (!res.ok) throw new Error("Failed to update activity");
 
       const response = await res.json();
-      
+
       // Update local state
       setActivities((prev) =>
         prev.map((a) => (a._id === activityId ? response.data : a))
       );
-      
+
       return response.data;
     } catch (err) {
       console.error("Error updating activity:", err);
@@ -136,11 +138,11 @@ export default function useStudentActivities() {
 
   // Initial fetch on mount
   useEffect(() => {
-    if (user && BACKEND_URL) {
+    if (targetId && BACKEND_URL) {
       fetchActivities();
       fetchActivityStats();
     }
-  }, [user, BACKEND_URL]);
+  }, [targetId, BACKEND_URL]);
 
   return {
     activities,

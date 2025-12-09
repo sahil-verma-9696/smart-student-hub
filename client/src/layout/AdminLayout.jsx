@@ -12,6 +12,7 @@ import {
   Users,
   Building2,
   Tag,
+  PackageIcon,
 } from "lucide-react";
 
 const adminNavigation = [
@@ -22,7 +23,11 @@ const adminNavigation = [
   { name: "Activity Types", href: "/admin/activity-types", icon: Tag },
   // { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Settings", href: "/admin/institue", icon: Settings },
-  // { name: "Settings", href: "/admin/settings", icon: Settings },
+  {
+    name: "ReportGenerator",
+    href: "/admin/reports",
+    icon: PackageIcon,
+  },
 ];
 const AdminLayout = () => {
   return (

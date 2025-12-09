@@ -10,7 +10,7 @@ import { AnalysisRequestDto } from './dto/analysis-request.dto';
 
 @Injectable()
 export class MindPioletService {
-  private model: ChatGroq;
+  private model: ChatGroq | null = null;
 
   constructor(
     @InjectModel(MindPiolet.name) private mindPioletModel: Model<MindPioletDocument>,
@@ -89,6 +89,10 @@ export class MindPioletService {
   }
 
   private async generateResponse(prompt: string): Promise<string> {
+    if (!this.model) {
+      return 'AI features are currently unavailable. Please configure the GROQ_API_KEY environment variable.';
+    }
+    
     try {
       if (!this.model) {
         return "I apologize, but the AI service is currently unavailable (API Key missing). Please contact the administrator.";

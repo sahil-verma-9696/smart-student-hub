@@ -9,8 +9,8 @@ import {
 import { Student, StudentSchema } from '../student/schema/student.schema';
 import { Faculty, FacultySchema } from '../faculty/schemas/faculty.schema';
 import { Academic, AcademicSchema } from '../academic/schema/academic.schema';
-import { Activity, ActivitySchema } from 'src/activity/schema/activity.schema';
-
+import { ActivitySchema, Activity } from '../activity/schema/activity.schema';
+// 
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -25,4 +25,4 @@ import { Activity, ActivitySchema } from 'src/activity/schema/activity.schema';
   providers: [ActivityAssignmentService],
   exports: [ActivityAssignmentService],
 })
-export class ActivityAssignmentModule {}
+export class ActivityAssignmentModule { }

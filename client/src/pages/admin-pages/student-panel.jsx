@@ -11,7 +11,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { useNavigate } from "react-router";
+
 export default function ActivitiesFilterPage() {
+  const navigate = useNavigate();
   // UI state
   const [selectedFilter, setSelectedFilter] = useState("students");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -116,7 +119,11 @@ export default function ActivitiesFilterPage() {
             </TableHeader>
             <TableBody>
               {filterStudents().map((s) => (
-                <TableRow key={s.id}>
+                <TableRow
+                  key={s.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => navigate(`/admin/student-profile/${s.id}`)}
+                >
                   <TableCell>{s.name}</TableCell>
                   <TableCell>{s.department}</TableCell>
                   <TableCell>{s.year}</TableCell>

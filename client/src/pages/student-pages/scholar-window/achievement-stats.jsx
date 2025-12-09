@@ -110,33 +110,7 @@ export function AchievementStats() {
         </CardContent>
       </Card>
 
-      {/* Upcoming Events */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-chart-2" />
-            Upcoming Events
-          </CardTitle>
-          <CardDescription>Don't miss these opportunities</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {[
-            { name: "AI Conference 2024", date: "Jan 25", type: "Conference" },
-            { name: "Coding Bootcamp", date: "Jan 28", type: "Workshop" },
-            { name: "Career Fair", date: "Feb 02", type: "Event" },
-          ].map((event) => (
-            <div key={event.name} className="flex items-center justify-between p-2 border rounded">
-              <div>
-                <div className="font-medium text-sm">{event.name}</div>
-                <Badge variant="outline" className="text-xs mt-1">
-                  {event.type}
-                </Badge>
-              </div>
-              <div className="text-sm text-muted-foreground">{event.date}</div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+
     </div>
   )
 }

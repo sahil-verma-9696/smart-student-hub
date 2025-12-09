@@ -1,4 +1,4 @@
-import { AnalyticsOverview } from "@/components/analytics/analytics-overview"
+// import { AnalyticsOverview } from "@/components/analytics/analytics-overview"
 import { StudentEngagement } from "@/components/analytics/student-engagement"
 import { ActivityTrends } from "@/components/analytics/activity-trends"
 import { DepartmentComparison } from "@/components/analytics/department-comparison"
@@ -27,7 +27,7 @@ export default function AnalyticsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               <div className="lg:col-span-3 space-y-6">
-                <AnalyticsOverview />
+                {/* <AnalyticsOverview /> */}
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                   <StudentEngagement />
                   <ActivityTrends />

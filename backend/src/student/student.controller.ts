@@ -10,7 +10,9 @@ import {
   Patch,
   Param,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { StudentService } from './student.service';
 // import { UpdateStudentDto } from './dto/update-student.dto';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -25,7 +27,7 @@ import { mindPioletData, MOCK_STUDENT_DATA } from './constants';
 
 @Controller('student')
 export class StudentController {
-  constructor(private readonly studentService: StudentService) {}
+  constructor(private readonly studentService: StudentService) { }
 
   // --------------------
   // SINGLE STUDENT CREATE
@@ -101,10 +103,34 @@ export class StudentController {
 
   @Get(':id/portfolio-data')
   getPortfolioData(@Param('id') id: string) {
-    return MOCK_STUDENT_DATA;
+    return this.studentService.getPortfolioData(id);
   }
   @Get(':id/mind-piolet-data')
   getMindPioletData(@Param('id') id: string) {
     return mindPioletData;
+  }
+
+  @Post(':id/portfolio-proxy')
+  async getPortfolioProxy(
+    @Param('id') id: string,
+    @Body() body: any,
+    @Res() res: Response,
+  ) {
+    try {
+      const stream = await this.studentService.generatePortfolio(id, body);
+      const { Readable } = require('stream');
+      // @ts-ignore
+      const nodeStream = Readable.fromWeb(stream);
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="portfolio.pdf"`,
+      });
+
+      nodeStream.pipe(res);
+    } catch (error) {
+      console.error('Proxy Error:', error);
+      res.status(500).send(error.message);
+    }
   }
 }

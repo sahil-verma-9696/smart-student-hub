@@ -1,7 +1,7 @@
-import { StudentOverview } from "@/pages/student-pages/scholar-window/student-overview";
+// import { StudentOverview } from "@/pages/student-pages/scholar-window/student-overview";
 import { RecentActivities } from "@/pages/student-pages/scholar-window/recent-activities";
 import { AchievementStats } from "@/pages/student-pages/scholar-window/achievement-stats";
-import { AttendanceChart } from "@/pages/student-pages/attendance-chart";
+//import { AttendanceChart } from "@/pages/student-pages/attendance-chart";
 
 export default function ScholarWindowPage() {
   return (
@@ -15,7 +15,7 @@ export default function ScholarWindowPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <StudentOverview />
+            {/* <StudentOverview /> */}
             <RecentActivities />
           </div>
 
@@ -23,7 +23,7 @@ export default function ScholarWindowPage() {
             <AchievementStats />
 
             {/* 👇 NEW Attendance Chart Section */}
-            <AttendanceChart present={22} absent={3} />
+
           </div>
         </div>
       </div>

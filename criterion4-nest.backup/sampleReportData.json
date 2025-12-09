@@ -1,0 +1,143 @@
+{
+  "programInfo": {
+    "department": "Computer Science & Engineering",
+    "programName": "B.Tech (CSE)",
+    "programmeCode": "CSE101",
+    "instituteName": "Allenhouse Institute of Technology",
+    "affiliatingUniversity": "AKTU, Lucknow"
+  },
+  "batchYears": {
+    "CAY": "2020-21",
+    "CAYm1": "2019-20",
+    "CAYm2": "2018-19",
+    "CAYm3": "2017-18",
+    "CAYm4": "2016-17",
+    "CAYm5": "2015-16",
+    "CAYm6": "2014-15"
+  },
+  "batches": {
+    "CAY": {
+      "batch": {
+        "sanctionedIntake": 60,
+        "totalAdmitted": 48,
+        "lateralEntry": 0,
+        "separateDivision": 2
+      }
+    },
+    "CAYm1": {
+      "batch": {
+        "sanctionedIntake": 60,
+        "totalAdmitted": 54,
+        "lateralEntry": 0,
+        "separateDivision": 6
+      }
+    },
+    "CAYm2": {
+      "batch": {
+        "sanctionedIntake": 60,
+        "totalAdmitted": 55,
+        "lateralEntry": 3,
+        "separateDivision": 3
+      }
+    },
+    "CAYm3": {
+      "batch": {
+        "sanctionedIntake": 60,
+        "totalAdmitted": 49,
+        "lateralEntry": 0,
+        "separateDivision": 3
+      }
+    },
+    "CAYm4": {
+      "batch": {
+        "sanctionedIntake": 60,
+        "totalAdmitted": 53,
+        "lateralEntry": 0,
+        "separateDivision": 3
+      }
+    },
+    "CAYm5": {
+      "batch": {
+        "sanctionedIntake": 60,
+        "totalAdmitted": 56,
+        "lateralEntry": 0,
+        "separateDivision": 3
+      }
+    },
+    "CAYm6": {
+      "batch": {
+        "sanctionedIntake": 60,
+        "totalAdmitted": 52,
+        "lateralEntry": 0,
+        "separateDivision": 6
+      }
+    }
+  },
+  "graduationStats": {
+    "CAY": { "yearI": "", "yearII": "", "yearIII": "", "yearIV": "" },
+    "CAYm1": { "yearI": "52", "yearII": "", "yearIII": "", "yearIV": "" },
+    "CAYm2": { "yearI": "50", "yearII": "48", "yearIII": "", "yearIV": "" },
+    "CAYm3": { "yearI": "45", "yearII": "42", "yearIII": "40", "yearIV": "" },
+    "CAYm4": { "yearI": "48", "yearII": "45", "yearIII": "44", "yearIV": "42" },
+    "CAYm5": { "yearI": "51", "yearII": "48", "yearIII": "47", "yearIV": "45" },
+    "CAYm6": { "yearI": "47", "yearII": "44", "yearIII": "42", "yearIV": "40" }
+  },
+  "totalGraduationStats": {
+    "CAY": { "yearI": "", "yearII": "", "yearIII": "", "yearIV": "" },
+    "CAYm1": { "yearI": "58", "yearII": "", "yearIII": "", "yearIV": "" },
+    "CAYm2": { "yearI": "56", "yearII": "54", "yearIII": "", "yearIV": "" },
+    "CAYm3": { "yearI": "50", "yearII": "48", "yearIII": "47", "yearIV": "" },
+    "CAYm4": { "yearI": "54", "yearII": "52", "yearIII": "51", "yearIV": "50" },
+    "CAYm5": { "yearI": "57", "yearII": "55", "yearIII": "54", "yearIV": "53" },
+    "CAYm6": { "yearI": "53", "yearII": "51", "yearIII": "49", "yearIV": "47" }
+  },
+  "placementStats": {
+    "CAYm4": {
+      "totalFinalYear": 50,
+      "placed": 42,
+      "higherStudies": 3,
+      "entrepreneur": 1
+    },
+    "CAYm5": {
+      "totalFinalYear": 53,
+      "placed": 44,
+      "higherStudies": 4,
+      "entrepreneur": 2
+    },
+    "CAYm6": {
+      "totalFinalYear": 47,
+      "placed": 38,
+      "higherStudies": 3,
+      "entrepreneur": 1
+    }
+  },
+  "placementDetails": {
+    "CAYm4": [
+      { "rollNo": "1616413002", "name": "Abhinav Gupta", "company": "TECHM", "referenceNumber": "1777434/ELTP/2020" },
+      { "rollNo": "1616413003", "name": "Aditya Singh", "company": "INFOSYS", "referenceNumber": "HRD/2019/13424805" }
+    ],
+    "CAYm5": [
+      { "rollNo": "1516413001", "name": "Aastha Saini", "company": "INFOSYS", "referenceNumber": "HRD/2018/12692994" }
+    ],
+    "CAYm6": [
+      { "rollNo": "1416413001", "name": "Aarti Sharma", "company": "TCS", "referenceNumber": "TCSL/2017/284563" }
+    ]
+  },
+  "interInstituteEvents": {
+    "outsideState": [
+      { "rollNo": "1716413045", "name": "Rahul Kumar", "event": "Smart India Hackathon", "venue": "IIT Bombay", "date": "22-23 Jan 2020", "remarks": "1st Prize" }
+    ],
+    "withinState": [
+      { "rollNo": "1716413034", "name": "Sneha Gupta", "event": "AKTU Techfest", "venue": "KIET Ghaziabad", "date": "10-12 Feb 2020", "remarks": "2nd Prize" }
+    ],
+    "prizeWinners": [
+      { "rollNo": "1716413045", "name": "Rahul Kumar", "event": "Smart India Hackathon", "venue": "IIT Bombay", "date": "22-23 Jan 2020", "remarks": "1st Prize - 1 Lakh" }
+    ]
+  },
+  "codingCompetitions": [
+    { "name": "Rahul Kumar", "event": "Google Code Jam", "venue": "Online", "date": "Apr 2020", "remarks": "Round 2 Qualified" }
+  ],
+  "universityMerit": [
+    { "rollNo": "1616413045", "name": "Rahul Kumar", "session": "2016-20", "percentage": "89.5%", "rank": "1st in University" }
+  ]
+}

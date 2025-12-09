@@ -11,7 +11,7 @@ import {
 import { InstituteType } from 'src/auth/types/auth.enum';
 // import { CreateAttachmentDto } from 'src/attachment/dto/create-attachment.dto';
 
-export default class CreateInstituteDto { 
+export default class CreateInstituteDto {
   // ---------------- BASIC ----------------
   @IsString()
   @IsNotEmpty()
@@ -78,6 +78,7 @@ export default class CreateInstituteDto {
   // @Type(() => CreateAttachmentDto)
   // logo?: CreateAttachmentDto;
 
+  @IsOptional()
   @IsString()
   logo?: string;
 }

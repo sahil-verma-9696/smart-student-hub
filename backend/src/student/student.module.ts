@@ -5,10 +5,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Student, StudentSchema } from './schema/student.schema';
 import { UserModule } from 'src/user/user.module';
 import { AcademicModule } from 'src/academic/academic.module';
+import { Activity, ActivitySchema } from 'src/activity/schema/activity.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Student.name, schema: StudentSchema }]),
+    MongooseModule.forFeature([{ name: Activity.name, schema: ActivitySchema }]),
     UserModule,
     AcademicModule,
   ],
@@ -16,4 +18,4 @@ import { AcademicModule } from 'src/academic/academic.module';
   providers: [StudentService],
   exports: [StudentService],
 })
-export class StudentModule {}
+export class StudentModule { }

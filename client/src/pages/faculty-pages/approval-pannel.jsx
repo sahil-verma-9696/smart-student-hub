@@ -26,111 +26,28 @@ export default function ApprovalPannel() {
   const { user } = useAuthContext()
   const [searchTerm, setSearchTerm] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("pending")
-  const [selectedItems, setSelectedItems] = useState([])
-  const [reviewingItem, setReviewingItem] = useState(null)
-  const [reviewComment, setReviewComment] = useState("")
-  const [assignments, setAssignments] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [actionLoading, setActionLoading] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [visibleSections, setVisibleSections] = useState(new Set())
-  const sectionRefs = useRef([])
-
-  // Fetch activities assigned to current faculty
-  const fetchAssignedActivities = async () => {
-    try {
-      setLoading(true)
-      
-      // Get faculty ID from user context
-      const facultyId = user?._id
-      const instituteId = user?.institute?._id
-      
-      if (!facultyId) {
-        console.error('No faculty ID found in user context')
-        toast.error('Unable to get faculty information')
-        setAssignments([])
-        return
-      }
-
-      // Fetch assignments for this faculty
-      const result = await assignmentAPI.getMyAssignedActivities(facultyId, instituteId)
-      console.log('Fetched assignments result:', result)
-      
-      // Ensure data is an array and handle { data: [...] } structure
-      let assignmentsArray = []
-      
-      if (Array.isArray(result)) {
-        assignmentsArray = result
-      } else if (result && Array.isArray(result.data)) {
-        assignmentsArray = result.data
-      } else if (result && typeof result === 'object') {
-        // Handle case where API returns a single object instead of array
-        assignmentsArray = [result]
-      }
-      
-      console.log('All assignments:', assignmentsArray)
-      console.log('Statuses found:', assignmentsArray.map(a => a.activityId?.status))
-
-      setAssignments(assignmentsArray)
-    } catch (error) {
-      console.error('Error fetching assigned activities:', error)
-      console.error('Error response:', error.response?.data)
-      toast.error('Failed to fetch assigned activities')
-      setAssignments([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    if (user?._id) {
-      fetchAssignedActivities()
-    }
-  }, [user])
-
-  // Intersection Observer for animations
-  useEffect(() => {
-    const observers = []
-    
-    sectionRefs.current.forEach((ref, index) => {
-      if (ref) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                setVisibleSections((prev) => new Set([...prev, index]))
-              }
-            })
-          },
-          { threshold: 0.1 }
-        )
-        
-        observer.observe(ref)
-        observers.push(observer)
-      }
-    })
-
-    return () => {
-      observers.forEach((observer) => observer.disconnect())
-    }
-  }, [assignments])
+  const [statusFilter, setStatusFilter] = useState("all")
+  // ...
 
   // Filter assignments based on search and type
   const filteredAssignments = assignments.filter((assignment) => {
     const activity = assignment.activityId
     if (!activity) return false
-    
+
     const studentName = activity.student?.basicUserDetails?.name || ''
     const studentEmail = activity.student?.basicUserDetails?.email || ''
     const activityTitle = activity.title || ''
-    
+
     const matchesSearch =
       studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
       activityTitle.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = typeFilter === "all" || activity.activityType?.toLowerCase() === typeFilter
-    const matchesStatus = statusFilter === "all" || (activity.status && activity.status.toLowerCase() === statusFilter.toLowerCase())
+
+    // Status matching: 'pending' filter should include 'submitted' and 'pending'
+    const matchesStatus = statusFilter === "all" ||
+      (statusFilter === "pending" && ["pending", "submitted", "under_review"].includes(activity.status?.toLowerCase())) ||
+      (activity.status && activity.status.toLowerCase() === statusFilter.toLowerCase())
 
     return matchesSearch && matchesType && matchesStatus
   })
@@ -230,11 +147,10 @@ export default function ApprovalPannel() {
     <main className="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
-        <div 
+        <div
           ref={(el) => (sectionRefs.current[0] = el)}
-          className={`flex items-center justify-between transition-all duration-1000 ${
-            visibleSections.has(0) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-          }`}
+          className={`flex items-center justify-between transition-all duration-1000 ${visibleSections.has(0) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
         >
           <div className="group cursor-default">
             <h1 className="text-5xl font-bold text-black mb-2 group-hover:text-blue-600 transition-colors duration-500 flex items-center gap-3">
@@ -261,7 +177,7 @@ export default function ApprovalPannel() {
         </div>
 
         {/* Stats Grid */}
-        <div 
+        <div
           ref={(el) => (sectionRefs.current[1] = el)}
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
@@ -272,9 +188,8 @@ export default function ApprovalPannel() {
           ].map((stat, index) => (
             <div
               key={stat.label}
-              className={`transition-all duration-1000 ${
-                visibleSections.has(1) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-              }`}
+              className={`transition-all duration-1000 ${visibleSections.has(1) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                }`}
               style={{ transitionDelay: `${index * 150 + 100}ms` }}
             >
               <Card className="border-2 border-black shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:border-blue-600 group/stat cursor-pointer overflow-hidden relative">
@@ -298,9 +213,8 @@ export default function ApprovalPannel() {
         {/* Main Content Card */}
         <div
           ref={(el) => (sectionRefs.current[2] = el)}
-          className={`transition-all duration-1000 delay-200 ${
-            visibleSections.has(2) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-          }`}
+          className={`transition-all duration-1000 delay-200 ${visibleSections.has(2) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}
         >
           <Card className="border-2 border-black shadow-xl bg-white hover:shadow-2xl hover:border-blue-600 transition-all duration-500 overflow-visible hover:scale-[1.01] group/card">
             <CardHeader className="group-hover/card:bg-gradient-to-r group-hover/card:from-blue-50 group-hover/card:to-transparent transition-all duration-500">
@@ -315,8 +229,8 @@ export default function ApprovalPannel() {
                   </CardDescription>
                 </div>
                 {selectedItems.length > 0 && (
-                  <Button 
-                    onClick={handleBulkApprove} 
+                  <Button
+                    onClick={handleBulkApprove}
                     disabled={actionLoading}
                     className="bg-black text-white hover:bg-blue-600 hover:border-blue-600 shadow-lg transition-all duration-500 hover:scale-110 hover:shadow-2xl border-2 border-black relative overflow-hidden group/btn"
                   >
@@ -361,7 +275,8 @@ export default function ApprovalPannel() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="pending">Pending Review</SelectItem>
+                    <SelectItem value="submitted">Submitted</SelectItem>
                     <SelectItem value="approved">Approved</SelectItem>
                     <SelectItem value="rejected">Rejected</SelectItem>
                   </SelectContent>
@@ -371,9 +286,9 @@ export default function ApprovalPannel() {
               {/* Bulk Actions */}
               {filteredAssignments.length > 0 && (
                 <div className="flex items-center gap-4 mb-4 p-4 bg-blue-50 rounded-xl border-2 border-blue-200 hover:border-blue-400 transition-all duration-300">
-                  <Checkbox 
-                    checked={selectedItems.length === filteredAssignments.length && filteredAssignments.length > 0} 
-                    onCheckedChange={handleSelectAll} 
+                  <Checkbox
+                    checked={selectedItems.length === filteredAssignments.length && filteredAssignments.length > 0}
+                    onCheckedChange={handleSelectAll}
                     className="border-2"
                   />
                   <span className="text-sm font-semibold text-blue-900">
@@ -388,10 +303,10 @@ export default function ApprovalPannel() {
                   const activity = assignment.activityId
                   const student = activity?.student
                   const studentDetails = student?.basicUserDetails
-                  
+
                   return (
-                    <div 
-                      key={assignment._id} 
+                    <div
+                      key={assignment._id}
                       className="border-2 border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-xl transition-all duration-500 group/activity hover:scale-[1.02] hover:-translate-y-1 cursor-pointer bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
@@ -487,9 +402,9 @@ export default function ApprovalPannel() {
                             }
                           }}>
                             <DialogTrigger asChild>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => {
                                   setReviewingItem(assignment)
                                   setDialogOpen(true)
@@ -592,116 +507,116 @@ export default function ApprovalPannel() {
                                     </div>
                                   </div>
 
-                            {/* External Links */}
-                            {reviewingItem.activityId?.externalLinks && reviewingItem.activityId.externalLinks.length > 0 && (
-                              <div className="p-4 border rounded-lg">
-                                <h4 className="font-medium mb-2">External Links</h4>
-                                <div className="space-y-2">
-                                  {reviewingItem.activityId.externalLinks.map((link, index) => (
-                                    <a 
-                                      key={index} 
-                                      href={link} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="block text-sm text-blue-600 hover:underline"
-                                    >
-                                      {link}
-                                    </a>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Attachments */}
-                            {reviewingItem.activityId?.attachments && reviewingItem.activityId.attachments.length > 0 && (
-                              <div className="p-4 border rounded-lg">
-                                <h4 className="font-medium mb-2">Attachments ({reviewingItem.activityId.attachments.length})</h4>
-                                <div className="space-y-2">
-                                  {reviewingItem.activityId.attachments.map((attachment, index) => (
-                                    <div key={index} className="flex items-center justify-between p-2 border rounded">
-                                      <div className="flex items-center gap-2">
-                                        <FileText className="h-4 w-4" />
-                                        <span className="text-sm">
-                                          {typeof attachment === 'object' ? attachment.name : `Attachment ${index + 1}`}
-                                        </span>
+                                  {/* External Links */}
+                                  {reviewingItem.activityId?.externalLinks && reviewingItem.activityId.externalLinks.length > 0 && (
+                                    <div className="p-4 border rounded-lg">
+                                      <h4 className="font-medium mb-2">External Links</h4>
+                                      <div className="space-y-2">
+                                        {reviewingItem.activityId.externalLinks.map((link, index) => (
+                                          <a
+                                            key={index}
+                                            href={link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block text-sm text-blue-600 hover:underline"
+                                          >
+                                            {link}
+                                          </a>
+                                        ))}
                                       </div>
-                                      {typeof attachment === 'object' && attachment.url && (
-                                        <Button variant="outline" size="sm" onClick={() => window.open(attachment.url, '_blank')}>
-                                          <Download className="h-4 w-4" />
-                                        </Button>
-                                      )}
                                     </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
+                                  )}
 
-                            {/* Review Comments */}
-                            <div className="space-y-2">
-                              <Label htmlFor="review-comment">Review Comments <span className="text-muted-foreground">(Required for rejection)</span></Label>
-                              <Textarea
-                                id="review-comment"
-                                placeholder="Add any comments or feedback for the student..."
-                                value={reviewComment}
-                                onChange={(e) => setReviewComment(e.target.value)}
-                                rows={3}
-                              />
-                            </div>
+                                  {/* Attachments */}
+                                  {reviewingItem.activityId?.attachments && reviewingItem.activityId.attachments.length > 0 && (
+                                    <div className="p-4 border rounded-lg">
+                                      <h4 className="font-medium mb-2">Attachments ({reviewingItem.activityId.attachments.length})</h4>
+                                      <div className="space-y-2">
+                                        {reviewingItem.activityId.attachments.map((attachment, index) => (
+                                          <div key={index} className="flex items-center justify-between p-2 border rounded">
+                                            <div className="flex items-center gap-2">
+                                              <FileText className="h-4 w-4" />
+                                              <span className="text-sm">
+                                                {typeof attachment === 'object' ? attachment.name : `Attachment ${index + 1}`}
+                                              </span>
+                                            </div>
+                                            {typeof attachment === 'object' && attachment.url && (
+                                              <Button variant="outline" size="sm" onClick={() => window.open(attachment.url, '_blank')}>
+                                                <Download className="h-4 w-4" />
+                                              </Button>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
 
-                            {/* Action Buttons */}
-                            <div className="flex gap-3">
-                              <Button 
-                                onClick={() => handleApprove(reviewingItem.activityId._id, reviewComment)} 
-                                className="flex-1"
-                                disabled={actionLoading}
-                              >
-                                {actionLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
-                                Approve
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                onClick={() => handleReject(reviewingItem.activityId._id, reviewComment)}
-                                className="flex-1"
-                                disabled={actionLoading}
-                              >
-                                {actionLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
-                                Reject
-                              </Button>
-                            </div>
+                                  {/* Review Comments */}
+                                  <div className="space-y-2">
+                                    <Label htmlFor="review-comment">Review Comments <span className="text-muted-foreground">(Required for rejection)</span></Label>
+                                    <Textarea
+                                      id="review-comment"
+                                      placeholder="Add any comments or feedback for the student..."
+                                      value={reviewComment}
+                                      onChange={(e) => setReviewComment(e.target.value)}
+                                      rows={3}
+                                    />
                                   </div>
-                                )}
-                              </DialogContent>
-                            </Dialog>
 
-                            <Button 
-                              size="sm" 
-                              onClick={() => handleApprove(activity._id)} 
-                              disabled={actionLoading}
-                              className="bg-black text-white hover:bg-green-600 transition-all duration-300 hover:scale-110 border-2 border-black hover:border-green-600"
-                            >
-                              {actionLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-1" />}
-                              Quick Approve
-                            </Button>
-                          </div>
+                                  {/* Action Buttons */}
+                                  <div className="flex gap-3">
+                                    <Button
+                                      onClick={() => handleApprove(reviewingItem.activityId._id, reviewComment)}
+                                      className="flex-1"
+                                      disabled={actionLoading}
+                                    >
+                                      {actionLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                                      Approve
+                                    </Button>
+                                    <Button
+                                      variant="destructive"
+                                      onClick={() => handleReject(reviewingItem.activityId._id, reviewComment)}
+                                      className="flex-1"
+                                      disabled={actionLoading}
+                                    >
+                                      {actionLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
+                                      Reject
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </DialogContent>
+                          </Dialog>
+
+                          <Button
+                            size="sm"
+                            onClick={() => handleApprove(activity._id)}
+                            disabled={actionLoading}
+                            className="bg-black text-white hover:bg-green-600 transition-all duration-300 hover:scale-110 border-2 border-black hover:border-green-600"
+                          >
+                            {actionLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-1" />}
+                            Quick Approve
+                          </Button>
                         </div>
                       </div>
-                    )
-                  })}
-                </div>
-
-                {filteredAssignments.length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="p-6 bg-gray-50 rounded-xl border-2 border-gray-200 inline-block">
-                      <Clock className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                      <p className="text-gray-600 font-medium">No pending activities assigned to you.</p>
-                      <p className="text-sm text-gray-500 mt-2">Check back later for new submissions.</p>
                     </div>
+                  )
+                })}
+              </div>
+
+              {filteredAssignments.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="p-6 bg-gray-50 rounded-xl border-2 border-gray-200 inline-block">
+                    <Clock className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                    <p className="text-gray-600 font-medium">No pending activities assigned to you.</p>
+                    <p className="text-sm text-gray-500 mt-2">Check back later for new submissions.</p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
-      </main>
-    )
-  }
+      </div>
+    </main>
+  )
+}

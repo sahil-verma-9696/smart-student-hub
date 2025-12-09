@@ -11,7 +11,7 @@ import { ActivityAssignment } from './schema/activity-assignment.schema';
 import { Student } from '../student/schema/student.schema';
 import { Faculty } from '../faculty/schemas/faculty.schema';
 import { Academic } from '../academic/schema/academic.schema';
-import { Activity } from 'src/activity/schema/activity.schema';
+import { Activity } from '../activity/schema/activity.schema';
 
 /**
  * ActivityAssignmentService - Production-Ready Implementation
@@ -51,7 +51,7 @@ export class ActivityAssignmentService {
     private readonly facultyModel: Model<Faculty>,
     @InjectModel(Academic.name)
     private readonly academicModel: Model<Academic>,
-  ) {}
+  ) { }
 
   /**
    * CREATE ACTIVITY ASSIGNMENT

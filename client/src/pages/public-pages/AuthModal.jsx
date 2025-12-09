@@ -141,10 +141,27 @@ export default function AuthModal({ open, onOpenChange }) {
     if (mode === "register-institute") {
       if (!validateInstitute()) return;
 
-      // prepare trimmed payload
+      // prepare nested payload
       const payload = {
-        ...institute,
-        inst_is_affiliated: institute.inst_is_affiliated === "true",
+        institute: {
+          institute_name: institute.inst_name,
+          institute_type: institute.inst_type,
+          official_email: institute.inst_email,
+          official_phone: institute.inst_phone,
+          address_line1: institute.inst_address_line1,
+          city: institute.inst_city,
+          state: institute.inst_state,
+          pincode: institute.inst_pincode,
+          affiliation_university: institute.inst_is_affiliated === "true" ? institute.inst_affiliation_university : undefined,
+          affiliation_id: institute.inst_is_affiliated === "true" ? institute.inst_affiliation_id : undefined,
+        },
+        admin: {
+          name: institute.admin_name,
+          email: institute.admin_email,
+          password: institute.admin_password,
+          gender: institute.admin_gender,
+          contactInfo: institute.admin_contactInfo,
+        },
       };
 
       registerInstitute(payload);
@@ -312,7 +329,7 @@ export default function AuthModal({ open, onOpenChange }) {
                     <Input
                       className={cn(
                         registerErrors[`admin_contactInfo.${key}`] &&
-                          "border-red-500"
+                        "border-red-500"
                       )}
                       value={institute.admin_contactInfo[key]}
                       onChange={(e) =>

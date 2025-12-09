@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 
 const navigationConfig = [
-  { name: "Crono Compose", href: "/faculty", icon: Home },
+  // { name: "Crono Compose", href: "/faculty", icon: Home },
+  { name: "Approval pannel", href: "/faculty", icon: Calendar },
   { name: "Approval pannel", href: "/faculty/approval-pannel", icon: Calendar },
   { name: "Activities", href: "/faculty/activities", icon: Trophy },
   { name: "Profile", href: "/faculty/profile", icon: BarChart3 },

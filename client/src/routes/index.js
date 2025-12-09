@@ -25,6 +25,10 @@ import Profile from "@/pages/student-pages/Profile";
 import ProfilePageProvider from "@/pages/student-pages/provider/profile-page-provider";
 import { Share } from "lucide-react";
 import ShareAchivos from "@/pages/student-pages/ShareAchivos";
+import ReportGenerator from "@/pages/admin-pages/report";
+import FacultyProfile from "@/pages/faculty-pages/profile";
+import FacultyActivitiesPage from "@/pages/faculty-pages/activities";
+import FacultySettingsPage from "@/pages/faculty-pages/settings";
 
 export default createBrowserRouter([
   {
@@ -73,7 +77,6 @@ export default createBrowserRouter([
       {
         path: "share-achivos",
         Component: ShareAchivos,
-
       }
     ],
   },
@@ -91,6 +94,18 @@ export default createBrowserRouter([
       {
         path: "approval-pannel",
         Component: ApprovalPannel,
+      },
+      {
+        path: "activities",
+        Component: FacultyActivitiesPage,
+      },
+      {
+        path: "profile",
+        Component: FacultyProfile,
+      },
+      {
+        path: "settings",
+        Component: FacultySettingsPage,
       },
     ],
   },
@@ -132,6 +147,10 @@ export default createBrowserRouter([
       {
         path: "institue",
         Component: InstituteManagementProvider,
+      },
+      {
+        path: "reports",
+        Component: ReportGenerator,
       },
       {
         path: "settings",
