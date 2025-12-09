@@ -7,6 +7,7 @@ import { AdminModule } from 'src/admin/admin.module';
 import { AcademicModule } from 'src/academic/academic.module';
 import { StudentModule } from 'src/student/student.module';
 import { FacultyModule } from 'src/faculty/faculty.module';
+import { ActivityModule } from 'src/activity/activity.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { FacultyModule } from 'src/faculty/faculty.module';
     AcademicModule,
     StudentModule,
     FacultyModule,
+    ActivityModule,
   ],
   controllers: [InstituteController],
   providers: [InstituteService],

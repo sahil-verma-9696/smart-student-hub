@@ -39,11 +39,11 @@ export class Activity {
   skills?: string[];
 
   @Prop({
-    enum: ACTIVITY_TYPES,
+    type: String,
     required: true,
     default: ACTIVITY_TYPES.DEFAULT,
   })
-  activityType: ACTIVITY_TYPES;
+  activityType: string;
 
   /******************************************************************
    ************************** Dates ************************************
@@ -59,33 +59,6 @@ export class Activity {
    ******************************************************************/
   @Prop({ enum: ACTIVITY_STATUS, default: ACTIVITY_STATUS.PENDING })
   status: ACTIVITY_STATUS;
-
-  @Prop({
-    type: { type: Types.ObjectId, ref: 'Facutly' },
-  })
-  approvedBy?: Types.ObjectId;
-
-  /************************ New ************************************ */
-  @Prop({ type: Date })
-  approved_at?: Date;
-
-  /************************ New ************************************ */
-  @Prop({ type: String })
-  approved_message?: string;
-
-  /************************ New ************************************ */
-  @Prop({
-    type: { type: Types.ObjectId, ref: 'Facutly' },
-  })
-  rejectedBy?: Types.ObjectId;
-
-  /************************ New ************************************ */
-  @Prop({ type: Date })
-  rejected_at?: Date;
-
-  /************************ New ************************************ */
-  @Prop({ type: String })
-  rejected_message?: string;
 
   /******************************************************************
    ************************** Credits (NEW) **************************

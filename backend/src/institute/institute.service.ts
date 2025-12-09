@@ -12,6 +12,9 @@ import { AcademicService } from 'src/academic/academic.service';
 import { StudentService } from 'src/student/student.service';
 import UpdateInstituteDetailsDto from './dto/update-insitute-details.dto';
 import { FacultyService } from 'src/faculty/faculty.service';
+import { ActivityService } from 'src/activity/activity.service';
+import { InstituteQueryDto } from './dto/query-institute.dto';
+import { SearchActivityDto } from 'src/activity/dto/search-activity.dto';
 // `inst3admin@gmail.com
 @Injectable()
 export class InstituteService {
@@ -21,6 +24,7 @@ export class InstituteService {
     private readonly academicService: AcademicService,
     private readonly studentService: StudentService,
     private readonly facultyService: FacultyService,
+    private readonly activityService: ActivityService,
   ) {}
 
   async create(createInstituteDto: CreateInstituteDto) {
@@ -190,12 +194,25 @@ export class InstituteService {
         await this.academicService.getInstituteDepartmentsCount(instituteId),
       totalFaculty:
         await this.facultyService.getInstituteFacultiesCount(instituteId),
-      totalActivities: 0,
+      totalActivities: (
+        await this.activityService.findAll({
+          instituteId,
+        })
+      ).length,
     };
 
     return response;
   }
 
+  getInstituteActivities(instituteId: string, query: SearchActivityDto) {
+    const filter = {
+      ...query,
+      instituteId: instituteId,
+    };
+    return this.activityService.findAll(filter);
+  }
+
+  getInstituteDashboardData(instituteId: string) {}
   // async getInstituteFullStructure(instituteId: string) {
   //   const result = await this.instituteModel.aggregate([
   //     {

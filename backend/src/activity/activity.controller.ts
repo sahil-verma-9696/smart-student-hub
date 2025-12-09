@@ -20,7 +20,7 @@ export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 
   @Post()
-  create(@Body() dto: CreateActivityDto) {
+  create(@Body() dto) {
     return this.activityService.create(dto);
   }
 

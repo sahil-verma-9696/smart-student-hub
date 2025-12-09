@@ -33,7 +33,7 @@ export class Student {
   })
   academicDetails: Types.ObjectId | AcademicDocument;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   roll_number: string;
 
   // --- Mind Pilot Fields ---

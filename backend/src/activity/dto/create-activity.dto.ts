@@ -43,9 +43,17 @@ export class CreateActivityDto {
   @IsObject()
   fields?: Record<string, any>;
 
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.CUSTOM,
+  )
+  @IsOptional()
+  @IsArray()
+  custom_skill?: string[];
+
   // -------------------------------------------
   // HACKATHON
   // -------------------------------------------
+
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
   )
@@ -94,6 +102,14 @@ export class CreateActivityDto {
   @IsOptional()
   @IsString()
   organizer?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsArray()
+  hackathon_skill?: string[];
+
   // -------------------------------------------
   // WORKSHOP
   // -------------------------------------------
@@ -102,14 +118,14 @@ export class CreateActivityDto {
   )
   @IsOptional()
   @IsString()
-  speaker?: string; 
+  workshopName?: string;
 
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
   )
   @IsOptional()
   @IsString()
-  mode?: string; 
+  mode?: string;
 
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
@@ -125,10 +141,16 @@ export class CreateActivityDto {
   @IsString()
   location?: string;
 
-  /****************************************
-   * Internship
-   *****************************************/
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
+  )
+  @IsOptional()
+  @IsArray()
+  workshop_skill?: string[];
 
+  // -------------------------------------------
+  // INTERNSHIP
+  // -------------------------------------------
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
   )
@@ -142,7 +164,7 @@ export class CreateActivityDto {
   @IsOptional()
   @IsString()
   role?: string;
-  
+
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
   )
@@ -170,4 +192,94 @@ export class CreateActivityDto {
   @IsOptional()
   @IsString()
   inst_paid?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsArray()
+  internship_skill?: string[];
+
+  // -------------------------------------------
+  // PLACEMENT
+  // -------------------------------------------
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_company?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_role?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_package?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_placementType?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_joiningDate?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsString()
+  placement_referenceNo?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsArray()
+  placement_skill?: string[];
+
+  /****************************************
+   * High School Marksheet
+   *****************************************/
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HIGH_SCHOOL,
+  )
+  @IsOptional()
+  @IsString()
+  board?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HIGH_SCHOOL,
+  )
+  @IsOptional()
+  @IsString()
+  schoolName?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HIGH_SCHOOL,
+  )
+  @IsOptional()
+  @IsNumber()
+  percentage?: number;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HIGH_SCHOOL,
+  )
+  @IsOptional()
+  @IsArray()
+  highschool_subjects?: string[];
 }

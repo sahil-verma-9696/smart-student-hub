@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PipelineStage, Types } from 'mongoose';
 
 import { Activity, ActivityDocument } from './schema/activity.schema';
-import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { SearchActivityDto } from './dto/search-activity.dto';
 import { ApproveActivityDto } from './dto/approve-activity.dto';
@@ -26,7 +25,7 @@ export class ActivityService {
   // -----------------------------
   // CREATE ACTIVITY
   // -----------------------------
-  async create(dto: CreateActivityDto) {
+  async create(dto) {
     const activity = await new this.activityModel(dto).save();
 
     return this.activityModel
@@ -46,6 +45,8 @@ export class ActivityService {
   // -----------------------------
   async findAll(query: SearchActivityDto) {
     const filter: FilterQuery<ActivityDocument> = {};
+
+    console.log(query);
 
     // --- normal filters on Activity fields ---
     if (query.activityType) {
@@ -107,8 +108,14 @@ export class ActivityService {
       );
     }
 
-    // sort like before
-    pipeline.push({ $sort: { createdAt: -1 } });
+    // sort support for createdAt = asc | desc
+    let sortOrder: 1 | -1 = -1; // default: desc
+
+    if (query.createdAt) {
+      sortOrder = query.createdAt === 'asc' ? 1 : -1;
+    }
+
+    pipeline.push({ $sort: { createdAt: sortOrder } });
 
     // run aggregation
     const activities = await this.activityModel.aggregate(pipeline).exec();
@@ -124,6 +131,14 @@ export class ActivityService {
       },
       { path: 'attachments' },
     ]);
+  }
+
+  async getStudentActivities(studentId: string) {
+    const studentObjId = new Types.ObjectId(studentId);
+    return this.activityModel
+      .find({ student: studentObjId })
+      .populate('attachments')
+      .exec();
   }
 
   // -----------------------------
@@ -265,6 +280,37 @@ export class ActivityService {
     return formatted;
   }
 
+  getInstituteActivityCount(instituteId: string) {
+    return this.activityModel.countDocuments({ institute: instituteId });
+  }
+
+  async getInstituteActivityStats(instituteId: string) {
+    const result = await this.activityModel.aggregate([
+      {
+        $match: { institute: instituteId },
+      },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Convert aggregation array into an object
+    const stats = {
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+    };
+
+    result.forEach((item) => {
+      stats[item._id] = item.count;
+    });
+
+    return stats;
+  }
+
   /******************************************************
    * @description Approve an activity
    * @param activityId - The ID of the activity to approve
@@ -379,5 +425,18 @@ export class ActivityService {
     );
 
     return { message: 'send Notification' };
+  }
+
+  getInstituteRecentActivities(instituteId: string) {
+    const instituteObjId = new Types.ObjectId(instituteId);
+    return this.activityModel
+      .find({ institute: instituteObjId })
+      .sort({ createdAt: -1 })
+      .limit(10);
+  }
+
+  getActivitiesByStudentId(studentId: string) {
+    const studentObjId = new Types.ObjectId(studentId);
+    return this.activityModel.find({ student: studentObjId });
   }
 }

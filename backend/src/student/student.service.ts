@@ -21,6 +21,8 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { UserDocument } from 'src/user/schema/user.schema';
 import { InstituteDocument } from 'src/institute/schemas/institute.schema';
 import { AcademicDocument } from 'src/academic/schema/academic.schema';
+import { SearchActivityDto } from 'src/activity/dto/search-activity.dto';
+import { ActivityService } from 'src/activity/activity.service';
 
 @Injectable()
 export class StudentService {
@@ -36,11 +38,8 @@ export class StudentService {
     // Services
     private readonly userService: UserService,
     private readonly academicService: AcademicService,
+    private readonly activityService: ActivityService,
   ) { }
-
-  // ... (previous methods)
-
-
 
   /***************************************
    * VALIDATE instituteId BEFORE creating
@@ -122,6 +121,8 @@ export class StudentService {
    ***************************************/
   async bulkCreateStudents(dto: BulkCreateStudentDto) {
     const { instituteId, students } = dto;
+
+    this.studentModel.syncIndexes();
 
     if (!Array.isArray(students)) {
       throw new Error('Invalid students array');
@@ -495,92 +496,18 @@ export class StudentService {
       .exec();
   }
 
-  async generatePortfolio(studentId: string, data: any): Promise<any> {
-    const response = await fetch(
-      `https://corneous-hyperplastic-finnegan.ngrok-free.dev/py/student/${studentId}/get-portfolio`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      },
-    );
+  getStudentActivities(studentId: string, query: SearchActivityDto) {
+    const filter = {
+      ...query,
+      studentId: studentId,
+    };
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Portfolio Generation Failed:', response.status, errorText);
-      throw new Error(`Failed to generate portfolio: ${response.statusText}`);
-    }
-
-    return response.body;
+    console.log(filter, studentId, 'filter');
+    return this.activityService.findAll(filter);
   }
 
-  async getPortfolioData(studentId: string) {
-    const student = await this.getStudentDetails(studentId);
-    if (!student) throw new NotFoundException('Student not found');
-
-    const basicDetails = student.basicUserDetails as any;
-
-    // Fetch approved activities
-    const activities = await this.activityModel.find({
-      student: new Types.ObjectId(studentId),
-      status: 'APPROVED',
-    }).exec();
-
-    const projects: string[] = [];
-    const achievements: string[] = [];
-    const skillsSet = new Set<string>();
-    const certificates: string[] = [];
-
-    // Map activities to categories
-    activities.forEach(activity => {
-      // Projects
-      if (['Project Review', 'Research Paper'].includes(activity.activityType)) {
-        projects.push(`${activity.title}: ${activity.description || ''} (${new Date(activity.createdAt).getFullYear()})`);
-      }
-
-      // Achievements
-      if (['Hackathon', 'Patent Publication', 'Conference Presentation'].includes(activity.activityType)) {
-        achievements.push(`${activity.title} (${new Date(activity.createdAt).getFullYear()})`);
-      }
-
-      // Certificates
-      if (['Certification'].includes(activity.activityType)) {
-        certificates.push(`${activity.title} (${new Date(activity.createdAt).getFullYear()})`);
-      }
-
-      // Using tags as skills if available
-      /* @ts-ignore */
-      if (activity.skills && Array.isArray(activity.skills)) {
-        /* @ts-ignore */
-        activity.skills.forEach(s => skillsSet.add(s));
-      }
-      /* @ts-ignore */
-      if (activity.tags && Array.isArray(activity.tags)) {
-        /* @ts-ignore */
-        activity.tags.forEach(t => skillsSet.add(t));
-      }
-    });
-
-    const education = [
-      // @ts-ignore
-      `${student.academicDetails?.degree?.name || 'Degree'} - ${student.academicDetails?.program?.name || 'Program'} (${student.academicDetails?.currentYear || 'Year'})`,
-    ];
-
-    return {
-      name: basicDetails.name,
-      email: basicDetails.email,
-      phone: basicDetails.contactInfo?.phone || '',
-      linkedin: '',
-      github: '',
-      projects: projects,
-      achievements: achievements,
-      skills: Array.from(skillsSet),
-      certificates: certificates,
-      education: education,
-      work_experience: [],
-    };
+  getMindPioletData(studentId: string) {
+    return this.activityService.getActivitiesByStudentId(studentId);
   }
 }
 type StudentFilter = Record<string, unknown>;

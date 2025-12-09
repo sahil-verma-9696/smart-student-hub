@@ -24,6 +24,7 @@ import { StudentQueryDto } from './dto/query.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { mindPioletData, MOCK_STUDENT_DATA } from './constants';
+import { SearchActivityDto } from 'src/activity/dto/search-activity.dto';
 
 @Controller('student')
 export class StudentController {
@@ -96,8 +97,16 @@ export class StudentController {
     return this.studentService.updateStudentAcademicDetails(id, body);
   }
 
-  @Get(':id/profile')
-  getStudentDetails(@Param('id') id: string) {
+  @Get(':id/activities')
+  getStudentActivities(
+    @Param('id') id: string,
+    @Query() query: SearchActivityDto,
+  ) {
+    return this.studentService.getStudentActivities(id, query);
+  }
+
+  @Get(':id')
+  getStudent(@Param('id') id: string) {
     return this.studentService.getStudentDetails(id);
   }
 
@@ -107,7 +116,7 @@ export class StudentController {
   }
   @Get(':id/mind-piolet-data')
   getMindPioletData(@Param('id') id: string) {
-    return mindPioletData;
+    return this.studentService.getMindPioletData(id);
   }
 
   @Post(':id/portfolio-proxy')

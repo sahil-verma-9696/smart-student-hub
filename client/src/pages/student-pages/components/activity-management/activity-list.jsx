@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { CardContent, Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -167,14 +167,11 @@ function ActivityCard({ activity, onShare }) {
 
   return (
     <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {statusIcon}
+      <div className="flex items-center gap-2">
+        {statusIcon}
+        <Link to={`/activities/${activity?._id}`}>
           <h3 className="font-semibold">{activity.title}</h3>
-        </div>
-        <Button variant="ghost" size="icon" onClick={() => onShare(activity)}>
-          <Share2 className="h-4 w-4" />
-        </Button>
+        </Link>
       </div>
 
       <p className="text-sm text-muted-foreground mt-2">

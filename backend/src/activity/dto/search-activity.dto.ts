@@ -1,4 +1,4 @@
-import { IsOptional } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 
 export class SearchActivityDto {
   @IsOptional()
@@ -6,15 +6,23 @@ export class SearchActivityDto {
 
   @IsOptional()
   status?: string;
+
   @IsOptional()
   studentId?: string;
+
   @IsOptional()
   title?: string;
+
   @IsOptional()
   from?: string;
+
   @IsOptional()
   to?: string;
 
   @IsOptional()
   instituteId?: string;
+
+  @IsOptional()
+  @IsEnum(['asc', 'desc'])
+  createdAt?: string;
 }

@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Student, StudentSchema } from './schema/student.schema';
 import { UserModule } from 'src/user/user.module';
 import { AcademicModule } from 'src/academic/academic.module';
-import { Activity, ActivitySchema } from 'src/activity/schema/activity.schema';
+import { ActivityModule } from 'src/activity/activity.module';
 
 @Module({
   imports: [
@@ -13,6 +13,7 @@ import { Activity, ActivitySchema } from 'src/activity/schema/activity.schema';
     MongooseModule.forFeature([{ name: Activity.name, schema: ActivitySchema }]),
     UserModule,
     AcademicModule,
+    ActivityModule,
   ],
   controllers: [StudentController],
   providers: [StudentService],

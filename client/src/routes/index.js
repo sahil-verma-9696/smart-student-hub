@@ -29,6 +29,7 @@ import ReportGenerator from "@/pages/admin-pages/report";
 import FacultyProfile from "@/pages/faculty-pages/profile";
 import FacultyActivitiesPage from "@/pages/faculty-pages/activities";
 import FacultySettingsPage from "@/pages/faculty-pages/settings";
+import ActivityDetailsPageProvider from "@/providers/activity-details-page-provider";
 
 export default createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export default createBrowserRouter([
      * *********************** Public Routes *****************************
      * ***********************************************************************/
     children: [],
+  },
+  {
+    path: "/activities/:activityId",
+    Component: ActivityDetailsPageProvider,
   },
   {
     path: "/student",

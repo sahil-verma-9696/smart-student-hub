@@ -8,8 +8,8 @@ import { MapPin, Mail, Phone, User, Landmark } from "lucide-react";
 import { useProfilePageContext } from "./contexts/profile-page-context";
 import { RecentActivities } from "./scholar-window/recent-activities";
 
-export default function Profile({ student }) {
-  const { profileData: user } = useProfilePageContext();
+export default function Profile() {
+  const { profileData: user, activities } = useProfilePageContext();
 
   if (!user) return null;
 
