@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -27,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { ActivityConfig } from "./constants";
 import { useActivityPageContext } from "../../hooks/useActivityPageContext";
+import { renderFields } from "./renderFields";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -104,22 +105,26 @@ export function ActivityTracker() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="w-full">Add Activity</Button>
+        <Button size="sm" className="w-full">
+          Add Activity
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-4xl w-full p-6 max-h-[85vh] overflow-y-auto">
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          
           {/* HEADER AREA */}
           <div className="space-y-3">
             <Label className="font-medium">Activity Type</Label>
-            <Select value={activityType} onValueChange={(v) => {
-              setActivityType(v);
-              setCustomPairs([]);
-              setCustomKey("");
-              setCustomValue("");
-              form.reset({});
-            }}>
+            <Select
+              value={activityType}
+              onValueChange={(v) => {
+                setActivityType(v);
+                setCustomPairs([]);
+                setCustomKey("");
+                setCustomValue("");
+                form.reset({});
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
@@ -135,10 +140,8 @@ export function ActivityTracker() {
 
           {/* LAYOUT */}
           <div className="flex flex-col lg:flex-row gap-8">
-
             {/* LEFT PANEL */}
             <div className="flex-1 space-y-6">
-
               <div className="space-y-2">
                 <Label>Title</Label>
                 <Input {...form.register("title")} />
@@ -188,7 +191,7 @@ export function ActivityTracker() {
                         className="space-y-2"
                       >
                         <Label>{field.label}</Label>
-                        {renderField(field, form)}
+                        {renderFields(field, form)}
                       </motion.div>
                     ))}
                   </div>
@@ -197,7 +200,9 @@ export function ActivityTracker() {
                 {/* CUSTOM TYPE */}
                 {activityType === "custom" && (
                   <div className="p-4 border rounded-lg bg-muted/20 space-y-4">
-                    <h2 className="text-lg font-semibold">Custom Activity Fields</h2>
+                    <h2 className="text-lg font-semibold">
+                      Custom Activity Fields
+                    </h2>
 
                     <div className="space-y-2">
                       <Label>Field Key</Label>
@@ -253,57 +258,3 @@ export function ActivityTracker() {
 }
 
 
-/* UNIVERSAL FIELD RENDERER */
-function renderField(field, form) {
-  const { register } = form;
-
-  switch (field.type) {
-    case "text":
-    case "number":
-      return <Input type={field.type} {...register(field.name)} />;
-
-    case "textarea":
-      return <Textarea rows={4} {...register(field.name)} />;
-
-    case "date":
-      return <Input type="date" {...register(field.name)} />;
-
-    case "select":
-      return (
-        <Select
-          onValueChange={(v) => form.setValue(field.name, v)}
-          defaultValue={form.getValues(field.name)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select" />
-          </SelectTrigger>
-          <SelectContent>
-            {field.options?.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-
-    case "radio":
-      return (
-        <div className="space-y-1">
-          {field.options?.map((opt) => (
-            <label key={opt.value} className="flex items-center gap-2">
-              <input
-                type="radio"
-                value={opt.value}
-                {...register(field.name)}
-              />
-              {opt.label}
-            </label>
-          ))}
-        </div>
-      );
-
-    default:
-      return <div className="text-red-500">Unknown Field</div>;
-  }
-}

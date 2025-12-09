@@ -43,6 +43,13 @@ export class CreateActivityDto {
   @IsObject()
   fields?: Record<string, any>;
 
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.CUSTOM,
+  )
+  @IsOptional()
+  @IsArray()
+  custom_skill?: string[];
+
   // -------------------------------------------
   // HACKATHON
   // -------------------------------------------
@@ -94,6 +101,14 @@ export class CreateActivityDto {
   @IsOptional()
   @IsString()
   organizer?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HACKATHON,
+  )
+  @IsOptional()
+  @IsArray()
+  hackathon_skill?: string[];
+
   // -------------------------------------------
   // WORKSHOP
   // -------------------------------------------
@@ -125,10 +140,16 @@ export class CreateActivityDto {
   @IsString()
   location?: string;
 
-  /****************************************
-   * Internship
-   *****************************************/
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.WORKSHOP,
+  )
+  @IsOptional()
+  @IsArray()
+  workshop_skill?: string[];
 
+  // -------------------------------------------
+  // INTERNSHIP
+  // -------------------------------------------
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
   )
@@ -171,9 +192,16 @@ export class CreateActivityDto {
   @IsString()
   inst_paid?: string;
 
-  /****************************************
-   * Internship
-   * *****************************************/
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.INTERNSHIP,
+  )
+  @IsOptional()
+  @IsArray()
+  internship_skill?: string[];
+
+  // -------------------------------------------
+  // PLACEMENT
+  // -------------------------------------------
   @ValidateIf(
     (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
   )
@@ -215,4 +243,11 @@ export class CreateActivityDto {
   @IsOptional()
   @IsString()
   placement_referenceNo?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.PLACEMENT,
+  )
+  @IsOptional()
+  @IsArray()
+  placement_skill?: string[];
 }

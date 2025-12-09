@@ -12,6 +12,9 @@ export const ActivityConfig = {
     ],
   },
 
+  // ---------------------------------------------------
+  //  H A C K A T H O N
+  // ---------------------------------------------------
   hackathon: {
     label: "Hackathon",
     fields: [
@@ -58,20 +61,43 @@ export const ActivityConfig = {
         type: "text",
         section: "details",
       },
-      // {
-      //   name: "teamMember",
-      //   label: "Team Member",
-      //   type: "text",
-      //   section: "details",
-      // },
+      {
+        name: "teamSize",
+        label: "Team Size",
+        type: "number",
+        section: "details",
+      },
+      {
+        name: "rank",
+        label: "Rank",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "hackDescription",
+        label: "Hack Description",
+        type: "textarea",
+        section: "details",
+      },
+
+      // SKILLS
+      {
+        name: "hackathon_skill",
+        label: "Skills",
+        type: "tags",
+        section: "skill",
+        placeholder: "e.g. Python, JS, RAG",
+      },
     ],
   },
 
+  // ---------------------------------------------------
+  //  W O R K S H O P
+  // ---------------------------------------------------
   workshop: {
     label: "Workshop",
     fields: [
       // BASIC
-      // { name: "workshopName", label: "Workshop Name", type: "text", section: "basic" },
       { name: "title", label: "Title", type: "text", section: "basic" },
       {
         name: "description",
@@ -93,25 +119,26 @@ export const ActivityConfig = {
           { label: "Offline", value: "offline" },
         ],
       },
-      // {
-      //   name: "certificate",
-      //   label: "Certificate Provided",
-      //   type: "checkbox",
-      //   section: "details",
-      // },
+
+      // SKILLS
+      {
+        name: "workshop_skill",
+        label: "Skills",
+        type: "tags",
+        section: "skill",
+        placeholder: "e.g. Communication, Leadership",
+      },
     ],
   },
 
+  // ---------------------------------------------------
+  //  I N T E R N S H I P
+  // ---------------------------------------------------
   internship: {
     label: "Internship",
     fields: [
       // BASIC
-      {
-        name: "title",
-        label: "Title",
-        type: "text",
-        section: "basic",
-      },
+      { name: "title", label: "Title", type: "text", section: "basic" },
       {
         name: "description",
         label: "Description",
@@ -150,9 +177,22 @@ export const ActivityConfig = {
           { label: "No", value: "no" },
         ],
       },
+
+      // SKILLS
+      {
+        name: "internship_skill",
+        label: "Skills",
+        type: "tags",
+        section: "skill",
+        placeholder: "e.g. React, SQL, Teamwork",
+      },
     ],
   },
 
+  // ---------------------------------------------------
+  //  C E R T I F I C A T I O N
+  // (Not in DTO, but included from your config)
+  // ---------------------------------------------------
   certification: {
     label: "Certification",
     fields: [
@@ -196,6 +236,9 @@ export const ActivityConfig = {
     ],
   },
 
+  // ---------------------------------------------------
+  //  C U S T O M
+  // ---------------------------------------------------
   custom: {
     label: "Custom",
     fields: [
@@ -206,10 +249,23 @@ export const ActivityConfig = {
         type: "textarea",
         section: "basic",
       },
-      // user-added dynamic fields will be appended here
+
+      // SKILLS
+      {
+        name: "custom_skill",
+        label: "Skills",
+        type: "tags",
+        section: "skill",
+        placeholder: "Enter skills",
+      },
+
+      // additional dynamic fields (user-created) will be appended here
     ],
   },
 
+  // ---------------------------------------------------
+  //  P L A C E M E N T
+  // ---------------------------------------------------
   placement: {
     label: "Placement",
     fields: [
@@ -262,6 +318,15 @@ export const ActivityConfig = {
         label: "Reference Number",
         type: "number",
         section: "details",
+      },
+
+      // SKILLS
+      {
+        name: "placement_skill",
+        label: "Skills",
+        type: "tags",
+        section: "skill",
+        placeholder: "e.g. DSA, Aptitude, Communication",
       },
     ],
   },
