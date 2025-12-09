@@ -26,7 +26,7 @@ export class ActivityService {
   // -----------------------------
   // CREATE ACTIVITY
   // -----------------------------
-  async create(dto: CreateActivityDto) {
+  async create(dto) {
     const activity = await new this.activityModel(dto).save();
 
     return this.activityModel

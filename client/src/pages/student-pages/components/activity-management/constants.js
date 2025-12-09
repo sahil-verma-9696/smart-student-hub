@@ -330,4 +330,288 @@ export const ActivityConfig = {
       },
     ],
   },
+
+  // ---------------------------------------------------
+  //  P L A C E M E N T
+  // ---------------------------------------------------
+  high_school: {
+    label: "High School Marksheet",
+    fields: [
+      // BASIC
+      { name: "title", label: "Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        section: "basic",
+      },
+
+      // DETAILS
+      {
+        name: "board",
+        label: "Board",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "schoolName",
+        label: "School Name",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "percentage",
+        label: "Percentage",
+        type: "number",
+        section: "details",
+      },
+
+      {
+        name: "passingYear",
+        label: "Passing Year",
+        type: "date",
+        section: "details",
+      },
+      // SKILLS
+      {
+        name: "highschool_subjects",
+        label: "Subjects",
+        type: "tags",
+        section: "skill",
+        placeholder: "e.g. Mathematics, English, Science",
+      },
+    ],
+  },
+
+  intermediate_school: {
+    label: "Intermediate School Marksheet",
+    fields: [
+      // BASIC
+      { name: "title", label: "Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        section: "basic",
+      },
+
+      // DETAILS
+      {
+        name: "board",
+        label: "Board",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "schoolName",
+        label: "School Name",
+        type: "text",
+        section: "details",
+      },
+      {
+        name: "percentage",
+        label: "Percentage",
+        type: "number",
+        section: "details",
+      },
+
+      {
+        name: "passingYear",
+        label: "Passing Year",
+        type: "date",
+        section: "details",
+      },
+      // SKILLS
+      {
+        name: "intermediateschool_subjects",
+        label: "Subjects",
+        type: "tags",
+        section: "skill",
+        placeholder: "e.g. Mathematics, English, Science",
+      },
+    ],
+  },
+
+  semester_results: {
+    label: "Semester Results",
+    fields: [
+      // ---------------- BASIC ----------------
+      { name: "title", label: "Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        section: "basic",
+      },
+
+      // ---------------- SEMESTER DETAILS ----------------
+      {
+        name: "semester",
+        label: "Semester",
+        type: "text", // or "number"
+        section: "details",
+      },
+      {
+        name: "academicYear",
+        label: "Academic Year",
+        type: "text", // example: "2023-2024"
+        section: "details",
+      },
+      {
+        name: "examType",
+        label: "Exam Type",
+        type: "select",
+        options: ["Regular", "Re-Exam", "Backlog"],
+        section: "details",
+      },
+
+      // ---------------- MARKS DETAILS ----------------
+      {
+        name: "cgpa",
+        label: "CGPA",
+        type: "number",
+        section: "marks",
+      },
+      {
+        name: "sgpa",
+        label: "SGPA",
+        type: "number",
+        section: "marks",
+      },
+      {
+        name: "percentage",
+        label: "Percentage",
+        type: "number",
+        section: "marks",
+      },
+      {
+        name: "totalCredits",
+        label: "Total Credits",
+        type: "number",
+        section: "marks",
+      },
+      {
+        name: "earnedCredits",
+        label: "Earned Credits",
+        type: "number",
+        section: "marks",
+      },
+
+      // ---------------- RESULT STATUS ----------------
+      {
+        name: "resultStatus",
+        label: "Result Status",
+        type: "select",
+        options: ["Pass", "Fail", "Backlog"],
+        section: "result",
+      },
+      {
+        name: "passingDate",
+        label: "Passing Date",
+        type: "date",
+        section: "result",
+      },
+
+      // ---------------- ATTACHMENTS ----------------
+      {
+        name: "marksheet",
+        label: "Marksheet / Scorecard",
+        type: "file",
+        section: "attachments",
+      },
+    ],
+  },
+
+  year_results: {
+    label: "Year Results",
+    fields: [
+      // ---------------- BASIC ----------------
+      { name: "title", label: "Title", type: "text", section: "basic" },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        section: "basic",
+      },
+  
+      // ---------------- YEAR DETAILS ----------------
+      {
+        name: "year",
+        label: "Academic Year",
+        type: "text", // Example: "2023-2024"
+        section: "details",
+      },
+      {
+        name: "yearNumber",
+        label: "Year Number",
+        type: "select",
+        options: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+        section: "details",
+      },
+  
+      // ---------------- SEMESTER SUB-RESULTS ----------------
+      {
+        name: "sem1SGPA",
+        label: "Semester 1 SGPA",
+        type: "number",
+        section: "semesters",
+      },
+      {
+        name: "sem2SGPA",
+        label: "Semester 2 SGPA",
+        type: "number",
+        section: "semesters",
+      },
+  
+      // ---------------- FINAL YEAR PERFORMANCE ----------------
+      {
+        name: "finalCGPA",
+        label: "Final CGPA",
+        type: "number",
+        section: "final",
+      },
+      {
+        name: "finalPercentage",
+        label: "Final Percentage",
+        type: "number",
+        section: "final",
+      },
+      {
+        name: "totalCredits",
+        label: "Total Credits",
+        type: "number",
+        section: "final",
+      },
+      {
+        name: "earnedCredits",
+        label: "Earned Credits",
+        type: "number",
+        section: "final",
+      },
+  
+      // ---------------- RESULT STATUS ----------------
+      {
+        name: "resultStatus",
+        label: "Result Status",
+        type: "select",
+        options: ["Pass", "Fail", "Backlog"],
+        section: "status",
+      },
+  
+      {
+        name: "passingDate",
+        label: "Passing Date",
+        type: "date",
+        section: "status",
+      },
+
+      {
+        name: 'backlogs',
+        label: 'Backlogs',
+        type: 'number',
+        section: 'status'
+      }
+    ],
+  }
+
 };

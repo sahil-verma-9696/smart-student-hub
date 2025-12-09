@@ -27,4 +27,5 @@ export enum ACTIVITY_TYPES {
   DEFAULT = 'default',
   INTERNSHIP = 'internship',
   PLACEMENT = 'placement',
+  HIGH_SCHOOL = 'high_school',
 }

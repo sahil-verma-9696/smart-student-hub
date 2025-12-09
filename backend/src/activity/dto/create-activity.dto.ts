@@ -250,4 +250,35 @@ export class CreateActivityDto {
   @IsOptional()
   @IsArray()
   placement_skill?: string[];
+
+  /****************************************
+   * High School Marksheet
+   *****************************************/
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HIGH_SCHOOL,
+  )
+  @IsOptional()
+  @IsString()
+  board?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HIGH_SCHOOL,
+  )
+  @IsOptional()
+  @IsString()
+  schoolName?: string;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HIGH_SCHOOL,
+  )
+  @IsOptional()
+  @IsNumber()
+  percentage?: number;
+
+  @ValidateIf(
+    (o: CreateActivityDto) => o.activityType === ACTIVITY_TYPES.HIGH_SCHOOL,
+  )
+  @IsOptional()
+  @IsArray()
+  highschool_subjects?: string[];
 }
